@@ -46,6 +46,45 @@ function testProviderMetadataAllowlistBlocksOverSpecificFields() {
   assert.equal(action.priority, 'high');
 }
 
+function testNestedAllowedMetadataStillScansPrivateContext() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-nested-metadata',
+      invoiceId: 'inv-nested-metadata',
+      customerId: 'customer-lab-003',
+      currency: 'USD',
+      totalCents: 45000,
+      providerMetadata: {
+        accountRef: {
+          workspace: 'IRB Alzheimer single-cell workspace',
+          billingId: 'acct-lab-003'
+        },
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-nested-metadata',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-safe-subscription',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 1,
+          unit: 'month',
+          amountCents: 45000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = byId(result.receipts, 'receipt-nested-metadata');
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('private-research-context'), true);
+  assert.equal(Object.prototype.hasOwnProperty.call(receipt.providerMetadata, 'accountRef'), false);
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -73,6 +112,7 @@ const tests = [
   testSafeReceiptIsDeliverableWithOnlyAllowedMetadata,
   testPrivateResearchContextIsRedactedBeforeReceiptDelivery,
   testProviderMetadataAllowlistBlocksOverSpecificFields,
+  testNestedAllowedMetadataStillScansPrivateContext,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

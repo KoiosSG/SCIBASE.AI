@@ -87,7 +87,7 @@ function sanitizeMetadata(metadata) {
       continue;
     }
 
-    const textFindings = findingsForText(String(value));
+    const textFindings = findingsForText(metadataValueText(value));
     if (textFindings.length > 0) {
       removedKeys.push(key);
       findings.push(...textFindings);
@@ -102,6 +102,14 @@ function sanitizeMetadata(metadata) {
     removedKeys: Array.from(new Set(removedKeys)).sort(),
     findings: Array.from(new Set(findings)).sort()
   };
+}
+
+function metadataValueText(value) {
+  if (value && typeof value === 'object') {
+    return stableStringify(value);
+  }
+
+  return String(value);
 }
 
 function evaluateReceipt(receipt) {
