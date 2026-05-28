@@ -23,8 +23,15 @@ function isoTime(value) {
   return new Date(value).getTime();
 }
 
+function normalizeReviewMode(mode) {
+  return String(mode || '')
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, '-');
+}
+
 function isBlindOrAnonymous(mode) {
-  return ['anonymous', 'blind', 'double-blind', 'fully-anonymous'].includes(mode);
+  return ['anonymous', 'blind', 'double-blind', 'fully-anonymous'].includes(normalizeReviewMode(mode));
 }
 
 function reviewerDisplay(item) {

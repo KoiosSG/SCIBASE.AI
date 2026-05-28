@@ -55,6 +55,33 @@ function testAnonymousReviewerIdentityIsRedacted() {
   assert.ok(!JSON.stringify(timelineEvent).includes('orcid:0000-0002-private'));
 }
 
+function testBlindModeRedactionAcceptsCaseAndSeparatorVariants() {
+  const project = buildSampleProject();
+  project.reviews = [
+    {
+      id: 'review-blind-variant',
+      reviewerId: 'orcid:0000-0002-variant-private',
+      anonymousLabel: 'anonymous-reviewer-variant',
+      mode: 'Double_Blind',
+      artifactId: 'dataset-cohort-table',
+      evidenceDigest: 'sha256:dataset-v1',
+      submittedAt: '2026-05-18T09:00:00Z',
+      reputationDelta: 18
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const task = byId(result.recertificationTasks, 'recertify-review-blind-variant');
+  const timelineEvent = result.timelinePacket.events.find(
+    (event) => event.reviewId === 'review-blind-variant'
+  );
+
+  assert.equal(task.reviewer, 'anonymous-reviewer-variant');
+  assert.equal(timelineEvent.reviewer, 'anonymous-reviewer-variant');
+  assert.ok(!JSON.stringify(result).includes('orcid:0000-0002-variant-private'));
+}
+
 function testInlineCommentsUseArtifactAnchorsForRecertification() {
   const project = buildSampleProject();
   const result = evaluateRecertification(project);
@@ -123,6 +150,7 @@ const tests = [
   testStaleReviewsFreezeReputationUntilRecertified,
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
   testAnonymousReviewerIdentityIsRedacted,
+  testBlindModeRedactionAcceptsCaseAndSeparatorVariants,
   testInlineCommentsUseArtifactAnchorsForRecertification,
   testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
