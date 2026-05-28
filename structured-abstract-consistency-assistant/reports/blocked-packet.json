@@ -14,6 +14,12 @@
       "message": "Conclusion uses definitive language despite exploratory or uncertain evidence."
     },
     {
+      "code": "ENDPOINT_MISMATCH",
+      "severity": "blocker",
+      "target": "results.primaryEndpoint",
+      "message": "Abstract results do not name the primary endpoint: review turnaround time."
+    },
+    {
       "code": "METHODS_DESIGN_MISMATCH",
       "severity": "blocker",
       "target": "methods.design",
@@ -57,5 +63,5 @@
     "limitationsBalanced": false
   },
   "assessedAt": "2026-05-28T10:10:00Z",
-  "auditDigest": "c5cd0a07b64617e2b81c6ec1ea68ece1ba19703589420dce2fa9098f27f5e71c"
+  "auditDigest": "0ed398cb28fba2097bcf78440e0cb5d8279ba8edf2fea37c0e69425b040ea17d"
 }

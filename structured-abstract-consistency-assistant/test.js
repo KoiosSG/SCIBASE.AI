@@ -45,6 +45,7 @@ function testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence() {
   assert.equal(packet.reviewLanes.editorSummary, 'blocked');
   assert.deepEqual(findingCodes(packet), [
     'CONCLUSION_OVERSTATES_EVIDENCE',
+    'ENDPOINT_MISMATCH',
     'METHODS_DESIGN_MISMATCH',
     'MISSING_LIMITATION_LANGUAGE',
     'RESULT_DIRECTION_MISMATCH',
@@ -92,6 +93,36 @@ function testPreservesSameCodeFindingsForDifferentEvidenceTargets() {
     'results.sampleSize'
   ]);
   assert.equal(packet.findings.filter((finding) => finding.code === 'SAMPLE_SIZE_MISMATCH').length, 2);
+}
+
+function testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-generic-endpoint',
+    assessedAt: '2026-05-28T10:35:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce reviewer load in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingTargets(packet, 'ENDPOINT_MISMATCH'), ['results.primaryEndpoint']);
+  assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-generic-endpoint'));
 }
 
 function testStagesAbstractMissingRequiredSections() {
@@ -167,6 +198,7 @@ function testAllowsConsistentStructuredAbstractWithStableDigest() {
 const tests = [
   testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence,
   testPreservesSameCodeFindingsForDifferentEvidenceTargets,
+  testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
   testStagesAbstractMissingRequiredSections,
   testAllowsConsistentStructuredAbstractWithStableDigest
 ];
