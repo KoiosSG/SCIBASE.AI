@@ -1,0 +1,132 @@
+const assert = require('assert');
+
+const { assessStructuredAbstract } = require('./index');
+
+function findingCodes(packet) {
+  return packet.findings.map((finding) => finding.code).sort();
+}
+
+function testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-risk',
+    assessedAt: '2026-05-28T10:10:00Z',
+    abstract: {
+      background: 'Remote review tools may improve manuscript quality.',
+      methods: 'We evaluated 120 participants in a randomized study.',
+      results: 'The primary endpoint improved strongly after the assistant was used.',
+      conclusions: 'The assistant definitively improves all review outcomes and is ready for clinical deployment.'
+    },
+    methods: {
+      design: 'exploratory observational pilot',
+      sampleSize: 84,
+      primaryEndpoint: 'review turnaround time',
+      confidenceIntervalCrossesNull: true
+    },
+    results: {
+      primaryEndpoint: 'review turnaround time',
+      direction: 'no_clear_effect',
+      sampleSize: 84,
+      effect: 'median review time changed by 1.1 hours',
+      exploratory: true
+    },
+    limitations: []
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.equal(packet.reviewLanes.authorDraft, 'revise_required');
+  assert.equal(packet.reviewLanes.aiPeerReview, 'blocked');
+  assert.equal(packet.reviewLanes.editorSummary, 'blocked');
+  assert.deepEqual(findingCodes(packet), [
+    'CONCLUSION_OVERSTATES_EVIDENCE',
+    'METHODS_DESIGN_MISMATCH',
+    'MISSING_LIMITATION_LANGUAGE',
+    'RESULT_DIRECTION_MISMATCH',
+    'SAMPLE_SIZE_MISMATCH'
+  ]);
+  assert.ok(packet.actions.includes('revise_methods_summary:ms-abstract-risk'));
+  assert.ok(packet.actions.includes('tone_down_conclusion:ms-abstract-risk'));
+  assert.ok(packet.actions.includes('add_limitations_to_abstract:ms-abstract-risk'));
+  assert.match(packet.auditDigest, /^[a-f0-9]{64}$/);
+}
+
+function testStagesAbstractMissingRequiredSections() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-incomplete',
+    assessedAt: '2026-05-28T10:15:00Z',
+    abstract: {
+      background: 'A short background is present.',
+      methods: 'We evaluated 64 projects in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 64 projects.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 64,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 64,
+      exploratory: false
+    },
+    limitations: ['single-institution pilot']
+  });
+
+  assert.equal(packet.status, 'stage_for_author_revision');
+  assert.equal(packet.reviewLanes.authorDraft, 'revision_queue');
+  assert.equal(packet.reviewLanes.aiPeerReview, 'draft_only');
+  assert.equal(packet.reviewLanes.editorSummary, 'withhold');
+  assert.deepEqual(findingCodes(packet), ['MISSING_ABSTRACT_SECTION']);
+  assert.deepEqual(packet.actions, ['add_missing_sections:ms-abstract-incomplete']);
+}
+
+function testAllowsConsistentStructuredAbstractWithStableDigest() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-clean',
+    assessedAt: '2026-05-28T10:20:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'release_peer_review_packet');
+  assert.equal(packet.reviewLanes.authorDraft, 'allowed');
+  assert.equal(packet.reviewLanes.aiPeerReview, 'allowed');
+  assert.equal(packet.reviewLanes.editorSummary, 'allowed');
+  assert.deepEqual(packet.findings, []);
+  assert.equal(packet.abstractSignals.sectionsComplete, true);
+  assert.equal(packet.abstractSignals.methodsAligned, true);
+  assert.equal(packet.abstractSignals.resultsAligned, true);
+  assert.equal(packet.abstractSignals.limitationsBalanced, true);
+  assert.deepEqual(packet.actions, ['release_with_abstract_consistency_monitoring:ms-abstract-clean']);
+  assert.match(packet.auditDigest, /^[a-f0-9]{64}$/);
+}
+
+const tests = [
+  testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence,
+  testStagesAbstractMissingRequiredSections,
+  testAllowsConsistentStructuredAbstractWithStableDigest
+];
+
+for (const test of tests) {
+  test();
+}
+
+console.log(`structured-abstract-consistency-assistant tests passed (${tests.length})`);

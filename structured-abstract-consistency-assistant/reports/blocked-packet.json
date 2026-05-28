@@ -1,0 +1,55 @@
+{
+  "manuscriptId": "ms-abstract-risk",
+  "status": "hold_peer_review_packet",
+  "reviewLanes": {
+    "authorDraft": "revise_required",
+    "aiPeerReview": "blocked",
+    "editorSummary": "blocked"
+  },
+  "findings": [
+    {
+      "code": "CONCLUSION_OVERSTATES_EVIDENCE",
+      "severity": "blocker",
+      "target": "abstract.conclusions",
+      "message": "Conclusion uses definitive language despite exploratory or uncertain evidence."
+    },
+    {
+      "code": "METHODS_DESIGN_MISMATCH",
+      "severity": "blocker",
+      "target": "methods.design",
+      "message": "Abstract methods do not describe the study design as exploratory observational pilot."
+    },
+    {
+      "code": "MISSING_LIMITATION_LANGUAGE",
+      "severity": "blocker",
+      "target": "abstract.conclusions",
+      "message": "Exploratory or uncertain findings need limitation language before AI review release."
+    },
+    {
+      "code": "RESULT_DIRECTION_MISMATCH",
+      "severity": "blocker",
+      "target": "results.direction",
+      "message": "Abstract results imply improvement, but the result packet reports no clear effect."
+    },
+    {
+      "code": "SAMPLE_SIZE_MISMATCH",
+      "severity": "blocker",
+      "target": "methods.sampleSize",
+      "message": "Abstract methods do not match the method sample size of 84."
+    }
+  ],
+  "actions": [
+    "add_limitations_to_abstract:ms-abstract-risk",
+    "align_results_with_primary_endpoint:ms-abstract-risk",
+    "revise_methods_summary:ms-abstract-risk",
+    "tone_down_conclusion:ms-abstract-risk"
+  ],
+  "abstractSignals": {
+    "sectionsComplete": true,
+    "methodsAligned": false,
+    "resultsAligned": false,
+    "limitationsBalanced": false
+  },
+  "assessedAt": "2026-05-28T10:10:00Z",
+  "auditDigest": "7620c47f0a29d60b6ac1bff35a826e21ca97afd1fd4233cb9f6aef261f7a8b99"
+}
