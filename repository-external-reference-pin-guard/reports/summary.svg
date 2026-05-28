@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340">
+  <rect width="1200" height="340" fill="#ffffff"/>
+  <text x="48" y="48" font-size="28" font-family="Arial" font-weight="700" fill="#111827">Repository External Reference Pin Guard</text>
+  <text x="48" y="74" font-size="15" font-family="Arial" fill="#475569">Issue #10 release/export gate for submodules, linked datasets, API sources, and model references</text>
+
+      <g transform="translate(48 94)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-risk</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">blocked-packet.json | findings 5 | digest 845fc5612c82a4a3</text>
+      </g>
+      <g transform="translate(48 162)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#047857"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-clean</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">clean-packet.json | findings 0 | digest 5b1ede709bdfe56b</text>
+      </g>
+      <g transform="translate(48 230)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#a16207"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-warning</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">warning-packet.json | findings 2 | digest 2bcec8202016cc03</text>
+      </g>
+</svg>
