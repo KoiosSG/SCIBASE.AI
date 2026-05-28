@@ -163,6 +163,38 @@ function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   assert.notEqual(firstBlock.anchor, secondBlock.anchor);
 }
 
+function testPrivateReferenceMarkersAreRedactedWithoutFilePaths() {
+  const packet = assessImportBatch({
+    importId: 'import-private-reference-marker',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:39:00Z',
+    source: {
+      channel: 'clipboard',
+      origin: 'trusted-notebook-output',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:notebook-output'
+    },
+    blocks: [
+      {
+        id: 'blk-private-marker',
+        type: 'notebook-output',
+        sectionId: 'results',
+        anchor: 'private-marker-output',
+        content: 'Rendered output from private-lab patient-export staging.'
+      }
+    ]
+  });
+
+  const outputBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-private-marker');
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['LOCAL_PRIVATE_PATH']);
+  assert.equal(
+    outputBlock.content,
+    'Rendered output from [redacted-private-reference] [redacted-private-reference] staging.'
+  );
+}
+
 function testAllowsTrustedAttestedImportWithStableDigest() {
   const packet = assessImportBatch({
     importId: 'import-clean-zotero-note',
@@ -205,6 +237,7 @@ const tests = [
   testQuarantinesUnsafeClipboardPayloadBeforeSharedInsert,
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
+  testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
   testAllowsTrustedAttestedImportWithStableDigest
 ];
 

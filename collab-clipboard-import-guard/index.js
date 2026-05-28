@@ -174,7 +174,8 @@ function redactLocalPrivatePaths(value = '') {
     .replace(/file:\/\/[^ \n]+/gi, '[redacted-local-path]')
     .replace(/[A-Z]:\\Users\\[^ \n]+/g, '[redacted-local-path]')
     .replace(/\/Users\/[^ \n]+/g, '[redacted-local-path]')
-    .replace(/\/home\/[^ \n]+/g, '[redacted-local-path]');
+    .replace(/\/home\/[^ \n]+/g, '[redacted-local-path]')
+    .replace(/\b(?:private-lab|patient-export)\b/gi, '[redacted-private-reference]');
 }
 
 function isStaleReviewMetadata(block, batch) {
