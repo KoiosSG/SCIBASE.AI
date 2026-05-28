@@ -1,0 +1,129 @@
+{
+  "batchId": "billing-privacy-review-20",
+  "generatedAt": "2026-05-28T09:00:00Z",
+  "receipts": [
+    {
+      "id": "receipt-safe-lab-plan",
+      "invoiceId": "inv-safe-lab-plan",
+      "customerId": "customer-lab-001",
+      "decision": "deliver-receipt",
+      "findings": [],
+      "removedMetadataKeys": [],
+      "providerMetadata": {
+        "accountRef": "acct-lab-001",
+        "billingPeriod": "2026-05",
+        "invoiceRef": "inv-safe-lab-plan",
+        "plan": "lab-pro"
+      },
+      "redactedLineItems": [
+        {
+          "id": "line-lab-plan",
+          "description": "Lab Pro monthly subscription",
+          "usageCategory": "subscription",
+          "findings": []
+        }
+      ],
+      "customerCopy": {
+        "receiptId": "receipt-safe-lab-plan",
+        "customerId": "customer-lab-001",
+        "currency": "USD",
+        "totalCents": 29900,
+        "lineItems": [
+          {
+            "id": "line-lab-plan",
+            "description": "Lab Pro monthly subscription",
+            "usageCategory": "subscription",
+            "quantity": 1,
+            "unit": "month",
+            "amountCents": 29900
+          }
+        ]
+      },
+      "auditDigest": "sha256:920e09e8abf433174de17eca8ca6b7e437f397637f333da492ac02d09c226c29"
+    },
+    {
+      "id": "receipt-private-compute",
+      "invoiceId": "inv-private-compute",
+      "customerId": "customer-lab-002",
+      "decision": "hold-for-finance-review",
+      "findings": [
+        "private-research-context",
+        "restricted-dataset-reference",
+        "unsafe-provider-metadata"
+      ],
+      "removedMetadataKeys": [
+        "collaboratorHandle",
+        "projectTitle"
+      ],
+      "providerMetadata": {
+        "accountRef": "acct-lab-002",
+        "billingPeriod": "2026-05",
+        "invoiceRef": "inv-private-compute",
+        "plan": "institution-compute"
+      },
+      "redactedLineItems": [
+        {
+          "id": "line-private-compute",
+          "description": "AI compute usage for restricted research workspace",
+          "usageCategory": "ai-compute",
+          "findings": [
+            "private-research-context"
+          ]
+        },
+        {
+          "id": "line-private-dataset",
+          "description": "Restricted dataset storage and processing",
+          "usageCategory": "storage",
+          "findings": [
+            "restricted-dataset-reference"
+          ]
+        }
+      ],
+      "customerCopy": {
+        "receiptId": "receipt-private-compute",
+        "customerId": "customer-lab-002",
+        "currency": "USD",
+        "totalCents": 122500,
+        "lineItems": [
+          {
+            "id": "line-private-compute",
+            "description": "AI compute usage for restricted research workspace",
+            "usageCategory": "ai-compute",
+            "quantity": 250,
+            "unit": "compute-hour",
+            "amountCents": 87500
+          },
+          {
+            "id": "line-private-dataset",
+            "description": "Restricted dataset storage and processing",
+            "usageCategory": "storage",
+            "quantity": 700,
+            "unit": "gb-month",
+            "amountCents": 35000
+          }
+        ]
+      },
+      "auditDigest": "sha256:49cd2b51f8a44d0cb4a058712ed3c2e348b3502acc07149e7f68e503b17ef5f8"
+    }
+  ],
+  "remediationActions": [
+    {
+      "id": "remediate-receipt-private-compute",
+      "receiptId": "receipt-private-compute",
+      "action": "replace-private-billing-fields-before-delivery",
+      "priority": "high",
+      "findings": [
+        "private-research-context",
+        "restricted-dataset-reference",
+        "unsafe-provider-metadata"
+      ]
+    }
+  ],
+  "summary": {
+    "deliverableReceipts": 1,
+    "heldReceipts": 1,
+    "remediationActions": 1,
+    "totalCentsReviewed": 152400
+  },
+  "auditDigest": "sha256:20bea339360007ff72444466bdcc632050a108e5d9a63ded5838c5cd951d4d63"
+}

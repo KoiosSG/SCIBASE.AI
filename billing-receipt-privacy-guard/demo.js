@@ -1,0 +1,76 @@
+const fs = require('fs');
+const path = require('path');
+const { evaluateReceiptPrivacy, buildSampleBatch } = require('./index');
+
+const reportsDir = path.join(__dirname, 'reports');
+fs.mkdirSync(reportsDir, { recursive: true });
+
+const result = evaluateReceiptPrivacy(buildSampleBatch());
+
+const packetPath = path.join(reportsDir, 'receipt-privacy-packet.json');
+const reportPath = path.join(reportsDir, 'receipt-privacy-report.md');
+const svgPath = path.join(reportsDir, 'summary.svg');
+
+fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
+
+const receipts = result.receipts
+  .map(
+    (receipt) =>
+      `- ${receipt.id}: ${receipt.decision}, findings: ${
+        receipt.findings.length > 0 ? receipt.findings.join(', ') : 'none'
+      }`
+  )
+  .join('\n');
+
+const actions = result.remediationActions
+  .map((action) => `- ${action.id}: ${action.action} (${action.priority})`)
+  .join('\n');
+
+const markdown = `# Billing Receipt Privacy Guard
+
+Batch: ${result.batchId}
+Generated: ${result.generatedAt}
+
+## Summary
+
+- Deliverable receipts: ${result.summary.deliverableReceipts}
+- Held receipts: ${result.summary.heldReceipts}
+- Remediation actions: ${result.summary.remediationActions}
+- Total cents reviewed: ${result.summary.totalCentsReviewed}
+- Audit digest: ${result.auditDigest}
+
+## Receipt Decisions
+
+${receipts}
+
+## Remediation Actions
+
+${actions}
+
+## Safety
+
+All fixtures are synthetic. The guard does not call payment processors, customer systems, private workspaces, institutional finance tools, or external APIs.
+`;
+
+fs.writeFileSync(reportPath, markdown);
+
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#102027"/>
+  <rect x="54" y="58" width="1172" height="604" rx="16" fill="#17313a" stroke="#9bd67a" stroke-width="4"/>
+  <text x="96" y="134" fill="#ffffff" font-family="Arial, sans-serif" font-size="42" font-weight="700">Billing Receipt Privacy Guard</text>
+  <text x="96" y="208" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Deliverable receipts: ${result.summary.deliverableReceipts}</text>
+  <text x="96" y="258" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Held receipts: ${result.summary.heldReceipts}</text>
+  <text x="96" y="308" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Remediation actions: ${result.summary.remediationActions}</text>
+  <text x="96" y="380" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">Checks: line-item text, provider metadata, restricted datasets, collaborator identifiers</text>
+  <text x="96" y="448" fill="#ffd37a" font-family="Arial, sans-serif" font-size="26">Private research context is replaced before receipts leave SCIBASE.</text>
+  <text x="96" y="574" fill="#a6d7c3" font-family="Arial, sans-serif" font-size="18">${result.auditDigest}</text>
+</svg>
+`;
+
+fs.writeFileSync(svgPath, svg);
+
+console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
+console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
+console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
+console.log(`Deliverable receipts: ${result.summary.deliverableReceipts}`);
+console.log(`Held receipts: ${result.summary.heldReceipts}`);
