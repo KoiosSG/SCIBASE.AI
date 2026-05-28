@@ -217,8 +217,6 @@ function overstatesConclusion(value) {
 }
 
 function hasLimitations(manuscript, conclusion) {
-  const limitations = manuscript.limitations || [];
-  if (limitations.some((item) => hasText(item))) return true;
   return /\b(may|exploratory|limited|uncertain|pilot|retrospective|requires validation)\b/i.test(conclusion);
 }
 

@@ -125,6 +125,37 @@ function testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint() {
   assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-generic-endpoint'));
 }
 
+function testRequiresLimitationLanguageInStructuredAbstractConclusion() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-limitation-outside-abstract',
+    assessedAt: '2026-05-28T10:40:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant reduces comment triage time in similar settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: true
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['MISSING_LIMITATION_LANGUAGE']);
+  assert.ok(packet.actions.includes('add_limitations_to_abstract:ms-abstract-limitation-outside-abstract'));
+  assert.equal(packet.abstractSignals.limitationsBalanced, false);
+}
+
 function testStagesAbstractMissingRequiredSections() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-incomplete',
@@ -199,6 +230,7 @@ const tests = [
   testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence,
   testPreservesSameCodeFindingsForDifferentEvidenceTargets,
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
+  testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,
   testAllowsConsistentStructuredAbstractWithStableDigest
 ];
