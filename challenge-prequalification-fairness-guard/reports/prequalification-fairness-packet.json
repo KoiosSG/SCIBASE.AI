@@ -52,7 +52,7 @@
       "challengeId": "challenge-18-prequalification-rna-biomarker",
       "decision": "hold-for-fairness-review",
       "sponsorDecision": "reject",
-      "weightedScore": 72,
+      "weightedScore": 70,
       "passThreshold": 75,
       "reviewersCounted": 1,
       "criteriaApplied": [
@@ -68,7 +68,7 @@
       ],
       "rejectionReasons": [],
       "appealStatus": "missing",
-      "auditDigest": "sha256:5d0ce06bf207fb2e881512558056970ea0e23834fd80ec4c8f57b3a3b820a90e"
+      "auditDigest": "sha256:155ac57faaf2c7ccabbb1799d38d4f73c1ed458c2da1a0bfc8fe49a2f4120dee"
     }
   ],
   "remediationActions": [
@@ -101,5 +101,5 @@
     "rejectedWithAudit": 0,
     "remediationActions": 2
   },
-  "auditDigest": "sha256:b00d02db12ede48b0d57d7a03982a22d2a3e3a510d596c8477fff5a9af759589"
+  "auditDigest": "sha256:d2c3f92e0cbdf23779537887ca5da9ecd84c708b359cab01999f38ed79b40b1e"
 }

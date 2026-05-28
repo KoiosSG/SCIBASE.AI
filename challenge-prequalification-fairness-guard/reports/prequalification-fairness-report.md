@@ -10,13 +10,13 @@ Generated: 2026-05-28T08:00:00Z
 - Rejected with audit trail: 0
 - Remediation actions: 2
 - Criteria digest: sha256:d643b033793917b9d0488787518a11e97094e671d52b86b69a6153375d726721
-- Audit digest: sha256:b00d02db12ede48b0d57d7a03982a22d2a3e3a510d596c8477fff5a9af759589
+- Audit digest: sha256:d2c3f92e0cbdf23779537887ca5da9ecd84c708b359cab01999f38ed79b40b1e
 
 ## Decisions
 
 - applicant-biofoundry: accept-prequalified, score 87, reasons: none
 - applicant-neuro-lab: hold-for-fairness-review, score 81, reasons: anonymous-screening-leak, inconsistent-threshold-decision
-- applicant-sponsor-alumni: hold-for-fairness-review, score 72, reasons: missing-appeal-window, missing-rejection-reason, reviewer-conflict, reviewer-quorum-shortfall
+- applicant-sponsor-alumni: hold-for-fairness-review, score 70, reasons: missing-appeal-window, missing-rejection-reason, reviewer-conflict, reviewer-quorum-shortfall
 
 ## Remediation Actions
 

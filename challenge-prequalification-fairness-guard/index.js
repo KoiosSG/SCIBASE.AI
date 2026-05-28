@@ -107,7 +107,7 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-published-criterion-score');
   }
 
-  const score = weightedScore(round.criteria, reviews);
+  const score = weightedScore(round.criteria, nonConflictedReviews);
   const passesThreshold = score >= round.passThreshold;
 
   if (
@@ -157,8 +157,9 @@ function evaluatePrequalificationRound(round) {
 
   const decisions = round.applicants.map((applicant) => {
     const reviews = reviewsByApplicant[applicant.id] || [];
+    const nonConflictedReviews = reviews.filter((review) => !review.conflict);
     const reasons = reasonsForApplicant(applicant, reviews, round);
-    const score = weightedScore(round.criteria, reviews);
+    const score = weightedScore(round.criteria, nonConflictedReviews);
     const decision =
       reasons.length > 0
         ? 'hold-for-fairness-review'

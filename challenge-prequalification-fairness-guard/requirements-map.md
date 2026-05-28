@@ -16,6 +16,7 @@
 
 - Holds inconsistent threshold decisions for fairness review before a solver is excluded.
 - Flags reviewer conflicts and missing rejection reasons for arbitration-ready remediation.
+- Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.
 - Produces deterministic digests for challenge administrators and third-party reviewers.
 
 ## Safety And Scope

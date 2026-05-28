@@ -45,6 +45,54 @@ function testConflictedAndIncompleteRejectionsStayAuditable() {
   assert.equal(decision.appealStatus, 'missing');
 }
 
+function testConflictedReviewerScoresDoNotInflateWeightedScore() {
+  const round = buildSampleRound();
+  round.minReviewers = 1;
+  round.applicants = [
+    {
+      id: 'applicant-conflicted-score',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-conflicted-score',
+      reviewerId: 'reviewer-sponsor-advisor',
+      anonymousScreeningObserved: true,
+      conflict: true,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 100,
+        'data-readiness': 100,
+        'safety-plan': 100
+      }
+    },
+    {
+      applicantId: 'applicant-conflicted-score',
+      reviewerId: 'reviewer-independent',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['missing independent validation plan'],
+      scores: {
+        'domain-fit': 50,
+        'data-readiness': 50,
+        'safety-plan': 50
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-conflicted-score');
+
+  assert.equal(decision.weightedScore, 50);
+  assert.equal(decision.reasons.includes('reviewer-conflict'), true);
+  assert.equal(decision.reasons.includes('inconsistent-threshold-decision'), true);
+}
+
 function testHiddenCriteriaAreBlockedBeforeScreeningResultsPublish() {
   const round = buildSampleRound();
   round.reviews.push({
@@ -85,6 +133,7 @@ const tests = [
   testEligibleApplicantIsAcceptedWithPublishedCriteriaAndQuorum,
   testAnonymousScreeningLeakHoldsApplicantForFairnessReview,
   testConflictedAndIncompleteRejectionsStayAuditable,
+  testConflictedReviewerScoresDoNotInflateWeightedScore,
   testHiddenCriteriaAreBlockedBeforeScreeningResultsPublish,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

@@ -16,5 +16,6 @@ Validation coverage:
 - anonymous-screening leaks hold a candidate for fairness review
 - inconsistent threshold decisions are held before rejection is published
 - conflicted reviewer participation and missing rejection reasons remain auditable
+- conflicted reviewer scores are excluded from weighted threshold evidence
 - unpublished screening criteria are blocked before results are published
 - audit digests are deterministic and private-data free
