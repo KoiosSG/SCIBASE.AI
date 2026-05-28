@@ -117,6 +117,55 @@ function testHiddenCriteriaAreBlockedBeforeScreeningResultsPublish() {
   assert.equal(decision.reasons.includes('unpublished-screening-criterion'), true);
 }
 
+function testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-expired-appeal',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      appealDueAt: '2026-05-27T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-expired-appeal',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      scores: {
+        'domain-fit': 60,
+        'data-readiness': 58,
+        'safety-plan': 62
+      }
+    },
+    {
+      applicantId: 'applicant-expired-appeal',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      scores: {
+        'domain-fit': 62,
+        'data-readiness': 57,
+        'safety-plan': 61
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-expired-appeal');
+  const action = byId(result.remediationActions, 'remediate-applicant-expired-appeal');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.appealStatus, 'expired');
+  assert.equal(decision.reasons.includes('expired-appeal-window'), true);
+  assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const first = evaluatePrequalificationRound(buildSampleRound());
   const second = evaluatePrequalificationRound(buildSampleRound());
@@ -135,6 +184,7 @@ const tests = [
   testConflictedAndIncompleteRejectionsStayAuditable,
   testConflictedReviewerScoresDoNotInflateWeightedScore,
   testHiddenCriteriaAreBlockedBeforeScreeningResultsPublish,
+  testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 

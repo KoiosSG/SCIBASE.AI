@@ -125,6 +125,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-appeal-window');
   }
 
+  if (applicant.sponsorDecision === 'reject' && appealStatus(applicant, round) === 'expired') {
+    reasons.push('expired-appeal-window');
+  }
+
   return uniqueSorted(reasons);
 }
 
@@ -141,7 +145,11 @@ function remediationAction(applicant, reasons) {
     return 'replace-conflicted-reviewer';
   }
 
-  if (reasons.includes('missing-rejection-reason') || reasons.includes('missing-appeal-window')) {
+  if (
+    reasons.includes('missing-rejection-reason') ||
+    reasons.includes('missing-appeal-window') ||
+    reasons.includes('expired-appeal-window')
+  ) {
     return 'publish-rejection-reasons-and-appeal-window';
   }
 
