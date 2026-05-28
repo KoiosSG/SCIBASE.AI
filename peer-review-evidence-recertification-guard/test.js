@@ -1,0 +1,97 @@
+const assert = require('assert');
+const {
+  evaluateRecertification,
+  buildSampleProject
+} = require('./index');
+
+function byId(items, id) {
+  return items.find((item) => item.id === id);
+}
+
+function testStaleReviewsFreezeReputationUntilRecertified() {
+  const project = buildSampleProject();
+  const result = evaluateRecertification(project);
+  const review = byId(result.reviewDecisions, 'review-dataset-methods');
+
+  assert.equal(review.status, 'recertification-required');
+  assert.deepEqual(review.reasons, [
+    'artifact-digest-changed',
+    'artifact-updated-after-review'
+  ]);
+
+  const action = byId(result.reputationActions, 'review-dataset-methods');
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.originalDelta, 18);
+  assert.equal(action.effectiveDelta, 0);
+  assert.equal(action.appliesTo, 'reviewer:orcid:0000-0002-reviewer-a');
+
+  assert.equal(result.summary.staleReviews, 2);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
+function testCurrentOrRecertifiedReviewsKeepReputationCredit() {
+  const project = buildSampleProject();
+  const result = evaluateRecertification(project);
+  const methods = byId(result.reviewDecisions, 'review-notebook-methods');
+  const code = byId(result.reviewDecisions, 'review-code-recertified');
+
+  assert.equal(methods.status, 'current');
+  assert.equal(code.status, 'current');
+
+  const codeAction = byId(result.reputationActions, 'review-code-recertified');
+  assert.equal(codeAction.action, 'apply-current-delta');
+  assert.equal(codeAction.effectiveDelta, 14);
+}
+
+function testAnonymousReviewerIdentityIsRedacted() {
+  const project = buildSampleProject();
+  const result = evaluateRecertification(project);
+  const task = byId(result.recertificationTasks, 'recertify-review-blind-data');
+  const timelineEvent = result.timelinePacket.events.find((event) => event.reviewId === 'review-blind-data');
+
+  assert.equal(task.reviewer, 'anonymous-reviewer-7');
+  assert.ok(!JSON.stringify(task).includes('orcid:0000-0002-private'));
+  assert.equal(timelineEvent.reviewer, 'anonymous-reviewer-7');
+  assert.ok(!JSON.stringify(timelineEvent).includes('orcid:0000-0002-private'));
+}
+
+function testInlineCommentsUseArtifactAnchorsForRecertification() {
+  const project = buildSampleProject();
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-code-line-41');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'stale');
+  assert.deepEqual(comment.reasons, [
+    'artifact-digest-changed',
+    'anchor-line-shifted-after-comment'
+  ]);
+
+  const task = byId(result.recertificationTasks, 'recertify-comment-code-line-41');
+  assert.equal(task.kind, 'inline-comment');
+  assert.equal(task.priority, 'normal');
+}
+
+function testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles() {
+  const project = buildSampleProject();
+  const result = evaluateRecertification(project);
+
+  assert.equal(result.timelinePacket.projectId, 'project-alpha-replication');
+  assert.equal(result.timelinePacket.events.length, 5);
+  assert.ok(result.timelinePacket.auditDigest.startsWith('sha256:'));
+  assert.ok(!JSON.stringify(result.timelinePacket).includes('private@'));
+}
+
+const tests = [
+  testStaleReviewsFreezeReputationUntilRecertified,
+  testCurrentOrRecertifiedReviewsKeepReputationCredit,
+  testAnonymousReviewerIdentityIsRedacted,
+  testInlineCommentsUseArtifactAnchorsForRecertification,
+  testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
+];
+
+for (const test of tests) {
+  test();
+}
+
+console.log(`${tests.length} peer review evidence recertification tests passed`);
