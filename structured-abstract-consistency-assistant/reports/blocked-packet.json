@@ -36,6 +36,12 @@
       "severity": "blocker",
       "target": "methods.sampleSize",
       "message": "Abstract methods do not match the method sample size of 84."
+    },
+    {
+      "code": "SAMPLE_SIZE_MISMATCH",
+      "severity": "blocker",
+      "target": "results.sampleSize",
+      "message": "Abstract results do not match the result sample size of 84."
     }
   ],
   "actions": [
@@ -51,5 +57,5 @@
     "limitationsBalanced": false
   },
   "assessedAt": "2026-05-28T10:10:00Z",
-  "auditDigest": "7620c47f0a29d60b6ac1bff35a826e21ca97afd1fd4233cb9f6aef261f7a8b99"
+  "auditDigest": "c5cd0a07b64617e2b81c6ec1ea68ece1ba19703589420dce2fa9098f27f5e71c"
 }

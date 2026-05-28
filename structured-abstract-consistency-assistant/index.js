@@ -193,8 +193,9 @@ function dedupeFindings(findings) {
   const seen = new Set();
   const deduped = [];
   for (const finding of findings) {
-    if (seen.has(finding.code)) continue;
-    seen.add(finding.code);
+    const key = `${finding.code}:${finding.target}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
     deduped.push(finding);
   }
   return deduped;

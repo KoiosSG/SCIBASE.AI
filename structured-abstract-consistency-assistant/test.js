@@ -6,6 +6,13 @@ function findingCodes(packet) {
   return packet.findings.map((finding) => finding.code).sort();
 }
 
+function findingTargets(packet, code) {
+  return packet.findings
+    .filter((finding) => finding.code === code)
+    .map((finding) => finding.target)
+    .sort();
+}
+
 function testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-risk',
@@ -41,12 +48,50 @@ function testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence() {
     'METHODS_DESIGN_MISMATCH',
     'MISSING_LIMITATION_LANGUAGE',
     'RESULT_DIRECTION_MISMATCH',
+    'SAMPLE_SIZE_MISMATCH',
     'SAMPLE_SIZE_MISMATCH'
+  ]);
+  assert.deepEqual(findingTargets(packet, 'SAMPLE_SIZE_MISMATCH'), [
+    'methods.sampleSize',
+    'results.sampleSize'
   ]);
   assert.ok(packet.actions.includes('revise_methods_summary:ms-abstract-risk'));
   assert.ok(packet.actions.includes('tone_down_conclusion:ms-abstract-risk'));
   assert.ok(packet.actions.includes('add_limitations_to_abstract:ms-abstract-risk'));
   assert.match(packet.auditDigest, /^[a-f0-9]{64}$/);
+}
+
+function testPreservesSameCodeFindingsForDifferentEvidenceTargets() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-dual-sample-mismatch',
+    assessedAt: '2026-05-28T10:25:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 120 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 118 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 94,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingTargets(packet, 'SAMPLE_SIZE_MISMATCH'), [
+    'methods.sampleSize',
+    'results.sampleSize'
+  ]);
+  assert.equal(packet.findings.filter((finding) => finding.code === 'SAMPLE_SIZE_MISMATCH').length, 2);
 }
 
 function testStagesAbstractMissingRequiredSections() {
@@ -121,6 +166,7 @@ function testAllowsConsistentStructuredAbstractWithStableDigest() {
 
 const tests = [
   testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence,
+  testPreservesSameCodeFindingsForDifferentEvidenceTargets,
   testStagesAbstractMissingRequiredSections,
   testAllowsConsistentStructuredAbstractWithStableDigest
 ];
