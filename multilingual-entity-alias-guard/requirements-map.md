@@ -5,6 +5,7 @@
 - Preserves language-tagged mentions from uploaded papers and datasets.
 - Maps trusted translated aliases to canonical ontology identifiers.
 - Holds false friends and homographs before creating graph edges.
+- Holds same-language alias collisions when ontology entries reuse the same translated term.
 - Emits schema.org-style `DefinedTerm` JSON-LD packets for entity pages.
 
 ## Knowledge Navigation

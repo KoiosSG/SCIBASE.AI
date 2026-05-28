@@ -32,6 +32,36 @@ function testFalseFriendMentionsAreHeldForCuratorReview() {
   assert.equal(action.action, 'review-multilingual-homograph');
 }
 
+function testSameLanguageAliasCollisionsAreHeldForCuratorReview() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.entities.push({
+    id: 'entity:custom:diabetes-insipidus',
+    canonicalName: 'Diabetes Insipidus',
+    ontology: 'SCIBASE-MED',
+    identifier: 'diabetes-insipidus',
+    localizedNames: {
+      es: ['diabetes mellitus']
+    }
+  });
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-diabetes-es');
+
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'alias-collision');
+  assert.deepEqual(event.candidateEntityIds, [
+    'entity:custom:diabetes-insipidus',
+    'entity:mesh:D003920'
+  ]);
+
+  const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
+  assert.equal(diabetes.mentions.length, 2);
+
+  const action = byId(result.curatorActions, 'curate-mention-diabetes-es');
+  assert.equal(action.priority, 'high');
+  assert.equal(action.action, 'review-multilingual-alias-collision');
+}
+
 function testLowConfidenceAliasesDoNotDriveRecommendations() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const event = byId(result.mentionDecisions, 'mention-cellule-fr');
@@ -66,6 +96,7 @@ function testAuditDigestIsDeterministicAndPrivateFree() {
 const tests = [
   testTrustedTranslatedAliasesBecomeCanonicalGraphNodes,
   testFalseFriendMentionsAreHeldForCuratorReview,
+  testSameLanguageAliasCollisionsAreHeldForCuratorReview,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree

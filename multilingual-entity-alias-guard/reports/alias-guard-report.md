@@ -9,7 +9,7 @@ Generated: 2026-05-28T07:00:00Z
 - Held homograph mentions: 1
 - Suppressed low-confidence mentions: 1
 - Entity packets emitted: 3
-- Audit digest: sha256:50892b2af7709ee090c562d10ad2e5140d3a82311c6ec2d67ab77e1355e8bf76
+- Audit digest: sha256:8bd1da50a253839d7f9becefa35e9192633262c8ece8caa8096ebb161ba52457
 
 ## Accepted Canonical Mappings
 

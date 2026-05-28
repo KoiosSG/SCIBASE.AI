@@ -29,8 +29,31 @@ function buildAliasIndex(entities) {
   for (const entity of entities) {
     for (const [language, terms] of Object.entries(entity.localizedNames)) {
       for (const term of terms) {
-        index.set(`${language}:${normalizeTerm(term)}`, {
-          entity,
+        const key = `${language}:${normalizeTerm(term)}`;
+        const existing = index.get(key);
+
+        if (!existing) {
+          index.set(key, {
+            kind: 'alias',
+            entity,
+            language,
+            term
+          });
+          continue;
+        }
+
+        const entitiesForAlias =
+          existing.kind === 'collision' ? existing.entities.slice() : [existing.entity];
+
+        if (entitiesForAlias.some((candidate) => candidate.id === entity.id)) {
+          continue;
+        }
+
+        entitiesForAlias.push(entity);
+        index.set(key, {
+          kind: 'collision',
+          entities: entitiesForAlias,
+          entityIds: entitiesForAlias.map((candidate) => candidate.id).sort(),
           language,
           term
         });
@@ -42,7 +65,8 @@ function buildAliasIndex(entities) {
 }
 
 function mentionDecision(mention, aliasIndex, homographs) {
-  const alias = aliasIndex.get(`${mention.language}:${normalizeTerm(mention.text)}`);
+  const aliasEntry = aliasIndex.get(`${mention.language}:${normalizeTerm(mention.text)}`);
+  const alias = aliasEntry && aliasEntry.kind === 'alias' ? aliasEntry : null;
   const candidateEntityId = alias ? alias.entity.id : mention.candidateEntityId || null;
   const homographKey = `${mention.language}:${normalizeTerm(mention.text)}`;
 
@@ -55,6 +79,22 @@ function mentionDecision(mention, aliasIndex, homographs) {
       decision: 'hold-for-curator-review',
       reason: 'false-friend-or-homograph',
       candidateEntityId,
+      candidateEntityIds: candidateEntityId ? [candidateEntityId] : [],
+      confidence: mention.confidence,
+      preservedLanguageTag: mention.language
+    };
+  }
+
+  if (aliasEntry && aliasEntry.kind === 'collision') {
+    return {
+      id: mention.id,
+      language: mention.language,
+      text: mention.text,
+      documentId: mention.documentId,
+      decision: 'hold-for-curator-review',
+      reason: 'alias-collision',
+      candidateEntityId: null,
+      candidateEntityIds: aliasEntry.entityIds,
       confidence: mention.confidence,
       preservedLanguageTag: mention.language
     };
@@ -69,6 +109,7 @@ function mentionDecision(mention, aliasIndex, homographs) {
       decision: 'suppress-recommendation',
       reason: alias || candidateEntityId ? 'low-confidence-alias' : 'unknown-alias',
       candidateEntityId,
+      candidateEntityIds: candidateEntityId ? [candidateEntityId] : [],
       confidence: mention.confidence,
       preservedLanguageTag: mention.language
     };
@@ -82,6 +123,7 @@ function mentionDecision(mention, aliasIndex, homographs) {
     decision: 'accept-canonical-entity',
     reason: 'trusted-translated-alias',
     candidateEntityId: alias.entity.id,
+    candidateEntityIds: [alias.entity.id],
     confidence: mention.confidence,
     preservedLanguageTag: mention.language
   };
@@ -96,13 +138,19 @@ function curatorActionForDecision(decision) {
     id: `curate-${decision.id}`,
     mentionId: decision.id,
     action:
-      decision.reason === 'false-friend-or-homograph'
+      decision.reason === 'alias-collision'
+        ? 'review-multilingual-alias-collision'
+        : decision.reason === 'false-friend-or-homograph'
         ? 'review-multilingual-homograph'
         : 'verify-translated-alias-before-recommendation',
-    priority: decision.reason === 'false-friend-or-homograph' ? 'high' : 'normal',
+    priority:
+      decision.reason === 'false-friend-or-homograph' || decision.reason === 'alias-collision'
+        ? 'high'
+        : 'normal',
     language: decision.language,
     text: decision.text,
     candidateEntityId: decision.candidateEntityId,
+    candidateEntityIds: decision.candidateEntityIds,
     reason: decision.reason
   };
 }
