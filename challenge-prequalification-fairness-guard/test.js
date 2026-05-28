@@ -166,6 +166,36 @@ function testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview() {
   assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
 }
 
+function testInvalidCriterionWeightsHoldPrequalificationRound() {
+  const round = buildSampleRound();
+  round.criteria = [
+    {
+      id: 'domain-fit',
+      label: 'Domain fit for the scientific challenge',
+      weight: 60
+    },
+    {
+      id: 'data-readiness',
+      label: 'Evidence that required data and tools are ready',
+      weight: 60
+    },
+    {
+      id: 'safety-plan',
+      label: 'Risk, NDA, and responsible-use plan',
+      weight: 25
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-biofoundry');
+  const action = byId(result.remediationActions, 'remediate-applicant-biofoundry');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('criteria-weight-total-invalid'), true);
+  assert.equal(action.action, 'publish-valid-weighted-scoring-rubric');
+  assert.equal(action.priority, 'high');
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const first = evaluatePrequalificationRound(buildSampleRound());
   const second = evaluatePrequalificationRound(buildSampleRound());
@@ -185,6 +215,7 @@ const tests = [
   testConflictedReviewerScoresDoNotInflateWeightedScore,
   testHiddenCriteriaAreBlockedBeforeScreeningResultsPublish,
   testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview,
+  testInvalidCriterionWeightsHoldPrequalificationRound,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 

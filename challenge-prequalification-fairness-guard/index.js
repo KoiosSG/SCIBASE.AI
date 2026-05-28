@@ -62,6 +62,10 @@ function publicCriteriaIds(round) {
   return round.criteria.map((criterion) => criterion.id);
 }
 
+function criteriaWeightTotal(round) {
+  return round.criteria.reduce((total, criterion) => total + criterion.weight, 0);
+}
+
 function reviewUsesHiddenCriteria(review, criteriaIds) {
   return Object.keys(review.scores).some((criterionId) => !criteriaIds.includes(criterionId));
 }
@@ -89,6 +93,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (reviews.some((review) => review.conflict)) {
     reasons.push('reviewer-conflict');
+  }
+
+  if (criteriaWeightTotal(round) !== 100) {
+    reasons.push('criteria-weight-total-invalid');
   }
 
   if (nonConflictedReviews.length < round.minReviewers) {
@@ -139,6 +147,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('unpublished-screening-criterion')) {
     return 'remove-unpublished-criterion-and-rescore';
+  }
+
+  if (reasons.includes('criteria-weight-total-invalid')) {
+    return 'publish-valid-weighted-scoring-rubric';
   }
 
   if (reasons.includes('reviewer-conflict')) {
@@ -212,7 +224,8 @@ function evaluatePrequalificationRound(round) {
       priority:
         decision.reasons.includes('anonymous-screening-leak') ||
         decision.reasons.includes('reviewer-conflict') ||
-        decision.reasons.includes('unpublished-screening-criterion')
+        decision.reasons.includes('unpublished-screening-criterion') ||
+        decision.reasons.includes('criteria-weight-total-invalid')
           ? 'high'
           : 'normal',
       reasons: decision.reasons
