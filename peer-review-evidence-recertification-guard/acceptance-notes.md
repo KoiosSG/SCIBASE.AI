@@ -12,4 +12,5 @@ Validation targets:
 - recertified code review keeps its 14 point reputation delta
 - double-blind reviewer identity is not leaked in tasks or timeline events
 - stale inline comment anchors generate comment-specific recertification tasks
+- artifact digest changes mark inline comment anchors stale even when the selector line is unchanged
 - timeline packets include deterministic audit digests

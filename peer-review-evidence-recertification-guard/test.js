@@ -72,6 +72,43 @@ function testInlineCommentsUseArtifactAnchorsForRecertification() {
   assert.equal(task.priority, 'normal');
 }
 
+function testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v4',
+      changedAt: '2026-05-20T09:30:00Z',
+      currentAnchors: {
+        'src/analyze.py#L41': { line: 41 }
+      }
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-same-line-changed-digest',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-same-line-changed-digest');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'stale');
+  assert.deepEqual(comment.reasons, ['artifact-digest-changed']);
+}
+
 function testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles() {
   const project = buildSampleProject();
   const result = evaluateRecertification(project);
@@ -87,6 +124,7 @@ const tests = [
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
   testAnonymousReviewerIdentityIsRedacted,
   testInlineCommentsUseArtifactAnchorsForRecertification,
+  testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];
 

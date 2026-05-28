@@ -130,6 +130,7 @@ function evaluateComment(project, comment) {
   } else {
     if (artifact.currentDigest !== comment.anchorDigest) {
       reasons.push('artifact-digest-changed');
+      anchorStatus = 'stale';
     }
 
     const currentAnchor = artifact.currentAnchors[comment.anchor.selector];

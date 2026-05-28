@@ -2,7 +2,7 @@
 
 This module adds a focused Community & User Reputation slice for SCIBASE issue #15. It checks whether peer reviews and inline comments still apply after reviewed documents, datasets, code, or notebooks change.
 
-The guard freezes stale review reputation deltas, generates recertification tasks, preserves anonymous and double-blind reviewer safety, and emits a deterministic project timeline audit packet.
+The guard freezes stale review reputation deltas, marks inline comment anchors stale when artifact evidence changes even if a selector line did not move, generates recertification tasks, preserves anonymous and double-blind reviewer safety, and emits a deterministic project timeline audit packet.
 
 ## Run
 
