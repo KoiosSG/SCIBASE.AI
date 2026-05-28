@@ -127,16 +127,22 @@ function sanitizeBlockBase(block, duplicateAnchorBlocks) {
 }
 
 function findDuplicateAnchorBlocks(blocks) {
-  const seen = new Set();
+  const blocksByAnchor = new Map();
   const duplicates = new Set();
+
   for (const block of blocks) {
     if (!block.anchor) continue;
-    if (seen.has(block.anchor)) {
-      duplicates.add(block.id);
-    } else {
-      seen.add(block.anchor);
+    const anchorBlocks = blocksByAnchor.get(block.anchor) || [];
+    anchorBlocks.push(block);
+    blocksByAnchor.set(block.anchor, anchorBlocks);
+  }
+
+  for (const anchorBlocks of blocksByAnchor.values()) {
+    if (anchorBlocks.length > 1) {
+      anchorBlocks.forEach((block) => duplicates.add(block.id));
     }
   }
+
   return duplicates;
 }
 

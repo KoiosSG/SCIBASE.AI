@@ -67,6 +67,7 @@ function testQuarantinesUnsafeClipboardPayloadBeforeSharedInsert() {
   assert.deepEqual(findingCodes(packet), [
     'CSV_FORMULA_CELL',
     'DUPLICATE_ANCHOR',
+    'DUPLICATE_ANCHOR',
     'HIDDEN_INSTRUCTION_TEXT',
     'LOCAL_PRIVATE_PATH',
     'STALE_REVIEW_METADATA',
@@ -83,8 +84,10 @@ function testQuarantinesUnsafeClipboardPayloadBeforeSharedInsert() {
   const reviewBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-review');
 
   assert.equal(tableBlock.cells[1][1], '\'=IMPORTXML("https://tracker.example/pixel", "//title")');
+  assert.equal(tableBlock.anchor.startsWith('assay-table-'), true);
   assert.equal(outputBlock.content, 'Saved figure to [redacted-local-path]');
   assert.equal(outputBlock.anchor.startsWith('assay-table-'), true);
+  assert.notEqual(tableBlock.anchor, outputBlock.anchor);
   assert.equal(reviewBlock.reviewMetadataStatus, 'dropped_stale');
   assert.equal(Object.hasOwn(reviewBlock, 'reviewMetadata'), false);
 }
@@ -116,6 +119,48 @@ function testStagesPartnerImportMissingSignedAttestationForCuratorReview() {
   assert.equal(packet.insertionLanes.auditRetention, 'staged');
   assert.deepEqual(findingCodes(packet), ['MISSING_SOURCE_ATTESTATION']);
   assert.deepEqual(packet.actions, ['request_signed_source_attestation:import-partner-forward']);
+}
+
+function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
+  const packet = assessImportBatch({
+    importId: 'import-anchor-collision',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:38:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:trusted-export'
+    },
+    blocks: [
+      {
+        id: 'blk-first',
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'shared-anchor',
+        content: 'First imported paragraph.'
+      },
+      {
+        id: 'blk-second',
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'shared-anchor',
+        content: 'Second imported paragraph.'
+      }
+    ]
+  });
+
+  const duplicateFindings = packet.findings.filter((finding) => finding.code === 'DUPLICATE_ANCHOR');
+  const firstBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-first');
+  const secondBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-second');
+
+  assert.deepEqual(duplicateFindings.map((finding) => finding.blockId).sort(), [
+    'blk-first',
+    'blk-second'
+  ]);
+  assert.equal(firstBlock.anchor.startsWith('shared-anchor-'), true);
+  assert.equal(secondBlock.anchor.startsWith('shared-anchor-'), true);
+  assert.notEqual(firstBlock.anchor, secondBlock.anchor);
 }
 
 function testAllowsTrustedAttestedImportWithStableDigest() {
@@ -159,6 +204,7 @@ function testAllowsTrustedAttestedImportWithStableDigest() {
 const tests = [
   testQuarantinesUnsafeClipboardPayloadBeforeSharedInsert,
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
+  testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testAllowsTrustedAttestedImportWithStableDigest
 ];
 

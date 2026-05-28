@@ -27,6 +27,12 @@
       "message": "Anchor assay-table appears more than once in the imported payload."
     },
     {
+      "code": "DUPLICATE_ANCHOR",
+      "severity": "blocker",
+      "blockId": "blk-table",
+      "message": "Anchor assay-table appears more than once in the imported payload."
+    },
+    {
       "code": "HIDDEN_INSTRUCTION_TEXT",
       "severity": "blocker",
       "blockId": "blk-hidden",
@@ -63,7 +69,7 @@
       "id": "blk-table",
       "type": "table",
       "sectionId": "methods",
-      "anchor": "assay-table",
+      "anchor": "assay-table-3ddee974",
       "cells": [
         [
           "condition",
@@ -97,9 +103,10 @@
     "quarantine_import:import-clipboard-unsafe",
     "redact_local_paths:blk-output",
     "regenerate_anchor:blk-output",
+    "regenerate_anchor:blk-table",
     "require_curator_source_review:import-clipboard-unsafe",
     "strip_hidden_instruction_text:blk-hidden"
   ],
   "assessedAt": "2026-05-28T08:30:00Z",
-  "auditDigest": "965afde16b81bd6d87be150fe40106cfaeb0802f6f16fd78a33845a9e6f2c6b7"
+  "auditDigest": "000b4c1e32eb25862548aae7b19e8b0aec79ffbdc3fe63c34a779e1d57a1d27e"
 }
