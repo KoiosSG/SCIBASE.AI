@@ -7,7 +7,7 @@ This module checks whether a scientific repository can safely publish a DOI, cit
 ## What It Checks
 
 - Git submodules and external code are pinned to immutable commit SHAs.
-- Linked datasets and model weights have checksum, DOI, or immutable version evidence.
+- Linked datasets and model weights have checksum, DOI, or immutable version evidence; floating aliases such as `latest` do not count.
 - API sources use dated snapshots with checksum evidence instead of floating "latest" endpoints.
 - Export bundles do not require authenticated external references.
 - License and attribution metadata are present before DOI publication.

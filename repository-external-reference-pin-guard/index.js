@@ -79,7 +79,12 @@ function needsDurableIdentifier(reference) {
 }
 
 function hasDurableIdentifier(reference) {
-  return hasText(reference.checksum) || hasText(reference.doi) || hasText(reference.version);
+  return hasText(reference.checksum) || hasText(reference.doi) || hasImmutableVersion(reference.version);
+}
+
+function hasImmutableVersion(version) {
+  if (!hasText(version)) return false;
+  return !/^(latest|main|master|head|current|stable|dev|nightly)$/i.test(version.trim());
 }
 
 function isStale(lastVerifiedAt, assessedAt, maxAgeDays) {

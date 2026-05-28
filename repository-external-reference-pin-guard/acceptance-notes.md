@@ -14,6 +14,7 @@ npm run check
 Expected evidence:
 
 - `reports/blocked-packet.json` blocks repository release when external references are floating, authenticated only, stale, or missing durable identifiers.
+- Floating version aliases such as `latest` are blocked unless the reference also has checksum or DOI evidence.
 - `reports/warning-packet.json` stages pinned references that still need license and attribution metadata.
 - `reports/clean-packet.json` releases a repository with immutable external pins, fresh verification evidence, and exportable metadata.
 - `reports/external-reference-report.md` summarizes lanes and finding codes.

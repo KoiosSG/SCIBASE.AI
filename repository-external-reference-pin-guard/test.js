@@ -137,10 +137,36 @@ function testStagesReferencesMissingLicenseAttributionOnly() {
   assert.deepEqual(packet.actions, ['complete_license_attribution:model-weights']);
 }
 
+function testFloatingVersionAliasDoesNotCountAsDurableIdentifier() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-floating-version',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'model-weights-latest',
+        kind: 'model_weights',
+        target: 'https://models.example.invalid/model.bin',
+        version: 'latest',
+        checksum: '',
+        doi: '',
+        license: 'Apache-2.0',
+        attribution: 'Example Model Lab',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['MISSING_DURABLE_IDENTIFIER']);
+  assert.ok(packet.actions.includes('add_checksum_or_doi:model-weights-latest'));
+  assert.equal(packet.referenceSignals.exportable, false);
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
-  testStagesReferencesMissingLicenseAttributionOnly
+  testStagesReferencesMissingLicenseAttributionOnly,
+  testFloatingVersionAliasDoesNotCountAsDurableIdentifier
 ];
 
 for (const test of tests) {
