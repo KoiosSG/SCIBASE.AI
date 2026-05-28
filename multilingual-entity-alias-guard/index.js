@@ -20,7 +20,7 @@ function digest(value) {
 }
 
 function normalizeTerm(term) {
-  return term.trim().toLocaleLowerCase();
+  return term.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 }
 
 function buildAliasIndex(entities) {

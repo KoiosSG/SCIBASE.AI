@@ -62,6 +62,33 @@ function testSameLanguageAliasCollisionsAreHeldForCuratorReview() {
   assert.equal(action.action, 'review-multilingual-alias-collision');
 }
 
+function testUnicodeAndWhitespaceAliasesMatchCanonicalEntities() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.entities.push({
+    id: 'entity:mesh:D005260',
+    canonicalName: 'Gene Therapy',
+    ontology: 'MeSH',
+    identifier: 'D005260',
+    localizedNames: {
+      es: ['terapia ge\u0301nica']
+    }
+  });
+  corpus.mentions.push({
+    id: 'mention-gene-therapy-es',
+    documentId: 'paper-9',
+    text: '  terapia   g\u00E9nica  ',
+    language: 'es',
+    confidence: 0.9
+  });
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-gene-therapy-es');
+
+  assert.equal(event.decision, 'accept-canonical-entity');
+  assert.equal(event.reason, 'trusted-translated-alias');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D005260');
+}
+
 function testLowConfidenceAliasesDoNotDriveRecommendations() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const event = byId(result.mentionDecisions, 'mention-cellule-fr');
@@ -97,6 +124,7 @@ const tests = [
   testTrustedTranslatedAliasesBecomeCanonicalGraphNodes,
   testFalseFriendMentionsAreHeldForCuratorReview,
   testSameLanguageAliasCollisionsAreHeldForCuratorReview,
+  testUnicodeAndWhitespaceAliasesMatchCanonicalEntities,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree
