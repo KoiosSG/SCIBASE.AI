@@ -41,6 +41,13 @@ function assessVisualAndOperableComponents(dashboard) {
           'blocker',
           `Critical component contrast is ${contrast.toFixed(2)}:1, below the 4.5:1 release threshold.`
         ));
+      } else if (contrast < 4.5) {
+        findings.push(finding(
+          component,
+          'LOW_CONTRAST_NONCRITICAL_METRIC',
+          'warning',
+          `Noncritical component contrast is ${contrast.toFixed(2)}:1, below the 4.5:1 readiness threshold.`
+        ));
       }
     }
 
@@ -145,6 +152,12 @@ function buildActions(dashboard, findings) {
     if (item.code === 'MISSING_SCREEN_READER_LABEL') {
       actions.add(`add_screen_reader_label:${item.componentId}`);
     }
+    if (
+      item.code === 'LOW_CONTRAST_CRITICAL_METRIC' ||
+      item.code === 'LOW_CONTRAST_NONCRITICAL_METRIC'
+    ) {
+      actions.add(`improve_contrast:${item.componentId}`);
+    }
   }
 
   return [...actions].sort();
@@ -153,7 +166,10 @@ function buildActions(dashboard, findings) {
 function buildWcagSignals(findings) {
   const codes = new Set(findings.map((finding) => finding.code));
   return {
-    perceivable: !codes.has('LOW_CONTRAST_CRITICAL_METRIC') && !codes.has('MISSING_TABLE_SUMMARY'),
+    perceivable:
+      !codes.has('LOW_CONTRAST_CRITICAL_METRIC') &&
+      !codes.has('LOW_CONTRAST_NONCRITICAL_METRIC') &&
+      !codes.has('MISSING_TABLE_SUMMARY'),
     operable: !codes.has('KEYBOARD_TRAP') && !codes.has('MISSING_REDUCED_MOTION_FALLBACK'),
     understandable: !codes.has('PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') && !codes.has('HEADING_ORDER_SKIP'),
     robust: !codes.has('MISSING_SCREEN_READER_LABEL')

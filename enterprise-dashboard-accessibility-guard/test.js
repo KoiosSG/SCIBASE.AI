@@ -49,10 +49,45 @@ function testWarningsAllowInternalOnlyPreview() {
   assert.ok(packet.actions.includes('add_reduced_motion_fallback:research-output-trend'));
 }
 
+function testNonCriticalLowContrastRequiresRemediationBeforeRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-low-contrast-secondary',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:05:00Z',
+    widgets: [
+      {
+        id: 'secondary-storage-trend',
+        type: 'metric',
+        title: 'Storage trend',
+        foreground: '#94a3b8',
+        background: '#f8fafc',
+        critical: false,
+        keyboardReachable: true,
+        screenReaderLabel: 'Storage trend across departments',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'remediate_before_public_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'internal_only');
+  assert.equal(packet.releaseLanes.scheduledExport, 'blocked');
+  assert.deepEqual(codes(packet), ['LOW_CONTRAST_NONCRITICAL_METRIC']);
+  assert.equal(packet.wcagSignals.perceivable, false);
+  assert.ok(packet.actions.includes('improve_contrast:secondary-storage-trend'));
+}
+
 const tests = [
   testCriticalAccessibilityIssuesBlockDashboardRelease,
   testCleanDashboardReleasesWithWcagSignals,
-  testWarningsAllowInternalOnlyPreview
+  testWarningsAllowInternalOnlyPreview,
+  testNonCriticalLowContrastRequiresRemediationBeforeRelease
 ];
 
 for (const test of tests) {

@@ -4,6 +4,7 @@
 - Keeps all records synthetic and local.
 - Uses dependency-free Node.js logic for deterministic dashboard release decisions.
 - Covers blocked, clean, and warning-only dashboard states with tests.
+- Treats noncritical low-contrast content as a remediation warning before public release.
 - Generates reviewer artifacts:
   - `reports/blocked-packet.json`
   - `reports/clean-packet.json`
