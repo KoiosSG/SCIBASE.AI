@@ -226,6 +226,48 @@ function testInvalidIndividualCriterionWeightsHoldPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-incomplete-review-evidence',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-incomplete-review-evidence',
+      reviewerId: 'reviewer-incomplete',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: []
+    },
+    {
+      applicantId: 'applicant-incomplete-review-evidence',
+      reviewerId: 'reviewer-partial',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 90
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-incomplete-review-evidence');
+  const action = byId(result.remediationActions, 'remediate-applicant-incomplete-review-evidence');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.weightedScore, 36);
+  assert.equal(decision.reasons.includes('missing-published-criterion-score'), true);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const first = evaluatePrequalificationRound(buildSampleRound());
   const second = evaluatePrequalificationRound(buildSampleRound());
@@ -247,6 +289,7 @@ const tests = [
   testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview,
   testInvalidCriterionWeightsHoldPrequalificationRound,
   testInvalidIndividualCriterionWeightsHoldPrequalificationRound,
+  testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 

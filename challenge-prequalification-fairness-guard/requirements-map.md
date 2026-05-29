@@ -10,6 +10,7 @@
 
 - Protects anonymous or named participation settings during prequalification review.
 - Requires reviewer quorum before a solver team is accepted or rejected.
+- Holds incomplete reviewer score packets for evidence completion instead of letting malformed review records crash or drive decisions.
 - Preserves audit evidence for each applicant before access to private challenge workspaces changes.
 
 ## Arbitration And Reward Distribution

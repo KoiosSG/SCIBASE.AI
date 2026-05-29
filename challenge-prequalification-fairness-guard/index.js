@@ -32,7 +32,7 @@ function groupBy(items, getKey) {
 
 function scoreForCriterion(reviews, criterionId) {
   const scores = reviews
-    .map((review) => review.scores[criterionId])
+    .map((review) => reviewScores(review)[criterionId])
     .filter((score) => typeof score === 'number');
 
   if (scores.length === 0) {
@@ -62,6 +62,10 @@ function publicCriteriaIds(round) {
   return round.criteria.map((criterion) => criterion.id);
 }
 
+function reviewScores(review) {
+  return review.scores && typeof review.scores === 'object' ? review.scores : {};
+}
+
 function criteriaWeightTotal(round) {
   return round.criteria.reduce((total, criterion) => total + criterion.weight, 0);
 }
@@ -77,7 +81,7 @@ function criteriaWeightsHaveInvalidValues(round) {
 }
 
 function reviewUsesHiddenCriteria(review, criteriaIds) {
-  return Object.keys(review.scores).some((criterionId) => !criteriaIds.includes(criterionId));
+  return Object.keys(reviewScores(review)).some((criterionId) => !criteriaIds.includes(criterionId));
 }
 
 function appealStatus(applicant, round) {
@@ -123,7 +127,7 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (
     criteriaIds.some((criterionId) =>
-      reviews.some((review) => typeof review.scores[criterionId] !== 'number')
+      reviews.some((review) => typeof reviewScores(review)[criterionId] !== 'number')
     )
   ) {
     reasons.push('missing-published-criterion-score');
@@ -183,6 +187,10 @@ function remediationAction(applicant, reasons) {
     return 'publish-rejection-reasons-and-appeal-window';
   }
 
+  if (reasons.includes('missing-published-criterion-score')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('inconsistent-threshold-decision')) {
     return 'reconcile-score-threshold-decision';
   }
@@ -227,7 +235,7 @@ function evaluatePrequalificationRound(round) {
           reviewerId: review.reviewerId,
           conflict: review.conflict,
           anonymousScreeningObserved: review.anonymousScreeningObserved,
-          scores: review.scores
+          scores: reviewScores(review)
         }))
       })
     };
