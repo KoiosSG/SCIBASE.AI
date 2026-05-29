@@ -18,4 +18,5 @@ Validation coverage:
 - conflicted reviewer participation and missing rejection reasons remain auditable
 - conflicted reviewer scores are excluded from weighted threshold evidence
 - unpublished screening criteria are blocked before results are published
+- invalid individual criterion weights are held even when the total still sums to 100
 - audit digests are deterministic and private-data free

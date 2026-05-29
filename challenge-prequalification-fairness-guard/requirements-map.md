@@ -2,7 +2,7 @@
 
 ## Challenge Posting Portal
 
-- Verifies that prequalification rounds use published criteria, weights, and pass thresholds.
+- Verifies that prequalification rounds use published criteria, nonnegative weights, valid weight totals, and pass thresholds.
 - Blocks unpublished sponsor preferences from entering solver-screening decisions.
 - Keeps prequalification decisions tied to challenge timelines and appeal windows.
 

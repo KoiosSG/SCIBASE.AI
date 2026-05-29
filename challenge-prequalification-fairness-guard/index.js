@@ -66,6 +66,16 @@ function criteriaWeightTotal(round) {
   return round.criteria.reduce((total, criterion) => total + criterion.weight, 0);
 }
 
+function criteriaWeightsHaveInvalidValues(round) {
+  return round.criteria.some(
+    (criterion) =>
+      typeof criterion.weight !== 'number' ||
+      !Number.isFinite(criterion.weight) ||
+      criterion.weight < 0 ||
+      criterion.weight > 100
+  );
+}
+
 function reviewUsesHiddenCriteria(review, criteriaIds) {
   return Object.keys(review.scores).some((criterionId) => !criteriaIds.includes(criterionId));
 }
@@ -97,6 +107,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (criteriaWeightTotal(round) !== 100) {
     reasons.push('criteria-weight-total-invalid');
+  }
+
+  if (criteriaWeightsHaveInvalidValues(round)) {
+    reasons.push('criteria-weight-value-invalid');
   }
 
   if (nonConflictedReviews.length < round.minReviewers) {
@@ -150,6 +164,10 @@ function remediationAction(applicant, reasons) {
   }
 
   if (reasons.includes('criteria-weight-total-invalid')) {
+    return 'publish-valid-weighted-scoring-rubric';
+  }
+
+  if (reasons.includes('criteria-weight-value-invalid')) {
     return 'publish-valid-weighted-scoring-rubric';
   }
 
@@ -225,7 +243,8 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('anonymous-screening-leak') ||
         decision.reasons.includes('reviewer-conflict') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
-        decision.reasons.includes('criteria-weight-total-invalid')
+        decision.reasons.includes('criteria-weight-total-invalid') ||
+        decision.reasons.includes('criteria-weight-value-invalid')
           ? 'high'
           : 'normal',
       reasons: decision.reasons
