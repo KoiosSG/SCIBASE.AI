@@ -211,6 +211,29 @@ function testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence() {
   assert.equal(packet.referenceSignals.immutablePins, false);
 }
 
+function testNullGitCommitShaDoesNotCountAsImmutablePin() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-null-git-pin',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'submodule-null-sha',
+        kind: 'git_submodule',
+        target: 'https://github.com/example/analysis-tools',
+        commitSha: '0000000000000000000000000000000000000000',
+        license: 'MIT',
+        attribution: 'Example Analysis Tools',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['FLOATING_GIT_REFERENCE']);
+  assert.ok(packet.actions.includes('pin_external_reference:submodule-null-sha'));
+  assert.equal(packet.referenceSignals.immutablePins, false);
+}
+
 function testMissingVerificationEvidenceBlocksOtherwisePinnedReference() {
   const packet = assessExternalReferences({
     repositoryId: 'repo-reference-missing-verification',
@@ -241,6 +264,7 @@ const tests = [
   testFloatingVersionAliasDoesNotCountAsDurableIdentifier,
   testFutureDatedVerificationEvidenceIsNotFresh,
   testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence,
+  testNullGitCommitShaDoesNotCountAsImmutablePin,
   testMissingVerificationEvidenceBlocksOtherwisePinnedReference
 ];
 

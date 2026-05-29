@@ -4,7 +4,7 @@ Issue #10 asks for robust project repositories with versioned files, collaborati
 
 | Issue #10 area | Coverage in this slice |
 | --- | --- |
-| File and metadata versioning | Holds releases when Git submodules or external code are not pinned to immutable commits. |
+| File and metadata versioning | Holds releases when Git submodules or external code are not pinned to immutable commits, including null all-zero commit placeholders. |
 | Hash-based integrity | Requires checksums, DOI evidence, or non-floating immutable versions for external datasets and model weights. |
 | Computation-aware reproducibility | Blocks reproducibility/export lanes when API data sources are floating, authenticated only, or backed by malformed/future snapshot dates. |
 | Repository identifiers and citation | Prevents DOI publication when external references lack verification timestamps, are stale, future-dated, or lack license/attribution metadata. |

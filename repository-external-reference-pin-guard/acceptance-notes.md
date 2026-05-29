@@ -14,6 +14,7 @@ npm run check
 Expected evidence:
 
 - `reports/blocked-packet.json` blocks repository release when external references are floating, authenticated only, stale, or missing durable identifiers.
+- All-zero Git commit placeholders are treated as unpinned references rather than immutable release evidence.
 - Floating version aliases such as `latest` are blocked unless the reference also has checksum or DOI evidence.
 - Future-dated API snapshots do not count as pinned snapshot evidence for DOI/export release.
 - Otherwise pinned references without verification timestamps are blocked until verification evidence is refreshed.

@@ -69,7 +69,8 @@ function isGitReference(reference) {
 }
 
 function hasPinnedCommit(reference) {
-  return /^[a-f0-9]{40}$/i.test(reference.commitSha || '');
+  const commitSha = reference.commitSha || '';
+  return /^[a-f0-9]{40}$/i.test(commitSha) && !/^0{40}$/.test(commitSha);
 }
 
 function hasSnapshotEvidence(reference, assessedAt) {
