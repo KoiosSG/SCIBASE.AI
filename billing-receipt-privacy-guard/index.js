@@ -104,6 +104,18 @@ function sanitizeLineItem(lineItem, index) {
   };
 }
 
+function receiptIdentifierFindings(receipt) {
+  return findingsForText(stableStringify({
+    id: receipt.id,
+    invoiceId: receipt.invoiceId,
+    customerId: receipt.customerId
+  }));
+}
+
+function sanitizeIdentifier(value, fallback) {
+  return hasPrivateContext(value) ? fallback : value;
+}
+
 function sanitizeMetadata(metadata) {
   const safe = {};
   const removedKeys = [];
@@ -141,16 +153,20 @@ function metadataValueText(value) {
   return String(value);
 }
 
-function evaluateReceipt(receipt) {
+function evaluateReceipt(receipt, index) {
   const redactedLineItems = receipt.lineItems.map((lineItem, index) => sanitizeLineItem(lineItem, index));
   const lineFindings = redactedLineItems.flatMap((lineItem) => lineItem.findings);
+  const identifierFindings = receiptIdentifierFindings(receipt);
   const metadata = sanitizeMetadata(receipt.providerMetadata);
-  const findings = Array.from(new Set([...lineFindings, ...metadata.findings])).sort();
+  const findings = Array.from(new Set([...lineFindings, ...identifierFindings, ...metadata.findings])).sort();
   const decision = findings.length > 0 ? 'hold-for-finance-review' : 'deliver-receipt';
+  const safeReceiptId = sanitizeIdentifier(receipt.id, `receipt-redacted-${index + 1}`);
+  const safeInvoiceId = sanitizeIdentifier(receipt.invoiceId, `invoice-redacted-${index + 1}`);
+  const safeCustomerId = sanitizeIdentifier(receipt.customerId, `customer-redacted-${index + 1}`);
 
   const customerCopy = {
-    receiptId: receipt.id,
-    customerId: receipt.customerId,
+    receiptId: safeReceiptId,
+    customerId: safeCustomerId,
     currency: receipt.currency,
     totalCents: receipt.totalCents,
     lineItems: redactedLineItems.map((lineItem) => ({
@@ -164,9 +180,9 @@ function evaluateReceipt(receipt) {
   };
 
   return {
-    id: receipt.id,
-    invoiceId: receipt.invoiceId,
-    customerId: receipt.customerId,
+    id: safeReceiptId,
+    invoiceId: safeInvoiceId,
+    customerId: safeCustomerId,
     decision,
     findings,
     removedMetadataKeys: metadata.removedKeys,
@@ -202,7 +218,7 @@ function remediationAction(receipt) {
 }
 
 function evaluateReceiptPrivacy(batch) {
-  const receipts = batch.receipts.map(evaluateReceipt);
+  const receipts = batch.receipts.map((receipt, index) => evaluateReceipt(receipt, index));
   const remediationActions = receipts
     .filter((receipt) => receipt.decision === 'hold-for-finance-review')
     .map((receipt) => ({

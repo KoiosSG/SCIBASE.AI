@@ -125,6 +125,111 @@ function testCustomerFacingLineItemFieldsAreRedacted() {
   assert.equal(JSON.stringify(receipt).includes('GSE-private'), false);
 }
 
+function testCustomerFacingReceiptIdentifiersAreRedacted() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-alzheimer-trial-001',
+      invoiceId: 'inv-GSE-private-collaborator',
+      customerId: 'customer-@private-reviewer',
+      currency: 'USD',
+      totalCents: 49000,
+      providerMetadata: {
+        accountRef: 'acct-lab-005',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-public-safe',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-platform-subscription',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 1,
+          unit: 'month',
+          amountCents: 49000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('private-research-context'), true);
+  assert.equal(receipt.findings.includes('restricted-dataset-reference'), true);
+  assert.equal(receipt.findings.includes('collaborator-identifier'), true);
+  assert.equal(receipt.id, 'receipt-redacted-1');
+  assert.equal(receipt.invoiceId, 'invoice-redacted-1');
+  assert.equal(receipt.customerId, 'customer-redacted-1');
+  assert.equal(receipt.customerCopy.receiptId, 'receipt-redacted-1');
+  assert.equal(receipt.customerCopy.customerId, 'customer-redacted-1');
+  assert.equal(JSON.stringify(result).includes('alzheimer'), false);
+  assert.equal(JSON.stringify(result).includes('GSE-private'), false);
+  assert.equal(JSON.stringify(result).includes('@private-reviewer'), false);
+}
+
+function testRedactedReceiptIdentifiersRemainDistinct() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-alzheimer-trial-001',
+      invoiceId: 'inv-alzheimer-trial-001',
+      customerId: 'customer-lab-006',
+      currency: 'USD',
+      totalCents: 12000,
+      providerMetadata: {
+        accountRef: 'acct-lab-006',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-public-safe-006',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-platform-subscription-a',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 1,
+          unit: 'month',
+          amountCents: 12000
+        }
+      ]
+    },
+    {
+      id: 'receipt-alzheimer-trial-002',
+      invoiceId: 'inv-alzheimer-trial-002',
+      customerId: 'customer-lab-007',
+      currency: 'USD',
+      totalCents: 13000,
+      providerMetadata: {
+        accountRef: 'acct-lab-007',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-public-safe-007',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-platform-subscription-b',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 1,
+          unit: 'month',
+          amountCents: 13000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+
+  assert.deepEqual(result.receipts.map((receipt) => receipt.id), [
+    'receipt-redacted-1',
+    'receipt-redacted-2'
+  ]);
+  assert.equal(new Set(result.receipts.map((receipt) => receipt.invoiceId)).size, 2);
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -154,6 +259,8 @@ const tests = [
   testProviderMetadataAllowlistBlocksOverSpecificFields,
   testNestedAllowedMetadataStillScansPrivateContext,
   testCustomerFacingLineItemFieldsAreRedacted,
+  testCustomerFacingReceiptIdentifiersAreRedacted,
+  testRedactedReceiptIdentifiersRemainDistinct,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

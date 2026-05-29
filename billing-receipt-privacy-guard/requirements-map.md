@@ -5,6 +5,7 @@
 - Keeps safe subscription receipts deliverable with a provider-metadata allowlist.
 - Removes project titles, collaborator handles, and private research descriptors from receipt metadata.
 - Scans nested provider metadata values so allowlisted keys cannot hide private workspace context.
+- Redacts receipt, invoice, and customer identifiers when they carry private project, dataset, or collaborator context.
 - Redacts customer-facing line-item identifiers and units when they carry restricted dataset context.
 - Preserves customer-useful totals, billing period, plan, and invoice references after redaction.
 
