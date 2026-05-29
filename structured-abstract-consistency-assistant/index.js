@@ -91,12 +91,12 @@ function assessResultsAlignment(manuscript) {
     }));
   }
 
-  if (results.direction === 'no_clear_effect' && impliesImprovement(abstractResults)) {
+  if (resultDirectionConflicts(results.direction, abstractResults)) {
     findings.push(finding({
       code: 'RESULT_DIRECTION_MISMATCH',
       severity: 'blocker',
       target: 'results.direction',
-      message: 'Abstract results imply improvement, but the result packet reports no clear effect.'
+      message: `Abstract results imply improvement, but the result packet reports ${formatDirection(results.direction)}.`
     }));
   }
 
@@ -210,6 +210,15 @@ function hasText(value) {
 
 function impliesImprovement(value) {
   return /\b(improved|improves|increase|increased|reduced|decreased|better|effective|benefit)\b/i.test(value);
+}
+
+function resultDirectionConflicts(direction, abstractResults) {
+  if (!impliesImprovement(abstractResults)) return false;
+  return /\b(no_clear_effect|worse|worsened|worsening|harm|harmful|inferior|declined|negative)\b/i.test(normalize(direction));
+}
+
+function formatDirection(direction) {
+  return normalize(direction).replace(/_/g, ' ') || 'an incompatible direction';
 }
 
 function overstatesConclusion(value) {
