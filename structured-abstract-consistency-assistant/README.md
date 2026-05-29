@@ -5,7 +5,7 @@ This module adds a focused issue #16 slice for the AI-Powered Research Assistant
 It evaluates synthetic manuscript packets for:
 
 - missing structured abstract sections
-- target-specific sample-size mismatches between abstract, methods, and results
+- target-specific sample-size mismatches between abstract, methods, and results, while accepting normal comma-formatted counts such as `1,200`
 - methods design mismatches
 - primary endpoint and result-direction drift, including negative results described as improvements
 - conclusions that imply benefit even when the results packet records no effect, worse outcomes, or harm

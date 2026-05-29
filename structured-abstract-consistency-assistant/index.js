@@ -43,7 +43,7 @@ function assessMethodsAlignment(manuscript) {
   const abstractMethods = normalize(manuscript.abstract?.methods);
   const findings = [];
 
-  if (manuscript.methods?.sampleSize && !abstractMethods.includes(String(manuscript.methods.sampleSize))) {
+  if (manuscript.methods?.sampleSize && !mentionsSampleSize(abstractMethods, manuscript.methods.sampleSize)) {
     findings.push(finding({
       code: 'SAMPLE_SIZE_MISMATCH',
       severity: 'blocker',
@@ -70,7 +70,7 @@ function assessResultsAlignment(manuscript) {
   const abstractResults = normalize(manuscript.abstract?.results);
   const findings = [];
 
-  if (results.sampleSize && !abstractResults.includes(String(results.sampleSize))) {
+  if (results.sampleSize && !mentionsSampleSize(abstractResults, results.sampleSize)) {
     findings.push(finding({
       code: 'SAMPLE_SIZE_MISMATCH',
       severity: 'blocker',
@@ -211,6 +211,14 @@ function dedupeFindings(findings) {
 
 function normalize(value = '') {
   return String(value).toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function mentionsSampleSize(text, sampleSize) {
+  const expected = String(sampleSize).replace(/,/g, '');
+  if (!/^\d+$/.test(expected)) return text.includes(String(sampleSize));
+
+  const comparableText = text.replace(/(\d),(?=\d)/g, '$1');
+  return new RegExp(`(^|\\D)${expected}(\\D|$)`).test(comparableText);
 }
 
 function hasText(value) {

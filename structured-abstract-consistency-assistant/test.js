@@ -188,6 +188,37 @@ function testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testAllowsFormattedSampleSizesInStructuredAbstract() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-formatted-sample-size',
+    assessedAt: '2026-05-29T18:18:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 1,200 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 1,200 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 1200,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 1200,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'release_peer_review_packet');
+  assert.deepEqual(packet.findings, []);
+  assert.equal(packet.abstractSignals.methodsAligned, true);
+  assert.equal(packet.abstractSignals.resultsAligned, true);
+}
+
 function testRequiresLimitationLanguageInStructuredAbstractConclusion() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-limitation-outside-abstract',
@@ -295,6 +326,7 @@ const tests = [
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
+  testAllowsFormattedSampleSizesInStructuredAbstract,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,
   testAllowsConsistentStructuredAbstractWithStableDigest
