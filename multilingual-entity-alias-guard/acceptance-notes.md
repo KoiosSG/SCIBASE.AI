@@ -15,6 +15,7 @@ Validation coverage:
 - Spanish `control` is held as a homograph/false friend instead of silently creating a statistical control-group edge
 - same-language translated alias collisions are held instead of silently attaching a mention to the wrong canonical entity
 - language-tag case differences do not suppress trusted translated aliases
+- regional language tags such as `es-MX` use base-language alias and homograph policy while preserving the original tag
 - low-confidence French alias output is suppressed from recommendations
 - localized names remain language-tagged on entity packets
 - audit output is deterministic and private-data free

@@ -108,6 +108,45 @@ function testLanguageTagCaseDoesNotSuppressTrustedAliases() {
   assert.equal(event.preservedLanguageTag, 'ES');
 }
 
+function testRegionalLanguageTagsUseBaseAliasLookup() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions.push({
+    id: 'mention-diabetes-es-mx',
+    documentId: 'paper-11',
+    text: 'diabetes mellitus',
+    language: 'es-MX',
+    confidence: 0.92
+  });
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-diabetes-es-mx');
+
+  assert.equal(event.decision, 'accept-canonical-entity');
+  assert.equal(event.reason, 'trusted-translated-alias');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D003920');
+  assert.equal(event.preservedLanguageTag, 'es-MX');
+}
+
+function testRegionalLanguageTagsStillUseBaseHomographHolds() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions.push({
+    id: 'mention-control-es-mx',
+    documentId: 'paper-12',
+    text: 'control',
+    language: 'es-MX',
+    confidence: 0.88,
+    candidateEntityId: 'entity:stat:control-group'
+  });
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-control-es-mx');
+
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'false-friend-or-homograph');
+  assert.equal(event.candidateEntityId, 'entity:stat:control-group');
+  assert.equal(event.preservedLanguageTag, 'es-MX');
+}
+
 function testLowConfidenceAliasesDoNotDriveRecommendations() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const event = byId(result.mentionDecisions, 'mention-cellule-fr');
@@ -145,6 +184,8 @@ const tests = [
   testSameLanguageAliasCollisionsAreHeldForCuratorReview,
   testUnicodeAndWhitespaceAliasesMatchCanonicalEntities,
   testLanguageTagCaseDoesNotSuppressTrustedAliases,
+  testRegionalLanguageTagsUseBaseAliasLookup,
+  testRegionalLanguageTagsStillUseBaseHomographHolds,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree
