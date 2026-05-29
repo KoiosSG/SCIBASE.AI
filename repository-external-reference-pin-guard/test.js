@@ -211,13 +211,37 @@ function testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence() {
   assert.equal(packet.referenceSignals.immutablePins, false);
 }
 
+function testMissingVerificationEvidenceBlocksOtherwisePinnedReference() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-missing-verification',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'dataset-needs-verification',
+        kind: 'linked_dataset',
+        target: 'https://doi.org/10.5281/zenodo.2345678',
+        checksum: 'sha256:abcdef123456',
+        doi: '10.5281/zenodo.2345678',
+        license: 'CC-BY-4.0',
+        attribution: 'Example Lab'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['STALE_REFERENCE_EVIDENCE']);
+  assert.ok(packet.actions.includes('refresh_reference_verification:dataset-needs-verification'));
+  assert.equal(packet.referenceSignals.verificationFresh, false);
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
   testStagesReferencesMissingLicenseAttributionOnly,
   testFloatingVersionAliasDoesNotCountAsDurableIdentifier,
   testFutureDatedVerificationEvidenceIsNotFresh,
-  testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence
+  testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence,
+  testMissingVerificationEvidenceBlocksOtherwisePinnedReference
 ];
 
 for (const test of tests) {

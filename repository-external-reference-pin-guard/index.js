@@ -55,7 +55,9 @@ function assessReference(reference, assessedAt, policy) {
     findings.push(finding(reference, 'MISSING_ATTRIBUTION', 'warning', 'External reference needs attribution metadata before DOI publication.'));
   }
 
-  if (isStale(reference.lastVerifiedAt, assessedAt, policy.maxReferenceAgeDays)) {
+  if (hasMissingVerificationEvidence(reference, findings)) {
+    findings.push(finding(reference, 'STALE_REFERENCE_EVIDENCE', 'blocker', 'External reference needs verification evidence before release.'));
+  } else if (isStale(reference.lastVerifiedAt, assessedAt, policy.maxReferenceAgeDays)) {
     findings.push(finding(reference, 'STALE_REFERENCE_EVIDENCE', 'blocker', 'External reference verification is older than policy allows.'));
   }
 
@@ -89,6 +91,11 @@ function hasDurableIdentifier(reference) {
 function hasImmutableVersion(version) {
   if (!hasText(version)) return false;
   return !/^(latest|main|master|head|current|stable|dev|nightly)$/i.test(version.trim());
+}
+
+function hasMissingVerificationEvidence(reference, findings) {
+  return !hasText(reference.lastVerifiedAt)
+    && !findings.some((item) => item.severity === 'blocker');
 }
 
 function isStale(lastVerifiedAt, assessedAt, maxAgeDays) {
