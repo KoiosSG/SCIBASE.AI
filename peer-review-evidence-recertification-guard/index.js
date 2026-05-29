@@ -24,6 +24,10 @@ function isoTime(value) {
 }
 
 function hasValidTime(value) {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return false;
+  }
+
   return Number.isFinite(isoTime(value));
 }
 
@@ -54,9 +58,11 @@ function findArtifact(project, artifactId) {
 function evaluateReview(project, review) {
   const artifact = findArtifact(project, review.artifactId);
   const reasons = [];
-  const reviewedAt = isoTime(review.recertifiedAt || review.submittedAt);
+  const reviewTime = review.recertifiedAt || review.submittedAt;
+  const reviewTimeIsValid = hasValidTime(reviewTime);
+  const reviewedAt = reviewTimeIsValid ? isoTime(reviewTime) : null;
 
-  if (!hasValidTime(review.recertifiedAt || review.submittedAt)) {
+  if (!reviewTimeIsValid) {
     reasons.push('invalid-review-timestamp');
   }
 
@@ -71,7 +77,7 @@ function evaluateReview(project, review) {
       reasons.push('artifact-digest-changed');
     }
 
-    if (hasValidTime(artifact.changedAt) && isoTime(artifact.changedAt) > reviewedAt) {
+    if (reviewTimeIsValid && hasValidTime(artifact.changedAt) && isoTime(artifact.changedAt) > reviewedAt) {
       reasons.push('artifact-updated-after-review');
     }
   }

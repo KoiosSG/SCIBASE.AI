@@ -14,9 +14,9 @@ Validation targets:
 - space-separated blind and fully anonymous mode labels do not leak raw reviewer IDs
 - stale inline comment anchors generate comment-specific recertification tasks
 - artifact digest changes mark inline comment anchors stale even when the selector line is unchanged
-- malformed inline comment timestamps require recertification before comment evidence is treated as current
+- missing or malformed inline comment timestamps require recertification before comment evidence is treated as current
 - missing inline comment anchor metadata requires recertification instead of crashing evidence evaluation
 - missing artifact anchor maps require comment recertification instead of crashing evidence evaluation
 - stale inline-comment evidence blocks reputation updates even when no stale review is present
-- malformed artifact change timestamps require review and inline-comment recertification before reputation credit or comment evidence is applied
+- missing or malformed artifact change timestamps require review and inline-comment recertification before reputation credit or comment evidence is applied
 - timeline packets include deterministic audit digests

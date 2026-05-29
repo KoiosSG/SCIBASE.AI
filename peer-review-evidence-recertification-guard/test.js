@@ -216,6 +216,47 @@ function testInvalidInlineCommentTimestampRequiresRecertification() {
   assert.deepEqual(task.reasons, ['invalid-comment-timestamp']);
 }
 
+function testMissingInlineCommentTimestampRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-19T09:30:00Z',
+      currentAnchors: {
+        'src/analyze.py#L41': { line: 41 }
+      }
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-missing-submitted-at',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: null
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-missing-submitted-at');
+  const task = byId(result.recertificationTasks, 'recertify-comment-missing-submitted-at');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'stale');
+  assert.deepEqual(comment.reasons, ['invalid-comment-timestamp']);
+  assert.equal(task.kind, 'inline-comment');
+  assert.deepEqual(task.reasons, ['invalid-comment-timestamp']);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 function testMissingInlineCommentAnchorMetadataRequiresRecertification() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -359,6 +400,43 @@ function testInvalidReviewTimestampRequiresRecertification() {
   assert.equal(action.effectiveDelta, 0);
 }
 
+function testMissingReviewTimestampRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-19T09:30:00Z',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-missing-submitted-at',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: null,
+      reputationDelta: 14
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-missing-submitted-at');
+  const task = byId(result.recertificationTasks, 'recertify-review-missing-submitted-at');
+  const action = byId(result.reputationActions, 'review-missing-submitted-at');
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['invalid-review-timestamp']);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['invalid-review-timestamp']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+}
+
 function testInvalidArtifactTimestampRequiresReviewRecertification() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -387,6 +465,43 @@ function testInvalidArtifactTimestampRequiresReviewRecertification() {
   const decision = byId(result.reviewDecisions, 'review-invalid-artifact-timestamp');
   const task = byId(result.recertificationTasks, 'recertify-review-invalid-artifact-timestamp');
   const action = byId(result.reputationActions, 'review-invalid-artifact-timestamp');
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['invalid-artifact-timestamp']);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['invalid-artifact-timestamp']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+}
+
+function testMissingArtifactTimestampRequiresReviewRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: null,
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-missing-artifact-timestamp',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      reputationDelta: 14
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-missing-artifact-timestamp');
+  const task = byId(result.recertificationTasks, 'recertify-review-missing-artifact-timestamp');
+  const action = byId(result.reputationActions, 'review-missing-artifact-timestamp');
 
   assert.equal(decision.status, 'recertification-required');
   assert.deepEqual(decision.reasons, ['invalid-artifact-timestamp']);
@@ -457,11 +572,14 @@ const tests = [
   testInlineCommentsUseArtifactAnchorsForRecertification,
   testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
   testInvalidInlineCommentTimestampRequiresRecertification,
+  testMissingInlineCommentTimestampRequiresRecertification,
   testMissingInlineCommentAnchorMetadataRequiresRecertification,
   testMissingArtifactAnchorMapRequiresCommentRecertification,
   testStaleInlineCommentsBlockReputationUpdateWithoutStaleReviews,
   testInvalidReviewTimestampRequiresRecertification,
+  testMissingReviewTimestampRequiresRecertification,
   testInvalidArtifactTimestampRequiresReviewRecertification,
+  testMissingArtifactTimestampRequiresReviewRecertification,
   testInvalidArtifactTimestampRequiresCommentRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];
