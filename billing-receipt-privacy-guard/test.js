@@ -85,6 +85,46 @@ function testNestedAllowedMetadataStillScansPrivateContext() {
   assert.equal(Object.prototype.hasOwnProperty.call(receipt.providerMetadata, 'accountRef'), false);
 }
 
+function testCustomerFacingLineItemFieldsAreRedacted() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-line-field-leak',
+      invoiceId: 'inv-line-field-leak',
+      customerId: 'customer-lab-004',
+      currency: 'USD',
+      totalCents: 28000,
+      providerMetadata: {
+        accountRef: 'acct-lab-004',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-line-field-leak',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-GSE-private-cohort-storage',
+          description: 'Storage usage',
+          usageCategory: 'storage',
+          quantity: 80,
+          unit: 'GSE-private gb-month',
+          amountCents: 28000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = byId(result.receipts, 'receipt-line-field-leak');
+  const lineItem = receipt.customerCopy.lineItems[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('restricted-dataset-reference'), true);
+  assert.equal(lineItem.id, 'line-redacted-1');
+  assert.equal(lineItem.unit, 'usage-unit');
+  assert.equal(lineItem.description, 'Restricted dataset storage and processing');
+  assert.equal(JSON.stringify(receipt).includes('GSE-private'), false);
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -113,6 +153,7 @@ const tests = [
   testPrivateResearchContextIsRedactedBeforeReceiptDelivery,
   testProviderMetadataAllowlistBlocksOverSpecificFields,
   testNestedAllowedMetadataStillScansPrivateContext,
+  testCustomerFacingLineItemFieldsAreRedacted,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

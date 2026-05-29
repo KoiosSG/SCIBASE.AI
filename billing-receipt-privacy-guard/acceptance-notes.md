@@ -16,6 +16,7 @@ Validation coverage:
 - safe receipts are deliverable with only allowed provider metadata
 - private research project context is removed from customer-facing receipt line items
 - restricted dataset details are replaced with usage-category-safe wording
+- customer-facing line-item identifiers and units are redacted when they contain restricted dataset context
 - unsafe provider metadata keys are removed before delivery
 - allowlisted provider metadata keys are still scanned when values are structured or nested
 - customer copies retain useful totals, currency, usage categories, quantities, and units

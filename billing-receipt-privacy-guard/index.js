@@ -44,6 +44,30 @@ function findingsForText(text) {
   return PRIVATE_PATTERNS.filter((item) => item.pattern.test(text)).map((item) => item.id);
 }
 
+function privacyText(value) {
+  if (value === undefined || value === null) {
+    return '';
+  }
+
+  return metadataValueText(value);
+}
+
+function hasPrivateContext(value) {
+  return findingsForText(privacyText(value)).length > 0;
+}
+
+function lineItemPrivacyFindings(lineItem) {
+  return findingsForText(
+    stableStringify({
+      id: lineItem.id,
+      description: lineItem.description,
+      projectRef: lineItem.projectRef,
+      usageCategory: lineItem.usageCategory,
+      unit: lineItem.unit
+    })
+  );
+}
+
 function categoryDescription(lineItem) {
   if (lineItem.usageCategory === 'ai-compute') {
     return 'AI compute usage for restricted research workspace';
@@ -60,15 +84,20 @@ function categoryDescription(lineItem) {
   return 'Research platform service';
 }
 
-function sanitizeLineItem(lineItem) {
-  const findings = findingsForText(`${lineItem.description} ${lineItem.projectRef || ''}`);
+function sanitizeLineItem(lineItem, index) {
+  const findings = lineItemPrivacyFindings(lineItem);
   const description = findings.length > 0 ? categoryDescription(lineItem) : lineItem.description;
+  const id = hasPrivateContext(lineItem.id) ? `line-redacted-${index + 1}` : lineItem.id;
+  const usageCategory = hasPrivateContext(lineItem.usageCategory)
+    ? 'research-platform-service'
+    : lineItem.usageCategory;
+  const unit = hasPrivateContext(lineItem.unit) ? 'usage-unit' : lineItem.unit;
 
   return {
-    id: lineItem.id,
-    usageCategory: lineItem.usageCategory,
+    id,
+    usageCategory,
     quantity: lineItem.quantity,
-    unit: lineItem.unit,
+    unit,
     amountCents: lineItem.amountCents,
     description,
     findings
@@ -113,7 +142,7 @@ function metadataValueText(value) {
 }
 
 function evaluateReceipt(receipt) {
-  const redactedLineItems = receipt.lineItems.map(sanitizeLineItem);
+  const redactedLineItems = receipt.lineItems.map((lineItem, index) => sanitizeLineItem(lineItem, index));
   const lineFindings = redactedLineItems.flatMap((lineItem) => lineItem.findings);
   const metadata = sanitizeMetadata(receipt.providerMetadata);
   const findings = Array.from(new Set([...lineFindings, ...metadata.findings])).sort();
