@@ -62,11 +62,15 @@ function evaluateReview(project, review) {
   if (!artifact) {
     reasons.push('artifact-missing');
   } else {
+    if (!hasValidTime(artifact.changedAt)) {
+      reasons.push('invalid-artifact-timestamp');
+    }
+
     if (artifact.currentDigest !== review.evidenceDigest) {
       reasons.push('artifact-digest-changed');
     }
 
-    if (isoTime(artifact.changedAt) > reviewedAt) {
+    if (hasValidTime(artifact.changedAt) && isoTime(artifact.changedAt) > reviewedAt) {
       reasons.push('artifact-updated-after-review');
     }
   }

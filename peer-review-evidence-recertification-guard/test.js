@@ -319,6 +319,43 @@ function testInvalidReviewTimestampRequiresRecertification() {
   assert.equal(action.effectiveDelta, 0);
 }
 
+function testInvalidArtifactTimestampRequiresReviewRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: 'not-a-date',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-invalid-artifact-timestamp',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      reputationDelta: 14
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-invalid-artifact-timestamp');
+  const task = byId(result.recertificationTasks, 'recertify-review-invalid-artifact-timestamp');
+  const action = byId(result.reputationActions, 'review-invalid-artifact-timestamp');
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['invalid-artifact-timestamp']);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['invalid-artifact-timestamp']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+}
+
 function testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles() {
   const project = buildSampleProject();
   const result = evaluateRecertification(project);
@@ -341,6 +378,7 @@ const tests = [
   testMissingArtifactAnchorMapRequiresCommentRecertification,
   testStaleInlineCommentsBlockReputationUpdateWithoutStaleReviews,
   testInvalidReviewTimestampRequiresRecertification,
+  testInvalidArtifactTimestampRequiresReviewRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];
 
