@@ -6,7 +6,7 @@ It evaluates synthetic import batches for:
 
 - untrusted clipboard or file sources
 - missing or unrecognized source trust metadata
-- missing signed source attestations from partner imports
+- missing or blank signed source attestations from partner imports
 - hidden instruction-like text that is not visible to collaborators
 - spreadsheet formula cells that could execute after import
 - notebook output snippets and table cells containing local or private filesystem paths

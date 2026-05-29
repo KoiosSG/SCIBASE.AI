@@ -121,6 +121,34 @@ function testStagesPartnerImportMissingSignedAttestationForCuratorReview() {
   assert.deepEqual(packet.actions, ['request_signed_source_attestation:import-partner-forward']);
 }
 
+function testStagesPartnerImportWithBlankSignedAttestationForCuratorReview() {
+  const packet = assessImportBatch({
+    importId: 'import-partner-blank-attestation',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:35:30Z',
+    source: {
+      channel: 'file-import',
+      origin: 'partner-lab-docx',
+      trustLevel: 'partner',
+      signedAttestation: '   '
+    },
+    blocks: [
+      {
+        id: 'blk-partner-blank-attestation',
+        type: 'paragraph',
+        sectionId: 'results',
+        anchor: 'partner-blank-attestation',
+        content: 'Partner lab supplied a corrected assay summary.'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.deepEqual(findingCodes(packet), ['MISSING_SOURCE_ATTESTATION']);
+  assert.deepEqual(packet.actions, ['request_signed_source_attestation:import-partner-blank-attestation']);
+  assert.equal(packet.source.attested, false);
+}
+
 function testStagesImportMissingSourceTrustMetadataForCuratorReview() {
   const packet = assessImportBatch({
     importId: 'import-missing-source-trust',
@@ -372,6 +400,7 @@ function testAllowsTrustedAttestedImportWithStableDigest() {
 const tests = [
   testQuarantinesUnsafeClipboardPayloadBeforeSharedInsert,
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
+  testStagesPartnerImportWithBlankSignedAttestationForCuratorReview,
   testStagesImportMissingSourceTrustMetadataForCuratorReview,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
