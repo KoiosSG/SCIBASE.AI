@@ -298,6 +298,47 @@ function testCustomerFacingCurrencyLabelsAreRedacted() {
   assert.equal(JSON.stringify(result).includes('GSE-private'), false);
 }
 
+function testCustomerFacingMoneyAndQuantityFieldsAreRedacted() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-amount-leak',
+      invoiceId: 'inv-amount-leak',
+      customerId: 'customer-lab-010',
+      currency: 'USD',
+      totalCents: '27000 GSE-private cohort',
+      providerMetadata: {
+        accountRef: 'acct-lab-010',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-amount-leak',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-platform-subscription-e',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: '1 participant from GSE-private cohort',
+          unit: 'month',
+          amountCents: '27000 GSE-private cohort'
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+  const lineItem = receipt.customerCopy.lineItems[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('restricted-dataset-reference'), true);
+  assert.equal(receipt.customerCopy.totalCents, null);
+  assert.equal(lineItem.quantity, null);
+  assert.equal(lineItem.amountCents, null);
+  assert.equal(result.summary.totalCentsReviewed, 0);
+  assert.equal(JSON.stringify(result).includes('GSE-private'), false);
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -331,6 +372,7 @@ const tests = [
   testRedactedReceiptIdentifiersRemainDistinct,
   testMissingProviderMetadataIsTreatedAsEmptyMetadata,
   testCustomerFacingCurrencyLabelsAreRedacted,
+  testCustomerFacingMoneyAndQuantityFieldsAreRedacted,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

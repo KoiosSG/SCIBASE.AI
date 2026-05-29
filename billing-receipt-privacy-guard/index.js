@@ -62,8 +62,10 @@ function lineItemPrivacyFindings(lineItem) {
       id: lineItem.id,
       description: lineItem.description,
       projectRef: lineItem.projectRef,
+      quantity: lineItem.quantity,
       usageCategory: lineItem.usageCategory,
-      unit: lineItem.unit
+      unit: lineItem.unit,
+      amountCents: lineItem.amountCents
     })
   );
 }
@@ -96,9 +98,9 @@ function sanitizeLineItem(lineItem, index) {
   return {
     id,
     usageCategory,
-    quantity: lineItem.quantity,
+    quantity: sanitizeCustomerNumber(lineItem.quantity),
     unit,
-    amountCents: lineItem.amountCents,
+    amountCents: sanitizeCustomerNumber(lineItem.amountCents),
     description,
     findings
   };
@@ -114,7 +116,8 @@ function receiptIdentifierFindings(receipt) {
 
 function receiptEnvelopeFindings(receipt) {
   return findingsForText(stableStringify({
-    currency: receipt.currency
+    currency: receipt.currency,
+    totalCents: receipt.totalCents
   }));
 }
 
@@ -124,6 +127,10 @@ function sanitizeIdentifier(value, fallback) {
 
 function sanitizeCurrency(value) {
   return hasPrivateContext(value) ? 'XXX' : value;
+}
+
+function sanitizeCustomerNumber(value) {
+  return hasPrivateContext(value) ? null : value;
 }
 
 function sanitizeMetadata(metadata = {}) {
@@ -175,12 +182,13 @@ function evaluateReceipt(receipt, index) {
   const safeInvoiceId = sanitizeIdentifier(receipt.invoiceId, `invoice-redacted-${index + 1}`);
   const safeCustomerId = sanitizeIdentifier(receipt.customerId, `customer-redacted-${index + 1}`);
   const safeCurrency = sanitizeCurrency(receipt.currency);
+  const safeTotalCents = sanitizeCustomerNumber(receipt.totalCents);
 
   const customerCopy = {
     receiptId: safeReceiptId,
     customerId: safeCustomerId,
     currency: safeCurrency,
-    totalCents: receipt.totalCents,
+    totalCents: safeTotalCents,
     lineItems: redactedLineItems.map((lineItem) => ({
       id: lineItem.id,
       description: lineItem.description,
@@ -250,7 +258,10 @@ function evaluateReceiptPrivacy(batch) {
     deliverableReceipts: receipts.filter((receipt) => receipt.decision === 'deliver-receipt').length,
     heldReceipts: receipts.filter((receipt) => receipt.decision === 'hold-for-finance-review').length,
     remediationActions: remediationActions.length,
-    totalCentsReviewed: receipts.reduce((total, receipt) => total + receipt.customerCopy.totalCents, 0)
+    totalCentsReviewed: receipts.reduce((total, receipt) => {
+      const amount = receipt.customerCopy.totalCents;
+      return total + (Number.isFinite(amount) ? amount : 0);
+    }, 0)
   };
 
   return {
