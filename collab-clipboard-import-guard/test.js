@@ -195,6 +195,44 @@ function testPrivateReferenceMarkersAreRedactedWithoutFilePaths() {
   );
 }
 
+function testTableCellsWithPrivatePathsAreQuarantinedAndRedacted() {
+  const packet = assessImportBatch({
+    importId: 'import-private-table-cell',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:39:30Z',
+    source: {
+      channel: 'clipboard',
+      origin: 'trusted-spreadsheet',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:spreadsheet-export'
+    },
+    blocks: [
+      {
+        id: 'blk-private-table-cell',
+        type: 'table',
+        sectionId: 'results',
+        anchor: 'private-table-cell',
+        cells: [
+          ['artifact', 'path'],
+          ['patient export', '/Users/sam/private-lab/patient-export.csv'],
+          ['formula link', '=HYPERLINK("file:///Users/sam/private-lab/patient-export.csv")']
+        ]
+      }
+    ]
+  });
+
+  const tableBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-private-table-cell');
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['CSV_FORMULA_CELL', 'LOCAL_PRIVATE_PATH']);
+  assert.ok(packet.actions.includes('escape_formula_cells:blk-private-table-cell'));
+  assert.ok(packet.actions.includes('redact_local_paths:blk-private-table-cell'));
+  assert.equal(tableBlock.cells[1][1], '[redacted-local-path]');
+  assert.equal(tableBlock.cells[2][1], '\'=HYPERLINK("[redacted-local-path]")');
+  assert.equal(JSON.stringify(packet).includes('/Users/sam'), false);
+  assert.equal(JSON.stringify(packet).includes('patient-export'), false);
+}
+
 function testAllowsTrustedAttestedImportWithStableDigest() {
   const packet = assessImportBatch({
     importId: 'import-clean-zotero-note',
@@ -238,6 +276,7 @@ const tests = [
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
+  testTableCellsWithPrivatePathsAreQuarantinedAndRedacted,
   testAllowsTrustedAttestedImportWithStableDigest
 ];
 

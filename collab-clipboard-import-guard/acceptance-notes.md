@@ -17,6 +17,7 @@ Expected evidence:
 - `reports/partner-review-packet.json` stages a partner import missing a signed source attestation.
 - `reports/clean-packet.json` allows a trusted, attested import.
 - Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion.
+- Table-cell local/private paths are quarantined, redacted, and still formula-escaped when needed.
 - `reports/import-provenance-report.md` summarizes insertion lanes and findings.
 - `reports/summary.svg` provides a visual review packet.
 - `reports/demo.mp4` is a short H.264 walkthrough generated from synthetic frames.

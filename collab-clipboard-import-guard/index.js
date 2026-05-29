@@ -78,14 +78,19 @@ function assessBlock(block, batch, duplicateAnchorBlocks) {
     sanitizedBlock.cells = sanitizeCells(block.cells);
   }
 
-  if (containsLocalPrivatePath(block.content)) {
+  if (containsLocalPrivatePath(block.content) || hasLocalPrivatePathCell(block)) {
     findings.push(finding({
       code: 'LOCAL_PRIVATE_PATH',
       severity: 'blocker',
       blockId: block.id,
       message: 'Imported notebook output references a local or private filesystem path.'
     }));
-    sanitizedBlock.content = redactLocalPrivatePaths(block.content);
+    if (typeof block.content === 'string') {
+      sanitizedBlock.content = redactLocalPrivatePaths(block.content);
+    }
+    if (Array.isArray(block.cells)) {
+      sanitizedBlock.cells = sanitizeCells(block.cells);
+    }
   }
 
   if (isStaleReviewMetadata(block, batch)) {
@@ -152,10 +157,20 @@ function hasFormulaCell(block) {
   ));
 }
 
+function hasLocalPrivatePathCell(block) {
+  return Array.isArray(block.cells) && block.cells.some((row) => (
+    Array.isArray(row) && row.some((cell) => typeof cell === 'string' && containsLocalPrivatePath(cell))
+  ));
+}
+
 function sanitizeCells(cells) {
   return cells.map((row) => row.map((cell) => {
-    if (typeof cell === 'string' && /^[=+\-@]/.test(cell.trim())) {
-      return `'${cell}`;
+    if (typeof cell === 'string') {
+      const redacted = containsLocalPrivatePath(cell) ? redactLocalPrivatePaths(cell) : cell;
+      if (/^[=+\-@]/.test(redacted.trim())) {
+        return `'${redacted}`;
+      }
+      return redacted;
     }
     return cell;
   }));
@@ -166,15 +181,15 @@ function containsHiddenInstruction(value = '') {
 }
 
 function containsLocalPrivatePath(value = '') {
-  return /(?:file:\/\/|[A-Z]:\\Users\\[^ ]+|\/Users\/[^ \n]+|\/home\/[^ \n]+|private-lab|patient-export)/i.test(value);
+  return /(?:file:\/\/|[A-Z]:\\Users\\[^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+|private-lab|patient-export)/i.test(value);
 }
 
 function redactLocalPrivatePaths(value = '') {
   return value
-    .replace(/file:\/\/[^ \n]+/gi, '[redacted-local-path]')
-    .replace(/[A-Z]:\\Users\\[^ \n]+/g, '[redacted-local-path]')
-    .replace(/\/Users\/[^ \n]+/g, '[redacted-local-path]')
-    .replace(/\/home\/[^ \n]+/g, '[redacted-local-path]')
+    .replace(/file:\/\/[^ \s"')]+/gi, '[redacted-local-path]')
+    .replace(/[A-Z]:\\Users\\[^ \s"')]+/g, '[redacted-local-path]')
+    .replace(/\/Users\/[^ \s"')]+/g, '[redacted-local-path]')
+    .replace(/\/home\/[^ \s"')]+/g, '[redacted-local-path]')
     .replace(/\b(?:private-lab|patient-export)\b/gi, '[redacted-private-reference]');
 }
 

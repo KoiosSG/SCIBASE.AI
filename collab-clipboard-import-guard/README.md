@@ -8,7 +8,7 @@ It evaluates synthetic import batches for:
 - missing signed source attestations from partner imports
 - hidden instruction-like text that is not visible to collaborators
 - spreadsheet formula cells that could execute after import
-- notebook output snippets containing local or private filesystem paths
+- notebook output snippets and table cells containing local or private filesystem paths
 - stale collaborator review metadata bound to old section versions
 - duplicate anchors that would collide inside the shared document, with every colliding block regenerated before insertion
 
