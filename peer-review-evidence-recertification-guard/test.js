@@ -136,6 +136,41 @@ function testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift() {
   assert.deepEqual(comment.reasons, ['artifact-digest-changed']);
 }
 
+function testInvalidReviewTimestampRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-19T09:30:00Z',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-invalid-recertified-at',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      recertifiedAt: 'not-a-date',
+      reputationDelta: 14
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-invalid-recertified-at');
+  const action = byId(result.reputationActions, 'review-invalid-recertified-at');
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['invalid-review-timestamp']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+}
+
 function testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles() {
   const project = buildSampleProject();
   const result = evaluateRecertification(project);
@@ -153,6 +188,7 @@ const tests = [
   testBlindModeRedactionAcceptsCaseAndSeparatorVariants,
   testInlineCommentsUseArtifactAnchorsForRecertification,
   testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
+  testInvalidReviewTimestampRequiresRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];
 

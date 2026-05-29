@@ -23,6 +23,10 @@ function isoTime(value) {
   return new Date(value).getTime();
 }
 
+function hasValidTime(value) {
+  return Number.isFinite(isoTime(value));
+}
+
 function normalizeReviewMode(mode) {
   return String(mode || '')
     .trim()
@@ -50,6 +54,10 @@ function evaluateReview(project, review) {
   const artifact = findArtifact(project, review.artifactId);
   const reasons = [];
   const reviewedAt = isoTime(review.recertifiedAt || review.submittedAt);
+
+  if (!hasValidTime(review.recertifiedAt || review.submittedAt)) {
+    reasons.push('invalid-review-timestamp');
+  }
 
   if (!artifact) {
     reasons.push('artifact-missing');

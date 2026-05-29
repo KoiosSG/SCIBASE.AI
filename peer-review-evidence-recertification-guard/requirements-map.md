@@ -3,6 +3,7 @@
 ## Peer Reviews & Comments
 
 - Structured peer-review evidence is tied to reviewed artifact digests.
+- Malformed review submission or recertification timestamps require recertification before review credit is applied.
 - Inline comments track artifact anchors and require recertification when anchors shift or artifact digests change.
 - Public, semi-private, and double-blind review modes are represented.
 - Review history is emitted in a project timeline packet.
