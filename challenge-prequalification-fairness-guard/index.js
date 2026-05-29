@@ -58,6 +58,51 @@ function uniqueSorted(values) {
   return Array.from(new Set(values)).sort();
 }
 
+function reviewerIdFor(review) {
+  return typeof review.reviewerId === 'string' ? review.reviewerId.trim() : '';
+}
+
+function duplicateNonConflictedReviewerIds(reviews) {
+  const counts = reviews
+    .filter((review) => !review.conflict)
+    .reduce((reviewerCounts, review) => {
+      const reviewerId = reviewerIdFor(review);
+      if (!reviewerId) {
+        return reviewerCounts;
+      }
+      reviewerCounts[reviewerId] = (reviewerCounts[reviewerId] || 0) + 1;
+      return reviewerCounts;
+    }, {});
+
+  return uniqueSorted(
+    Object.entries(counts)
+      .filter(([, count]) => count > 1)
+      .map(([reviewerId]) => reviewerId)
+  );
+}
+
+function countableNonConflictedReviews(reviews) {
+  const seenReviewerIds = new Set();
+
+  return reviews.filter((review) => {
+    if (review.conflict) {
+      return false;
+    }
+
+    const reviewerId = reviewerIdFor(review);
+    if (!reviewerId) {
+      return true;
+    }
+
+    if (seenReviewerIds.has(reviewerId)) {
+      return false;
+    }
+
+    seenReviewerIds.add(reviewerId);
+    return true;
+  });
+}
+
 function publicCriteriaIds(round) {
   return round.criteria.map((criterion) => criterion.id);
 }
@@ -98,7 +143,8 @@ function appealStatus(applicant, round) {
 
 function reasonsForApplicant(applicant, reviews, round) {
   const criteriaIds = publicCriteriaIds(round);
-  const nonConflictedReviews = reviews.filter((review) => !review.conflict);
+  const nonConflictedReviews = countableNonConflictedReviews(reviews);
+  const duplicateReviewerIds = duplicateNonConflictedReviewerIds(reviews);
   const reasons = [];
 
   if (round.anonymousScreeningRequired && reviews.some((review) => !review.anonymousScreeningObserved)) {
@@ -107,6 +153,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (reviews.some((review) => review.conflict)) {
     reasons.push('reviewer-conflict');
+  }
+
+  if (duplicateReviewerIds.length > 0) {
+    reasons.push('duplicate-reviewer-score-evidence');
   }
 
   if (criteriaWeightTotal(round) !== 100) {
@@ -179,6 +229,10 @@ function remediationAction(applicant, reasons) {
     return 'replace-conflicted-reviewer';
   }
 
+  if (reasons.includes('duplicate-reviewer-score-evidence')) {
+    return 'deduplicate-reviewer-score-evidence';
+  }
+
   if (
     reasons.includes('missing-rejection-reason') ||
     reasons.includes('missing-appeal-window') ||
@@ -203,7 +257,7 @@ function evaluatePrequalificationRound(round) {
 
   const decisions = round.applicants.map((applicant) => {
     const reviews = reviewsByApplicant[applicant.id] || [];
-    const nonConflictedReviews = reviews.filter((review) => !review.conflict);
+    const nonConflictedReviews = countableNonConflictedReviews(reviews);
     const reasons = reasonsForApplicant(applicant, reviews, round);
     const score = weightedScore(round.criteria, nonConflictedReviews);
     const decision =
@@ -221,7 +275,7 @@ function evaluatePrequalificationRound(round) {
       sponsorDecision: applicant.sponsorDecision,
       weightedScore: score,
       passThreshold: round.passThreshold,
-      reviewersCounted: reviews.filter((review) => !review.conflict).length,
+      reviewersCounted: nonConflictedReviews.length,
       criteriaApplied: publicCriteriaIds(round),
       reasons,
       rejectionReasons: applicant.rejectionReasons,
@@ -250,6 +304,7 @@ function evaluatePrequalificationRound(round) {
       priority:
         decision.reasons.includes('anonymous-screening-leak') ||
         decision.reasons.includes('reviewer-conflict') ||
+        decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||
         decision.reasons.includes('criteria-weight-value-invalid')

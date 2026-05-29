@@ -62,7 +62,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" v
   <text x="96" y="208" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Accepted applicants: ${result.summary.accepted}</text>
   <text x="96" y="258" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Held for fairness review: ${result.summary.held}</text>
   <text x="96" y="308" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Remediation actions: ${result.summary.remediationActions}</text>
-  <text x="96" y="380" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">Checks: criteria, thresholds, anonymity, conflicts, rejection reasons, appeal windows</text>
+  <text x="96" y="380" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">Checks: criteria, distinct reviewer quorum, thresholds, anonymity, conflicts, appeals</text>
   <text x="96" y="448" fill="#ffd37a" font-family="Arial, sans-serif" font-size="26">Unfair screening decisions are held before applicants are accepted or rejected.</text>
   <text x="96" y="574" fill="#a6d7c3" font-family="Arial, sans-serif" font-size="18">${result.auditDigest}</text>
 </svg>

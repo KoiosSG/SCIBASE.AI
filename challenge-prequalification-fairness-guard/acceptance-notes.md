@@ -20,4 +20,5 @@ Validation coverage:
 - unpublished screening criteria are blocked before results are published
 - invalid individual criterion weights are held even when the total still sums to 100
 - incomplete reviewer score evidence is held for completion without crashing the prequalification packet
+- duplicate reviewer score evidence is held and deduplicated before quorum or weighted threshold scoring
 - audit digests are deterministic and private-data free

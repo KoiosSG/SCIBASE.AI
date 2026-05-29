@@ -268,6 +268,58 @@ function testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing() {
   assert.equal(action.action, 'complete-prequalification-evidence');
 }
 
+function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
+  const round = buildSampleRound();
+  round.minReviewers = 2;
+  round.applicants = [
+    {
+      id: 'applicant-duplicate-reviewer',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-duplicate-reviewer',
+      reviewerId: 'reviewer-repeat',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 96,
+        'data-readiness': 94,
+        'safety-plan': 95
+      }
+    },
+    {
+      applicantId: 'applicant-duplicate-reviewer',
+      reviewerId: 'reviewer-repeat',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 93,
+        'safety-plan': 94
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-duplicate-reviewer');
+  const action = byId(result.remediationActions, 'remediate-applicant-duplicate-reviewer');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reviewersCounted, 1);
+  assert.equal(decision.reasons.includes('duplicate-reviewer-score-evidence'), true);
+  assert.equal(decision.reasons.includes('reviewer-quorum-shortfall'), true);
+  assert.equal(action.action, 'deduplicate-reviewer-score-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const first = evaluatePrequalificationRound(buildSampleRound());
   const second = evaluatePrequalificationRound(buildSampleRound());
@@ -290,6 +342,7 @@ const tests = [
   testInvalidCriterionWeightsHoldPrequalificationRound,
   testInvalidIndividualCriterionWeightsHoldPrequalificationRound,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
+  testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 
