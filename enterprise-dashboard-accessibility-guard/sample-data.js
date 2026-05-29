@@ -16,6 +16,17 @@ const blockedDashboard = {
       headingLevel: 2
     },
     {
+      id: 'contract-risk-score',
+      type: 'metric',
+      title: 'Contract risk score',
+      foreground: 'var(--metric-danger)',
+      background: '#ffffff',
+      critical: true,
+      keyboardReachable: true,
+      screenReaderLabel: 'Contract risk score across departments',
+      headingLevel: 2
+    },
+    {
       id: 'private-project-table',
       type: 'table',
       title: 'Private projects',

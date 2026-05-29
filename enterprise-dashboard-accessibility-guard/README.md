@@ -7,6 +7,7 @@ This module evaluates institutional admin dashboard releases before they are sho
 ## What It Checks
 
 - Critical metric color contrast and warning-level contrast checks for noncritical content
+- Invalid or unparseable contrast evidence, including unresolved CSS color tokens
 - Missing screen-reader labels
 - Keyboard reachability and focus traps
 - Private user or project data embedded in screen-reader labels, table summaries, or export summaries

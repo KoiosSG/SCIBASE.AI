@@ -34,7 +34,14 @@ function assessVisualAndOperableComponents(dashboard) {
   for (const component of components) {
     if (component.foreground && component.background) {
       const contrast = contrastRatio(component.foreground, component.background);
-      if (component.critical && contrast < 4.5) {
+      if (contrast === null) {
+        findings.push(finding(
+          component,
+          'INVALID_CONTRAST_EVIDENCE',
+          'blocker',
+          'Component color evidence must be parseable hex values before dashboard release.'
+        ));
+      } else if (component.critical && contrast < 4.5) {
         findings.push(finding(
           component,
           'LOW_CONTRAST_CRITICAL_METRIC',
@@ -158,6 +165,9 @@ function buildActions(dashboard, findings) {
     ) {
       actions.add(`improve_contrast:${item.componentId}`);
     }
+    if (item.code === 'INVALID_CONTRAST_EVIDENCE') {
+      actions.add(`provide_valid_contrast_evidence:${item.componentId}`);
+    }
     if (item.code === 'PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') {
       actions.add(`redact_accessibility_text:${item.componentId}`);
     }
@@ -170,6 +180,7 @@ function buildWcagSignals(findings) {
   const codes = new Set(findings.map((finding) => finding.code));
   return {
     perceivable:
+      !codes.has('INVALID_CONTRAST_EVIDENCE') &&
       !codes.has('LOW_CONTRAST_CRITICAL_METRIC') &&
       !codes.has('LOW_CONTRAST_NONCRITICAL_METRIC') &&
       !codes.has('MISSING_TABLE_SUMMARY'),
@@ -182,13 +193,19 @@ function buildWcagSignals(findings) {
 function contrastRatio(foreground, background) {
   const fg = relativeLuminance(hexToRgb(foreground));
   const bg = relativeLuminance(hexToRgb(background));
+  if (fg === null || bg === null) return null;
   const lighter = Math.max(fg, bg);
   const darker = Math.min(fg, bg);
   return (lighter + 0.05) / (darker + 0.05);
 }
 
 function hexToRgb(hex) {
-  const normalized = hex.replace('#', '');
+  if (typeof hex !== 'string') return null;
+  const token = hex.trim().replace('#', '');
+  const normalized = /^[0-9a-f]{3}$/i.test(token)
+    ? token.split('').map((char) => char + char).join('')
+    : token;
+  if (!/^[0-9a-f]{6}$/i.test(normalized)) return null;
   const bigint = parseInt(normalized, 16);
   return {
     r: (bigint >> 16) & 255,
@@ -197,7 +214,9 @@ function hexToRgb(hex) {
   };
 }
 
-function relativeLuminance({ r, g, b }) {
+function relativeLuminance(rgb) {
+  if (!rgb) return null;
+  const { r, g, b } = rgb;
   const channels = [r, g, b].map((channel) => {
     const srgb = channel / 255;
     return srgb <= 0.03928 ? srgb / 12.92 : ((srgb + 0.055) / 1.055) ** 2.4;

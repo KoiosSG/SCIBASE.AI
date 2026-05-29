@@ -117,12 +117,78 @@ function testPrivateDataInTableSummaryBlocksRelease() {
   assert.ok(packet.actions.includes('redact_accessibility_text:private-summary-table'));
 }
 
+function testInvalidContrastEvidenceBlocksRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-invalid-contrast-evidence',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:15:00Z',
+    widgets: [
+      {
+        id: 'contract-risk-score',
+        type: 'metric',
+        title: 'Contract risk score',
+        foreground: 'var(--metric-danger)',
+        background: '#ffffff',
+        critical: true,
+        keyboardReachable: true,
+        screenReaderLabel: 'Contract risk score across departments',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'blocked');
+  assert.deepEqual(codes(packet), ['INVALID_CONTRAST_EVIDENCE']);
+  assert.equal(packet.wcagSignals.perceivable, false);
+  assert.ok(packet.actions.includes('provide_valid_contrast_evidence:contract-risk-score'));
+}
+
+function testShorthandHexContrastEvidenceRemainsValid() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-shorthand-contrast',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:20:00Z',
+    widgets: [
+      {
+        id: 'repository-sync-status',
+        type: 'metric',
+        title: 'Repository sync status',
+        foreground: '#000',
+        background: '#fff',
+        critical: true,
+        keyboardReachable: true,
+        screenReaderLabel: 'Repository sync status across departments',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'release_with_accessibility_monitoring');
+  assert.deepEqual(packet.findings, []);
+  assert.equal(packet.wcagSignals.perceivable, true);
+}
+
 const tests = [
   testCriticalAccessibilityIssuesBlockDashboardRelease,
   testCleanDashboardReleasesWithWcagSignals,
   testWarningsAllowInternalOnlyPreview,
   testNonCriticalLowContrastRequiresRemediationBeforeRelease,
-  testPrivateDataInTableSummaryBlocksRelease
+  testPrivateDataInTableSummaryBlocksRelease,
+  testInvalidContrastEvidenceBlocksRelease,
+  testShorthandHexContrastEvidenceRemainsValid
 ];
 
 for (const test of tests) {
