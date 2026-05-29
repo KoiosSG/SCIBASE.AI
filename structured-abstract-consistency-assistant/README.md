@@ -9,6 +9,7 @@ It evaluates synthetic manuscript packets for:
 - methods design mismatches
 - primary endpoint and bidirectional result-direction drift, including negative/no-effect results described as improvements and improved results described as worsened or harmful
 - conclusions that imply benefit with improvement/lower/shorter/faster language even when the results packet records no effect, worse outcomes, or harm
+- safety-benefit conclusions such as safe, well tolerated, or tolerable when adverse-outcome evidence worsens
 - conclusions that describe worse/no-effect outcomes when the results packet records improvement
 - accurate adverse-outcome wording, such as increased adverse events, without mistaking it for a benefit claim when the result packet also records a worse direction
 - conclusions that overstate exploratory or uncertain evidence

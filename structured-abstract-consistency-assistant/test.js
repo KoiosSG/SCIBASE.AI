@@ -253,6 +253,37 @@ function testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection() {
   assert.equal(packet.abstractSignals.resultsAligned, true);
 }
 
+function testBlocksSafetyBenefitConclusionWhenAdverseResultsWorsen() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-unsafe-safety-claim',
+    assessedAt: '2026-05-29T23:05:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, adverse event rate, increased in 96 manuscripts.',
+      conclusions: 'The assistant was safe and well tolerated in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'adverse event rate',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'adverse event rate',
+      direction: 'worse',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['CONCLUSION_RESULT_DIRECTION_MISMATCH']);
+  assert.ok(packet.actions.includes('tone_down_conclusion:ms-abstract-unsafe-safety-claim'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testBlocksWorseOutcomeClaimWhenResultsShowImprovement() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-wording-drift',
@@ -424,6 +455,7 @@ const tests = [
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
   testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,
   testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection,
+  testBlocksSafetyBenefitConclusionWhenAdverseResultsWorsen,
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
