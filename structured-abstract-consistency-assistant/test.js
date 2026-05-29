@@ -253,6 +253,37 @@ function testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection() {
   assert.equal(packet.abstractSignals.resultsAligned, true);
 }
 
+function testBlocksWorseOutcomeClaimWhenResultsShowImprovement() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-worse-wording-drift',
+    assessedAt: '2026-05-29T22:35:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, worsened in 96 manuscripts.',
+      conclusions: 'The assistant may require additional monitoring in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['RESULT_DIRECTION_MISMATCH']);
+  assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-worse-wording-drift'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testAllowsFormattedSampleSizesInStructuredAbstract() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-formatted-sample-size',
@@ -393,6 +424,7 @@ const tests = [
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
   testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,
   testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection,
+  testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,

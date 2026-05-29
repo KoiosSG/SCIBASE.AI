@@ -96,7 +96,7 @@ function assessResultsAlignment(manuscript) {
       code: 'RESULT_DIRECTION_MISMATCH',
       severity: 'blocker',
       target: 'results.direction',
-      message: `Abstract results imply improvement, but the result packet reports ${formatDirection(results.direction)}.`
+      message: `Abstract results describe a directional effect that conflicts with the result packet: ${formatDirection(results.direction)}.`
     }));
   }
 
@@ -131,7 +131,7 @@ function assessConclusionBalance(manuscript) {
       code: 'CONCLUSION_RESULT_DIRECTION_MISMATCH',
       severity: 'blocker',
       target: 'abstract.conclusions',
-      message: `Abstract conclusion implies benefit, but the result packet reports ${formatDirection(manuscript.results?.direction)}.`
+      message: `Abstract conclusion describes a directional effect that conflicts with the result packet: ${formatDirection(manuscript.results?.direction)}.`
     }));
   }
 
@@ -232,13 +232,32 @@ function impliesImprovement(value) {
   );
 }
 
+function impliesWorseOutcome(value) {
+  return (
+    /\b(worse|worsened|worsening|harm|harms|harmful|inferior|declined|negative|no clear effect|no effect|null effect|unchanged|not significant|non-significant)\b/i.test(value)
+    || (/\b(increase|increased|increases)\b/i.test(value) && mentionsAdverseOutcome(value))
+  );
+}
+
 function mentionsAdverseOutcome(value) {
   return /\b(adverse event|adverse events|harm|harms|mortality|death|deaths|complication|complications|toxicity|toxicities|failure|failures|error|errors|infection|infections)\b/i.test(value);
 }
 
 function resultDirectionConflicts(direction, abstractResults) {
-  if (!impliesImprovement(abstractResults)) return false;
-  return /\b(no_clear_effect|worse|worsened|worsening|harm|harmful|inferior|declined|negative)\b/i.test(normalize(direction));
+  const normalizedDirection = normalize(direction);
+  return (
+    impliesImprovement(abstractResults) && isNegativeOrNoEffectDirection(normalizedDirection)
+  ) || (
+    impliesWorseOutcome(abstractResults) && isPositiveDirection(normalizedDirection)
+  );
+}
+
+function isNegativeOrNoEffectDirection(direction) {
+  return /\b(no_clear_effect|no clear effect|no_effect|worse|worsened|worsening|harm|harmful|inferior|declined|negative)\b/i.test(direction);
+}
+
+function isPositiveDirection(direction) {
+  return /\b(improved|improvement|improves|better|benefit|beneficial|positive|effective|reduced|reduction|decreased|lower|lowered|shorter|faster)\b/i.test(direction);
 }
 
 function formatDirection(direction) {

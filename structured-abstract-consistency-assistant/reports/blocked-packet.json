@@ -17,7 +17,7 @@
       "code": "CONCLUSION_RESULT_DIRECTION_MISMATCH",
       "severity": "blocker",
       "target": "abstract.conclusions",
-      "message": "Abstract conclusion implies benefit, but the result packet reports no clear effect."
+      "message": "Abstract conclusion describes a directional effect that conflicts with the result packet: no clear effect."
     },
     {
       "code": "ENDPOINT_MISMATCH",
@@ -41,7 +41,7 @@
       "code": "RESULT_DIRECTION_MISMATCH",
       "severity": "blocker",
       "target": "results.direction",
-      "message": "Abstract results imply improvement, but the result packet reports no clear effect."
+      "message": "Abstract results describe a directional effect that conflicts with the result packet: no clear effect."
     },
     {
       "code": "SAMPLE_SIZE_MISMATCH",
@@ -69,5 +69,5 @@
     "limitationsBalanced": false
   },
   "assessedAt": "2026-05-28T10:10:00Z",
-  "auditDigest": "0a6e4dbcb19540b1ca3ce5a05c92d24ce6ab07778e39e4623a55b96e52c4db24"
+  "auditDigest": "925e4baeba3d1db2bf596c037e265a96bcea81535f7246885ae6c5dac5756df2"
 }
