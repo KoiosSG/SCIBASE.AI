@@ -7,7 +7,7 @@
 - Malformed artifact change timestamps require review and inline-comment recertification before review credit or comment evidence is applied.
 - Inline comments track artifact anchors and require recertification when anchors shift, artifact digests change, artifact timing evidence is malformed, anchor metadata is missing, artifact anchor maps are missing, or comment timing evidence is malformed.
 - Stale review or inline-comment evidence blocks reputation updates until recertification is complete.
-- Public, semi-private, and double-blind review modes are represented.
+- Public, semi-private, and double-blind review modes are represented, with blind and fully anonymous labels normalized across hyphenated, underscored, and space-separated variants.
 - Review history is emitted in a project timeline packet.
 
 ## Contributor Credits
@@ -24,6 +24,6 @@
 
 ## Privacy And Trust
 
-- Double-blind reviewer IDs are replaced by anonymous labels.
+- Double-blind and fully anonymous reviewer IDs are replaced by anonymous labels even when incoming mode names use spaces or underscores.
 - Synthetic data only; no private profile emails, credentials, or external API calls.
 - The timeline audit digest is deterministic for reviewer verification.

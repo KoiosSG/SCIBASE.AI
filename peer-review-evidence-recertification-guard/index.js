@@ -31,7 +31,8 @@ function normalizeReviewMode(mode) {
   return String(mode || '')
     .trim()
     .toLowerCase()
-    .replace(/_/g, '-');
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 function isBlindOrAnonymous(mode) {

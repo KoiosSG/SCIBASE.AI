@@ -11,6 +11,7 @@ Validation targets:
 - stale dataset review freezes an 18 point reputation delta
 - recertified code review keeps its 14 point reputation delta
 - double-blind reviewer identity is not leaked in tasks or timeline events
+- space-separated blind and fully anonymous mode labels do not leak raw reviewer IDs
 - stale inline comment anchors generate comment-specific recertification tasks
 - artifact digest changes mark inline comment anchors stale even when the selector line is unchanged
 - malformed inline comment timestamps require recertification before comment evidence is treated as current

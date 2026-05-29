@@ -82,6 +82,46 @@ function testBlindModeRedactionAcceptsCaseAndSeparatorVariants() {
   assert.ok(!JSON.stringify(result).includes('orcid:0000-0002-variant-private'));
 }
 
+function testBlindModeRedactionAcceptsSpaceSeparatedModes() {
+  const project = buildSampleProject();
+  project.reviews = [
+    {
+      id: 'review-space-blind',
+      reviewerId: 'orcid:0000-0002-space-private',
+      anonymousLabel: 'anonymous-reviewer-space',
+      mode: 'Double Blind',
+      artifactId: 'dataset-cohort-table',
+      evidenceDigest: 'sha256:dataset-v1',
+      submittedAt: '2026-05-18T09:00:00Z',
+      reputationDelta: 18
+    }
+  ];
+  project.inlineComments = [
+    {
+      id: 'comment-space-anonymous',
+      reviewerId: 'orcid:0000-0002-comment-private',
+      anonymousLabel: 'anonymous-commenter-space',
+      mode: 'Fully Anonymous',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v2',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const reviewTask = byId(result.recertificationTasks, 'recertify-review-space-blind');
+  const commentTask = byId(result.recertificationTasks, 'recertify-comment-space-anonymous');
+
+  assert.equal(reviewTask.reviewer, 'anonymous-reviewer-space');
+  assert.equal(commentTask.reviewer, 'anonymous-commenter-space');
+  assert.ok(!JSON.stringify(result).includes('orcid:0000-0002-space-private'));
+  assert.ok(!JSON.stringify(result).includes('orcid:0000-0002-comment-private'));
+}
+
 function testInlineCommentsUseArtifactAnchorsForRecertification() {
   const project = buildSampleProject();
   const result = evaluateRecertification(project);
@@ -413,6 +453,7 @@ const tests = [
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
   testAnonymousReviewerIdentityIsRedacted,
   testBlindModeRedactionAcceptsCaseAndSeparatorVariants,
+  testBlindModeRedactionAcceptsSpaceSeparatedModes,
   testInlineCommentsUseArtifactAnchorsForRecertification,
   testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
   testInvalidInlineCommentTimestampRequiresRecertification,
