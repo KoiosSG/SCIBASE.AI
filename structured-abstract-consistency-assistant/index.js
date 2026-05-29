@@ -226,7 +226,7 @@ function hasText(value) {
 }
 
 function impliesImprovement(value) {
-  return /\b(improved|improves|increase|increased|reduced|decreased|better|effective|benefit)\b/i.test(value);
+  return /\b(improved|improvement|improves|increase|increased|reduced|reduction|decreased|lower|lowered|shorter|faster|better|effective|benefit)\b/i.test(value);
 }
 
 function resultDirectionConflicts(direction, abstractResults) {

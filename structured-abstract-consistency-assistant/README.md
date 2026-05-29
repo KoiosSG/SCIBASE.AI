@@ -7,8 +7,8 @@ It evaluates synthetic manuscript packets for:
 - missing structured abstract sections
 - target-specific sample-size mismatches between abstract, methods, and results, while accepting normal comma-formatted counts such as `1,200`
 - methods design mismatches
-- primary endpoint and result-direction drift, including negative results described as improvements
-- conclusions that imply benefit even when the results packet records no effect, worse outcomes, or harm
+- primary endpoint and result-direction drift, including negative/no-effect results described as improvements, lower outcomes, shorter times, or faster review
+- conclusions that imply benefit with improvement/lower/shorter/faster language even when the results packet records no effect, worse outcomes, or harm
 - conclusions that overstate exploratory or uncertain evidence
 - missing limitation language when confidence intervals cross null or findings are exploratory
 

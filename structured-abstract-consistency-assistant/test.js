@@ -188,6 +188,41 @@ function testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-lower-outcome-drift',
+    assessedAt: '2026-05-29T19:25:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, was lower in 96 manuscripts.',
+      conclusions: 'The assistant may lower comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'no_clear_effect',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), [
+    'CONCLUSION_RESULT_DIRECTION_MISMATCH',
+    'RESULT_DIRECTION_MISMATCH'
+  ]);
+  assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-lower-outcome-drift'));
+  assert.ok(packet.actions.includes('tone_down_conclusion:ms-abstract-lower-outcome-drift'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testAllowsFormattedSampleSizesInStructuredAbstract() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-formatted-sample-size',
@@ -326,6 +361,7 @@ const tests = [
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
+  testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,
   testAllowsFormattedSampleSizesInStructuredAbstract,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,
