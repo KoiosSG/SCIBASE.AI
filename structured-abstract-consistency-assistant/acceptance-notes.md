@@ -20,6 +20,7 @@ Expected evidence:
 - Result-direction checks also block abstracts that describe improved results as worse, harmful, or no-effect.
 - Conclusion-direction checks block reviewer-facing conclusion benefit claims when the result packet records no effect, worse outcomes, or harm.
 - Conclusion-direction checks block safety-benefit claims such as safe or well tolerated when adverse-outcome evidence worsens.
+- Conclusion-direction checks block negated safety-concern claims such as no safety concerns when adverse-outcome evidence worsens.
 - Negated benefit wording such as did not improve is treated as no-effect/worse language instead of a positive improvement claim.
 - Conclusion-direction checks also block reviewer-facing conclusion worse/no-effect claims when the result packet records improvement.
 - Benefit-language checks include lower/shorter/faster outcome wording, not only "improved" phrasing.

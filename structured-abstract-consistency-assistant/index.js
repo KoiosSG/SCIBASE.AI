@@ -248,12 +248,21 @@ function impliesNegatedBenefitClaim(value) {
 }
 
 function impliesPositiveSafetyClaim(value) {
+  if (impliesNegatedSafetyConcern(value)) return true;
   if (impliesNegativeSafetyClaim(value)) return false;
   return /\b(safe|well[- ]tolerated|tolerable|promising)\b/i.test(value);
 }
 
 function impliesNegativeSafetyClaim(value) {
+  if (impliesNegatedSafetyConcern(value)) return false;
   return /\b(unsafe|not safe|not well[- ]tolerated|poorly[- ]tolerated|not tolerable|safety concerns?)\b/i.test(value);
+}
+
+function impliesNegatedSafetyConcern(value) {
+  const negatedSafetyPrefix = '(no|without|absence of|absent|not any)';
+  const safetyQualifier = '(?:clear\\s+|new\\s+|additional\\s+|excess\\s+|serious\\s+|treatment-related\\s+|observed\\s+|increase in\\s+|increased\\s+)?';
+  const safetyConcern = '(?:safety concerns?|safety signals?|adverse events?|harms?|toxicity|toxicities|complications?)';
+  return new RegExp(`\\b${negatedSafetyPrefix}\\s+${safetyQualifier}${safetyConcern}\\b`, 'i').test(value);
 }
 
 function mentionsAdverseOutcome(value) {
