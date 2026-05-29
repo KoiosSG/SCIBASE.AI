@@ -4,7 +4,7 @@
 
 - Preserves language-tagged mentions from uploaded papers and datasets.
 - Maps trusted translated aliases to canonical ontology identifiers.
-- Normalizes language-tag casing and regional subtags for alias lookup while preserving the original tag on decisions.
+- Normalizes language-tag casing plus hyphenated or underscored regional subtags for alias lookup while preserving the original tag on decisions.
 - Holds false friends and homographs before creating graph edges.
 - Holds same-language alias collisions when ontology entries reuse the same translated term.
 - Emits schema.org-style `DefinedTerm` JSON-LD packets for entity pages.

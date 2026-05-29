@@ -147,6 +147,39 @@ function testRegionalLanguageTagsStillUseBaseHomographHolds() {
   assert.equal(event.preservedLanguageTag, 'es-MX');
 }
 
+function testUnderscoreRegionalLanguageTagsUseBaseAliasAndHomographRules() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions.push(
+    {
+      id: 'mention-diabetes-es-mx-underscore',
+      documentId: 'paper-13',
+      text: 'diabetes mellitus',
+      language: 'es_MX',
+      confidence: 0.92
+    },
+    {
+      id: 'mention-control-es-mx-underscore',
+      documentId: 'paper-14',
+      text: 'control',
+      language: 'es_MX',
+      confidence: 0.88,
+      candidateEntityId: 'entity:stat:control-group'
+    }
+  );
+
+  const result = evaluateAliasGuard(corpus);
+  const aliasEvent = byId(result.mentionDecisions, 'mention-diabetes-es-mx-underscore');
+  const homographEvent = byId(result.mentionDecisions, 'mention-control-es-mx-underscore');
+
+  assert.equal(aliasEvent.decision, 'accept-canonical-entity');
+  assert.equal(aliasEvent.reason, 'trusted-translated-alias');
+  assert.equal(aliasEvent.candidateEntityId, 'entity:mesh:D003920');
+  assert.equal(aliasEvent.preservedLanguageTag, 'es_MX');
+  assert.equal(homographEvent.decision, 'hold-for-curator-review');
+  assert.equal(homographEvent.reason, 'false-friend-or-homograph');
+  assert.equal(homographEvent.candidateEntityId, 'entity:stat:control-group');
+}
+
 function testLowConfidenceAliasesDoNotDriveRecommendations() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const event = byId(result.mentionDecisions, 'mention-cellule-fr');
@@ -209,6 +242,7 @@ const tests = [
   testLanguageTagCaseDoesNotSuppressTrustedAliases,
   testRegionalLanguageTagsUseBaseAliasLookup,
   testRegionalLanguageTagsStillUseBaseHomographHolds,
+  testUnderscoreRegionalLanguageTagsUseBaseAliasAndHomographRules,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testMissingConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,

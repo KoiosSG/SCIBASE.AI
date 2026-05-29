@@ -24,7 +24,7 @@ function normalizeTerm(term) {
 }
 
 function normalizeLanguageTag(language) {
-  return String(language || '').normalize('NFKC').trim().toLocaleLowerCase();
+  return String(language || '').normalize('NFKC').trim().replace(/_/g, '-').toLocaleLowerCase();
 }
 
 function languageLookupKeys(language) {
