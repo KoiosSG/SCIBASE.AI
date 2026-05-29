@@ -58,6 +58,19 @@ function uniqueSorted(values) {
   return Array.from(new Set(values)).sort();
 }
 
+function duplicatePublishedCriterionIds(round) {
+  const criterionCounts = round.criteria.reduce((counts, criterion) => {
+    counts[criterion.id] = (counts[criterion.id] || 0) + 1;
+    return counts;
+  }, Object.create(null));
+
+  return uniqueSorted(
+    Object.entries(criterionCounts)
+      .filter(([, count]) => count > 1)
+      .map(([criterionId]) => criterionId)
+  );
+}
+
 function reviewerIdFor(review) {
   return typeof review.reviewerId === 'string' ? review.reviewerId.trim() : '';
 }
@@ -162,6 +175,7 @@ function appealStatus(applicant, round) {
 
 function reasonsForApplicant(applicant, reviews, round) {
   const criteriaIds = publicCriteriaIds(round);
+  const duplicateCriterionIds = duplicatePublishedCriterionIds(round);
   const nonConflictedReviews = countableNonConflictedReviews(reviews);
   const duplicateReviewerIds = duplicateNonConflictedReviewerIds(reviews);
   const applicantAppealStatus = appealStatus(applicant, round);
@@ -173,6 +187,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (reviews.some((review) => review.conflict)) {
     reasons.push('reviewer-conflict');
+  }
+
+  if (duplicateCriterionIds.length > 0) {
+    reasons.push('duplicate-published-criterion');
   }
 
   if (duplicateReviewerIds.length > 0) {
@@ -243,6 +261,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('unpublished-screening-criterion')) {
     return 'remove-unpublished-criterion-and-rescore';
+  }
+
+  if (reasons.includes('duplicate-published-criterion')) {
+    return 'publish-unique-screening-criteria';
   }
 
   if (reasons.includes('criteria-weight-total-invalid')) {
@@ -337,6 +359,7 @@ function evaluatePrequalificationRound(round) {
       priority:
         decision.reasons.includes('anonymous-screening-leak') ||
         decision.reasons.includes('reviewer-conflict') ||
+        decision.reasons.includes('duplicate-published-criterion') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||

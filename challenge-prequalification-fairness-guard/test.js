@@ -275,6 +275,70 @@ function testInvalidIndividualCriterionWeightsHoldPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testDuplicatePublishedCriterionIdsHoldPrequalificationRound() {
+  const round = buildSampleRound();
+  round.criteria = [
+    {
+      id: 'domain-fit',
+      label: 'Domain fit for the scientific challenge',
+      weight: 50
+    },
+    {
+      id: 'domain-fit',
+      label: 'Duplicated sponsor rubric identifier',
+      weight: 25
+    },
+    {
+      id: 'safety-plan',
+      label: 'Risk, NDA, and responsible-use plan',
+      weight: 25
+    }
+  ];
+  round.applicants = [
+    {
+      id: 'applicant-duplicate-criterion',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-duplicate-criterion',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'safety-plan': 92
+      }
+    },
+    {
+      applicantId: 'applicant-duplicate-criterion',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 96,
+        'safety-plan': 94
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-duplicate-criterion');
+  const action = byId(result.remediationActions, 'remediate-applicant-duplicate-criterion');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('duplicate-published-criterion'), true);
+  assert.equal(action.action, 'publish-unique-screening-criteria');
+  assert.equal(action.priority, 'high');
+}
+
 function testInvalidPassThresholdHoldsPrequalificationRound() {
   const round = buildSampleRound();
   round.passThreshold = -5;
@@ -453,6 +517,7 @@ const tests = [
   testInvalidAppealWindowHoldsRejectedApplicantForFairnessReview,
   testInvalidCriterionWeightsHoldPrequalificationRound,
   testInvalidIndividualCriterionWeightsHoldPrequalificationRound,
+  testDuplicatePublishedCriterionIdsHoldPrequalificationRound,
   testInvalidPassThresholdHoldsPrequalificationRound,
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
