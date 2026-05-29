@@ -17,5 +17,6 @@ Validation coverage:
 - language-tag case differences do not suppress trusted translated aliases
 - regional language tags such as `es-MX` use base-language alias and homograph policy while preserving the original tag
 - low-confidence French alias output is suppressed from recommendations
+- missing or non-numeric confidence evidence is suppressed before graph recommendations
 - localized names remain language-tagged on entity packets
 - audit output is deterministic and private-data free

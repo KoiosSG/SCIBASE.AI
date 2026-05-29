@@ -156,6 +156,29 @@ function testLowConfidenceAliasesDoNotDriveRecommendations() {
   assert.equal(result.recommendationGuards.suppressedMentionIds.includes('mention-cellule-fr'), true);
 }
 
+function testMissingConfidenceAliasesDoNotDriveRecommendations() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions = [
+    {
+      id: 'mention-diabetes-missing-confidence',
+      documentId: 'paper-13',
+      text: 'diabetes mellitus',
+      language: 'es'
+    }
+  ];
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-diabetes-missing-confidence');
+  const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
+
+  assert.equal(event.decision, 'suppress-recommendation');
+  assert.equal(event.reason, 'low-confidence-alias');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D003920');
+  assert.equal(result.recommendationGuards.suppressedMentionIds.includes('mention-diabetes-missing-confidence'), true);
+  assert.equal(result.recommendationGuards.safeEntityIds.includes('entity:mesh:D003920'), false);
+  assert.equal(diabetes.mentions.length, 0);
+}
+
 function testLanguageTaggedSynonymsArePreservedForEntityPages() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
@@ -187,6 +210,7 @@ const tests = [
   testRegionalLanguageTagsUseBaseAliasLookup,
   testRegionalLanguageTagsStillUseBaseHomographHolds,
   testLowConfidenceAliasesDoNotDriveRecommendations,
+  testMissingConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

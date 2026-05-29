@@ -35,6 +35,11 @@ function languageLookupKeys(language) {
   return primary && primary !== normalized ? [normalized, primary] : [normalized];
 }
 
+function confidenceScore(value) {
+  const score = Number(value);
+  return Number.isFinite(score) ? score : null;
+}
+
 function buildAliasIndex(entities) {
   const index = new Map();
 
@@ -87,6 +92,7 @@ function mentionDecision(mention, aliasIndex, homographs) {
   const homographEntry = languageKeys
     .map((languageKey) => homographs[`${languageKey}:${termKey}`])
     .find(Boolean);
+  const confidence = confidenceScore(mention.confidence);
 
   if (homographEntry) {
     return {
@@ -118,7 +124,7 @@ function mentionDecision(mention, aliasIndex, homographs) {
     };
   }
 
-  if (!alias || mention.confidence < 0.8) {
+  if (!alias || confidence === null || confidence < 0.8) {
     return {
       id: mention.id,
       language: mention.language,

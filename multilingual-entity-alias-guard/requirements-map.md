@@ -17,7 +17,7 @@
 
 ## AI Research Recommendations
 
-- Suppresses low-confidence mentions from recommendation inputs.
+- Suppresses low-confidence or missing-confidence mentions from recommendation inputs.
 - Exposes safe canonical entity IDs for graph recommendations.
 - Keeps multilingual evidence auditable with deterministic digests.
 
