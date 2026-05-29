@@ -160,6 +160,11 @@ function evaluateComment(project, comment) {
     reasons.push('artifact-missing');
     anchorStatus = 'missing';
   } else {
+    if (!hasValidTime(artifact.changedAt)) {
+      reasons.push('invalid-artifact-timestamp');
+      anchorStatus = 'stale';
+    }
+
     if (artifact.currentDigest !== comment.anchorDigest) {
       reasons.push('artifact-digest-changed');
       anchorStatus = 'stale';

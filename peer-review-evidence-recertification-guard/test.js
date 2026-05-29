@@ -356,6 +356,48 @@ function testInvalidArtifactTimestampRequiresReviewRecertification() {
   assert.equal(action.effectiveDelta, 0);
 }
 
+function testInvalidArtifactTimestampRequiresCommentRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: 'not-a-date',
+      currentAnchors: {
+        'src/analyze.py#L41': { line: 41 }
+      }
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-invalid-artifact-timestamp',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-invalid-artifact-timestamp');
+  const task = byId(result.recertificationTasks, 'recertify-comment-invalid-artifact-timestamp');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'stale');
+  assert.deepEqual(comment.reasons, ['invalid-artifact-timestamp']);
+  assert.equal(task.kind, 'inline-comment');
+  assert.deepEqual(task.reasons, ['invalid-artifact-timestamp']);
+  assert.equal(result.summary.staleComments, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 function testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles() {
   const project = buildSampleProject();
   const result = evaluateRecertification(project);
@@ -379,6 +421,7 @@ const tests = [
   testStaleInlineCommentsBlockReputationUpdateWithoutStaleReviews,
   testInvalidReviewTimestampRequiresRecertification,
   testInvalidArtifactTimestampRequiresReviewRecertification,
+  testInvalidArtifactTimestampRequiresCommentRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];
 
