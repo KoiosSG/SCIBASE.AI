@@ -180,6 +180,19 @@ function testUnderscoreRegionalLanguageTagsUseBaseAliasAndHomographRules() {
   assert.equal(homographEvent.candidateEntityId, 'entity:stat:control-group');
 }
 
+function testMixedScriptLatinLanguageMentionsAreHeldForCuratorReview() {
+  const result = evaluateAliasGuard(buildSampleCorpus());
+  const event = byId(result.mentionDecisions, 'mention-crispr-cyrillic-spoof');
+
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'script-confusable-alias');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D000077768');
+
+  const action = byId(result.curatorActions, 'curate-mention-crispr-cyrillic-spoof');
+  assert.equal(action.priority, 'high');
+  assert.equal(action.action, 'review-multilingual-script-confusable');
+}
+
 function testLowConfidenceAliasesDoNotDriveRecommendations() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const event = byId(result.mentionDecisions, 'mention-cellule-fr');
@@ -229,7 +242,7 @@ function testAuditDigestIsDeterministicAndPrivateFree() {
 
   assert.ok(result.auditDigest.startsWith('sha256:'));
   assert.equal(result.summary.acceptedMentions, 6);
-  assert.equal(result.summary.heldMentions, 1);
+  assert.equal(result.summary.heldMentions, 2);
   assert.equal(result.summary.suppressedMentions, 1);
   assert.ok(!JSON.stringify(result).includes('private@'));
 }
@@ -243,6 +256,7 @@ const tests = [
   testRegionalLanguageTagsUseBaseAliasLookup,
   testRegionalLanguageTagsStillUseBaseHomographHolds,
   testUnderscoreRegionalLanguageTagsUseBaseAliasAndHomographRules,
+  testMixedScriptLatinLanguageMentionsAreHeldForCuratorReview,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testMissingConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,

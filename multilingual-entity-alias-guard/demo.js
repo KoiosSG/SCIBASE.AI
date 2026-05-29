@@ -30,7 +30,7 @@ Generated: ${result.generatedAt}
 ## Summary
 
 - Accepted mentions: ${result.summary.acceptedMentions}
-- Held homograph mentions: ${result.summary.heldMentions}
+- Held curator-review mentions: ${result.summary.heldMentions}
 - Suppressed low-confidence mentions: ${result.summary.suppressedMentions}
 - Entity packets emitted: ${result.summary.entityPackets}
 - Audit digest: ${result.auditDigest}
@@ -45,7 +45,7 @@ ${held}
 
 ## Recommendation Guard
 
-Suppressed mentions are not allowed to drive entity-page recommendations until a curator verifies the alias mapping.
+Held or suppressed mentions are not allowed to drive entity-page recommendations until a curator verifies the alias mapping.
 
 ## Safety
 
@@ -59,7 +59,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" v
   <rect x="54" y="58" width="1172" height="604" rx="18" fill="#142f42" stroke="#7bd88f" stroke-width="4"/>
   <text x="96" y="136" fill="#ffffff" font-family="Arial, sans-serif" font-size="44" font-weight="700">Multilingual Entity Alias Guard</text>
   <text x="96" y="210" fill="#d8f6df" font-family="Arial, sans-serif" font-size="28">Accepted canonical mentions: ${result.summary.acceptedMentions}</text>
-  <text x="96" y="260" fill="#d8f6df" font-family="Arial, sans-serif" font-size="28">Held homograph mentions: ${result.summary.heldMentions}</text>
+  <text x="96" y="260" fill="#d8f6df" font-family="Arial, sans-serif" font-size="28">Held curator-review mentions: ${result.summary.heldMentions}</text>
   <text x="96" y="310" fill="#d8f6df" font-family="Arial, sans-serif" font-size="28">Suppressed low-confidence mentions: ${result.summary.suppressedMentions}</text>
   <text x="96" y="380" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">Languages preserved: en, de, es, fr</text>
   <text x="96" y="430" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">JSON-LD entity packets ready for schema.org-style pages</text>

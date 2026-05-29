@@ -7,6 +7,7 @@
 - Normalizes language-tag casing plus hyphenated or underscored regional subtags for alias lookup while preserving the original tag on decisions.
 - Holds false friends and homographs before creating graph edges.
 - Holds same-language alias collisions when ontology entries reuse the same translated term.
+- Holds Latin-language mentions with Cyrillic or Greek lookalike characters for curator review before creating graph edges.
 - Emits schema.org-style `DefinedTerm` JSON-LD packets for entity pages.
 
 ## Knowledge Navigation
@@ -25,4 +26,4 @@
 
 - Synthetic data only.
 - No credentials, private corpora, live ontology calls, external APIs, or production recommendation systems.
-- This slice is distinct from ontology drift, synonym dedupe, temporal validity, geospatial provenance, and recommendation visibility/diversity guards.
+- This slice is distinct from ontology drift, synonym dedupe, generic entity disambiguation, temporal validity, geospatial provenance, and recommendation visibility/diversity guards.

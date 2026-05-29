@@ -19,6 +19,35 @@ function digest(value) {
   return `sha256:${crypto.createHash('sha256').update(stableStringify(value)).digest('hex')}`;
 }
 
+const LATIN_SCRIPT_LANGUAGES = new Set([
+  'ca',
+  'cs',
+  'da',
+  'de',
+  'en',
+  'es',
+  'fi',
+  'fr',
+  'hr',
+  'hu',
+  'id',
+  'it',
+  'nl',
+  'no',
+  'pl',
+  'pt',
+  'ro',
+  'sk',
+  'sl',
+  'sv',
+  'tr',
+  'vi'
+]);
+
+const LATIN_LETTER_RE = /[A-Za-z\u00C0-\u024F]/u;
+const CYRILLIC_LATIN_CONFUSABLE_RE = /[\u0405\u0410\u0412\u0415\u041A\u041C\u041D\u041E\u0420\u0421\u0422\u0425\u0430\u0435\u043E\u0440\u0441\u0445\u0455]/u;
+const GREEK_LATIN_CONFUSABLE_RE = /[\u0391\u0392\u0395\u0396\u0397\u0399\u039A\u039C\u039D\u039F\u03A1\u03A4\u03A5\u03A7]/u;
+
 function normalizeTerm(term) {
   return term.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 }
@@ -33,6 +62,23 @@ function languageLookupKeys(language) {
 
   const primary = normalized.split('-')[0];
   return primary && primary !== normalized ? [normalized, primary] : [normalized];
+}
+
+function primaryLanguage(language) {
+  return normalizeLanguageTag(language).split('-')[0] || '';
+}
+
+function hasMixedScriptConfusableRisk(mention) {
+  const primary = primaryLanguage(mention.language);
+  if (!LATIN_SCRIPT_LANGUAGES.has(primary)) {
+    return false;
+  }
+
+  const text = String(mention.text || '').normalize('NFKC');
+  return (
+    LATIN_LETTER_RE.test(text) &&
+    (CYRILLIC_LATIN_CONFUSABLE_RE.test(text) || GREEK_LATIN_CONFUSABLE_RE.test(text))
+  );
 }
 
 function confidenceScore(value) {
@@ -93,6 +139,21 @@ function mentionDecision(mention, aliasIndex, homographs) {
     .map((languageKey) => homographs[`${languageKey}:${termKey}`])
     .find(Boolean);
   const confidence = confidenceScore(mention.confidence);
+
+  if (hasMixedScriptConfusableRisk(mention)) {
+    return {
+      id: mention.id,
+      language: mention.language,
+      text: mention.text,
+      documentId: mention.documentId,
+      decision: 'hold-for-curator-review',
+      reason: 'script-confusable-alias',
+      candidateEntityId,
+      candidateEntityIds: candidateEntityId ? [candidateEntityId] : [],
+      confidence: mention.confidence,
+      preservedLanguageTag: mention.language
+    };
+  }
 
   if (homographEntry) {
     return {
@@ -164,11 +225,15 @@ function curatorActionForDecision(decision) {
     action:
       decision.reason === 'alias-collision'
         ? 'review-multilingual-alias-collision'
+        : decision.reason === 'script-confusable-alias'
+        ? 'review-multilingual-script-confusable'
         : decision.reason === 'false-friend-or-homograph'
         ? 'review-multilingual-homograph'
         : 'verify-translated-alias-before-recommendation',
     priority:
-      decision.reason === 'false-friend-or-homograph' || decision.reason === 'alias-collision'
+      decision.reason === 'false-friend-or-homograph' ||
+      decision.reason === 'alias-collision' ||
+      decision.reason === 'script-confusable-alias'
         ? 'high'
         : 'normal',
     language: decision.language,
@@ -371,6 +436,14 @@ function buildSampleCorpus() {
         language: 'fr',
         confidence: 0.61,
         candidateEntityId: 'entity:mesh:D002477'
+      },
+      {
+        id: 'mention-crispr-cyrillic-spoof',
+        documentId: 'paper-9',
+        text: '\u0421RISPR-Cas9',
+        language: 'en',
+        confidence: 0.97,
+        candidateEntityId: 'entity:mesh:D000077768'
       }
     ]
   };

@@ -113,6 +113,20 @@
       ],
       "confidence": 0.61,
       "preservedLanguageTag": "fr"
+    },
+    {
+      "id": "mention-crispr-cyrillic-spoof",
+      "language": "en",
+      "text": "СRISPR-Cas9",
+      "documentId": "paper-9",
+      "decision": "hold-for-curator-review",
+      "reason": "script-confusable-alias",
+      "candidateEntityId": "entity:mesh:D000077768",
+      "candidateEntityIds": [
+        "entity:mesh:D000077768"
+      ],
+      "confidence": 0.97,
+      "preservedLanguageTag": "en"
     }
   ],
   "entityPackets": [
@@ -338,12 +352,26 @@
         "entity:mesh:D002477"
       ],
       "reason": "low-confidence-alias"
+    },
+    {
+      "id": "curate-mention-crispr-cyrillic-spoof",
+      "mentionId": "mention-crispr-cyrillic-spoof",
+      "action": "review-multilingual-script-confusable",
+      "priority": "high",
+      "language": "en",
+      "text": "СRISPR-Cas9",
+      "candidateEntityId": "entity:mesh:D000077768",
+      "candidateEntityIds": [
+        "entity:mesh:D000077768"
+      ],
+      "reason": "script-confusable-alias"
     }
   ],
   "recommendationGuards": {
     "suppressedMentionIds": [
       "mention-control-es",
-      "mention-cellule-fr"
+      "mention-cellule-fr",
+      "mention-crispr-cyrillic-spoof"
     ],
     "safeEntityIds": [
       "entity:mesh:D000077768",
@@ -352,9 +380,9 @@
   },
   "summary": {
     "acceptedMentions": 6,
-    "heldMentions": 1,
+    "heldMentions": 2,
     "suppressedMentions": 1,
     "entityPackets": 3
   },
-  "auditDigest": "sha256:8bd1da50a253839d7f9becefa35e9192633262c8ece8caa8096ebb161ba52457"
+  "auditDigest": "sha256:58b1b2b3395ce6655f497a7bd521b57f00def5458b200200c46fa0f76ad854db"
 }
