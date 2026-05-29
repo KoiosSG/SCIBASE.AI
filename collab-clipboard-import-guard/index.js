@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 function assessImportBatch(batch) {
   const sourceFindings = assessSource(batch);
-  const duplicateAnchorBlocks = findDuplicateAnchorBlocks(batch.blocks || []);
+  const duplicateAnchorBlocks = findAnchorCollisionBlocks(batch.blocks || [], batch.existingAnchors || []);
   const sanitizedBlocks = [];
   const blockFindings = [];
 
@@ -140,12 +140,16 @@ function sanitizeBlockBase(block, duplicateAnchorBlocks) {
   return sanitized;
 }
 
-function findDuplicateAnchorBlocks(blocks) {
+function findAnchorCollisionBlocks(blocks, existingAnchors = []) {
   const blocksByAnchor = new Map();
   const duplicates = new Set();
+  const existingAnchorSet = new Set(existingAnchors.filter(Boolean));
 
   for (const block of blocks) {
     if (!block.anchor) continue;
+    if (existingAnchorSet.has(block.anchor)) {
+      duplicates.add(block.id);
+    }
     const anchorBlocks = blocksByAnchor.get(block.anchor) || [];
     anchorBlocks.push(block);
     blocksByAnchor.set(block.anchor, anchorBlocks);

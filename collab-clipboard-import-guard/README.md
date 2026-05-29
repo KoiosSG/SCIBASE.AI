@@ -11,7 +11,7 @@ It evaluates synthetic import batches for:
 - spreadsheet formula cells that could execute after import
 - notebook output snippets and table cells containing local or private filesystem paths
 - stale or malformed collaborator review metadata bound to old section versions or unverifiable expiry evidence
-- duplicate anchors that would collide inside the shared document, with every colliding block regenerated before insertion
+- duplicate anchors that would collide inside the import payload or with existing shared-document anchors, with every colliding block regenerated before insertion
 
 The guard emits a deterministic packet with sanitized blocks, reviewer actions, insertion lanes, findings, and a SHA-256 audit digest.
 

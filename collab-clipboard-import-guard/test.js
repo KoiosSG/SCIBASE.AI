@@ -190,6 +190,38 @@ function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   assert.notEqual(firstBlock.anchor, secondBlock.anchor);
 }
 
+function testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated() {
+  const packet = assessImportBatch({
+    importId: 'import-existing-anchor-collision',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:38:30Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:trusted-export'
+    },
+    existingAnchors: ['methods-overview'],
+    blocks: [
+      {
+        id: 'blk-existing-anchor',
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'methods-overview',
+        content: 'Imported paragraph with an anchor already present in shared state.'
+      }
+    ]
+  });
+
+  const importedBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-existing-anchor');
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['DUPLICATE_ANCHOR']);
+  assert.ok(packet.actions.includes('regenerate_anchor:blk-existing-anchor'));
+  assert.equal(importedBlock.anchor.startsWith('methods-overview-'), true);
+  assert.notEqual(importedBlock.anchor, 'methods-overview');
+}
+
 function testPrivateReferenceMarkersAreRedactedWithoutFilePaths() {
   const packet = assessImportBatch({
     importId: 'import-private-reference-marker',
@@ -342,6 +374,7 @@ const tests = [
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
   testStagesImportMissingSourceTrustMetadataForCuratorReview,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
+  testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
   testTableCellsWithPrivatePathsAreQuarantinedAndRedacted,
   testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion,
