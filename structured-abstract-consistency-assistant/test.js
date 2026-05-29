@@ -223,6 +223,36 @@ function testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-adverse-increase',
+    assessedAt: '2026-05-29T21:45:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, adverse event rate, increased in 96 manuscripts.',
+      conclusions: 'The assistant may require additional monitoring in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'adverse event rate',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'adverse event rate',
+      direction: 'worse',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'release_peer_review_packet');
+  assert.deepEqual(packet.findings, []);
+  assert.equal(packet.abstractSignals.resultsAligned, true);
+}
+
 function testAllowsFormattedSampleSizesInStructuredAbstract() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-formatted-sample-size',
@@ -362,6 +392,7 @@ const tests = [
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
   testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,
+  testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection,
   testAllowsFormattedSampleSizesInStructuredAbstract,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,

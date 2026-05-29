@@ -226,7 +226,14 @@ function hasText(value) {
 }
 
 function impliesImprovement(value) {
-  return /\b(improved|improvement|improves|increase|increased|reduced|reduction|decreased|lower|lowered|shorter|faster|better|effective|benefit)\b/i.test(value);
+  return (
+    /\b(improved|improvement|improves|reduced|reduction|decreased|lower|lowered|shorter|faster|better|effective|benefit)\b/i.test(value)
+    || (/\b(increase|increased|increases)\b/i.test(value) && !mentionsAdverseOutcome(value))
+  );
+}
+
+function mentionsAdverseOutcome(value) {
+  return /\b(adverse event|adverse events|harm|harms|mortality|death|deaths|complication|complications|toxicity|toxicities|failure|failures|error|errors|infection|infections)\b/i.test(value);
 }
 
 function resultDirectionConflicts(direction, abstractResults) {
