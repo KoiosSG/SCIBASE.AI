@@ -136,6 +136,46 @@ function testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift() {
   assert.deepEqual(comment.reasons, ['artifact-digest-changed']);
 }
 
+function testInvalidInlineCommentTimestampRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-19T09:30:00Z',
+      currentAnchors: {
+        'src/analyze.py#L41': { line: 41 }
+      }
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-invalid-submitted-at',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: 'not-a-date'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-invalid-submitted-at');
+  const task = byId(result.recertificationTasks, 'recertify-comment-invalid-submitted-at');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'stale');
+  assert.deepEqual(comment.reasons, ['invalid-comment-timestamp']);
+  assert.equal(task.kind, 'inline-comment');
+  assert.deepEqual(task.reasons, ['invalid-comment-timestamp']);
+}
+
 function testInvalidReviewTimestampRequiresRecertification() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -188,6 +228,7 @@ const tests = [
   testBlindModeRedactionAcceptsCaseAndSeparatorVariants,
   testInlineCommentsUseArtifactAnchorsForRecertification,
   testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
+  testInvalidInlineCommentTimestampRequiresRecertification,
   testInvalidReviewTimestampRequiresRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];

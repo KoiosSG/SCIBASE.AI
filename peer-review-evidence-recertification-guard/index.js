@@ -139,6 +139,11 @@ function evaluateComment(project, comment) {
   const reasons = [];
   let anchorStatus = 'current';
 
+  if (!hasValidTime(comment.submittedAt)) {
+    reasons.push('invalid-comment-timestamp');
+    anchorStatus = 'stale';
+  }
+
   if (!artifact) {
     reasons.push('artifact-missing');
     anchorStatus = 'missing';

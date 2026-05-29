@@ -13,4 +13,5 @@ Validation targets:
 - double-blind reviewer identity is not leaked in tasks or timeline events
 - stale inline comment anchors generate comment-specific recertification tasks
 - artifact digest changes mark inline comment anchors stale even when the selector line is unchanged
+- malformed inline comment timestamps require recertification before comment evidence is treated as current
 - timeline packets include deterministic audit digests
