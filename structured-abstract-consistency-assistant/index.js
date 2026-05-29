@@ -226,6 +226,7 @@ function hasText(value) {
 }
 
 function impliesImprovement(value) {
+  if (impliesNegatedBenefitClaim(value)) return false;
   return (
     /\b(improved|improvement|improves|reduced|reduction|decreased|lower|lowered|shorter|faster|better|effective|benefit)\b/i.test(value)
     || impliesPositiveSafetyClaim(value)
@@ -236,9 +237,14 @@ function impliesImprovement(value) {
 function impliesWorseOutcome(value) {
   return (
     /\b(worse|worsened|worsening|harm|harms|harmful|inferior|declined|negative|no clear effect|no effect|null effect|unchanged|not significant|non-significant)\b/i.test(value)
+    || impliesNegatedBenefitClaim(value)
     || impliesNegativeSafetyClaim(value)
     || (/\b(increase|increased|increases)\b/i.test(value) && mentionsAdverseOutcome(value))
   );
+}
+
+function impliesNegatedBenefitClaim(value) {
+  return /\b(did not|does not|do not|not|no|failed to|fails to|failure to)\s+(improve|improved|improves|improvement|reduce|reduced|reduction|decrease|decreased|lower|lowered|shorten|shortened|accelerate|accelerated|benefit|effective)\b/i.test(value);
 }
 
 function impliesPositiveSafetyClaim(value) {

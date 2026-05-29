@@ -315,6 +315,41 @@ function testBlocksWorseOutcomeClaimWhenResultsShowImprovement() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksNegatedBenefitClaimWhenResultsShowImprovement() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-negated-benefit-drift',
+    assessedAt: '2026-05-30T00:18:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, did not improve in 96 manuscripts.',
+      conclusions: 'The assistant did not improve comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), [
+    'CONCLUSION_RESULT_DIRECTION_MISMATCH',
+    'RESULT_DIRECTION_MISMATCH'
+  ]);
+  assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-negated-benefit-drift'));
+  assert.ok(packet.actions.includes('tone_down_conclusion:ms-abstract-negated-benefit-drift'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testAllowsFormattedSampleSizesInStructuredAbstract() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-formatted-sample-size',
@@ -457,6 +492,7 @@ const tests = [
   testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection,
   testBlocksSafetyBenefitConclusionWhenAdverseResultsWorsen,
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
+  testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,

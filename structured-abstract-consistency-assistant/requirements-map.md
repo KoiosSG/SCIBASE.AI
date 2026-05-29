@@ -4,7 +4,7 @@
 | --- | --- |
 | Auto peer review reports | Blocks or stages AI peer-review output when the abstract is not evidence-aligned. |
 | Clarity and coherence checks | Verifies the structured abstract has required sections and coherent methods/results/conclusion text. |
-| Claims vs. evidence alignment | Compares abstract claims against method design, target-specific sample sizes, comma-formatted manuscript counts, primary endpoint, bidirectional result direction, conclusion benefit drift, safety-benefit claims over worse adverse-outcome evidence, lower/shorter/faster benefit wording, negative/no-effect-result drift, improved-result/worse-wording drift, accurate adverse-outcome wording, and uncertainty. |
+| Claims vs. evidence alignment | Compares abstract claims against method design, target-specific sample sizes, comma-formatted manuscript counts, primary endpoint, bidirectional result direction, conclusion benefit drift, safety-benefit claims over worse adverse-outcome evidence, lower/shorter/faster benefit wording, negated benefit wording, negative/no-effect-result drift, improved-result/worse-wording drift, accurate adverse-outcome wording, and uncertainty. |
 | Adaptive review workflow | Emits author-draft, AI peer-review, and editor-summary lanes with remediation actions. |
 | Reviewer-ready artifacts | Produces deterministic JSON packets, Markdown summary, SVG overview, and MP4 demo evidence. |
 
