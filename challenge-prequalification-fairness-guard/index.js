@@ -125,6 +125,15 @@ function criteriaWeightsHaveInvalidValues(round) {
   );
 }
 
+function passThresholdIsInvalid(round) {
+  return (
+    typeof round.passThreshold !== 'number' ||
+    !Number.isFinite(round.passThreshold) ||
+    round.passThreshold < 0 ||
+    round.passThreshold > 100
+  );
+}
+
 function reviewUsesHiddenCriteria(review, criteriaIds) {
   return Object.keys(reviewScores(review)).some((criterionId) => !criteriaIds.includes(criterionId));
 }
@@ -172,6 +181,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (criteriaWeightsHaveInvalidValues(round)) {
     reasons.push('criteria-weight-value-invalid');
+  }
+
+  if (passThresholdIsInvalid(round)) {
+    reasons.push('pass-threshold-invalid');
   }
 
   if (nonConflictedReviews.length < round.minReviewers) {
@@ -234,6 +247,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('criteria-weight-value-invalid')) {
     return 'publish-valid-weighted-scoring-rubric';
+  }
+
+  if (reasons.includes('pass-threshold-invalid')) {
+    return 'publish-valid-prequalification-threshold';
   }
 
   if (reasons.includes('reviewer-conflict')) {
@@ -319,7 +336,8 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||
-        decision.reasons.includes('criteria-weight-value-invalid')
+        decision.reasons.includes('criteria-weight-value-invalid') ||
+        decision.reasons.includes('pass-threshold-invalid')
           ? 'high'
           : 'normal',
       reasons: decision.reasons

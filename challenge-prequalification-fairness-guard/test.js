@@ -275,6 +275,20 @@ function testInvalidIndividualCriterionWeightsHoldPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testInvalidPassThresholdHoldsPrequalificationRound() {
+  const round = buildSampleRound();
+  round.passThreshold = -5;
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-biofoundry');
+  const action = byId(result.remediationActions, 'remediate-applicant-biofoundry');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('pass-threshold-invalid'), true);
+  assert.equal(action.action, 'publish-valid-prequalification-threshold');
+  assert.equal(action.priority, 'high');
+}
+
 function testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing() {
   const round = buildSampleRound();
   round.applicants = [
@@ -391,6 +405,7 @@ const tests = [
   testInvalidAppealWindowHoldsRejectedApplicantForFairnessReview,
   testInvalidCriterionWeightsHoldPrequalificationRound,
   testInvalidIndividualCriterionWeightsHoldPrequalificationRound,
+  testInvalidPassThresholdHoldsPrequalificationRound,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree

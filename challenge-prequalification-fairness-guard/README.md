@@ -2,7 +2,7 @@
 
 This module adds a focused Scientific Bounty System slice for SCIBASE issue #18. It evaluates sponsor-side prequalification rounds before solver teams are accepted or rejected from a challenge.
 
-The guard checks published screening criteria, valid criterion weight values and totals, complete reviewer score evidence, weighted threshold consistency, anonymous-screening requirements, reviewer conflicts, distinct reviewer quorum, duplicate reviewer score evidence, rejection reason completeness, parseable appeal windows, and audit evidence. Conflicted reviewer scores are excluded from threshold scoring while the conflict remains auditable, and repeated reviewer identities are deduplicated before quorum or threshold scoring. Unfair or incomplete screening decisions are held for remediation before challenge access changes.
+The guard checks published screening criteria, valid criterion weight values and totals, valid pass thresholds, complete reviewer score evidence, weighted threshold consistency, anonymous-screening requirements, reviewer conflicts, distinct reviewer quorum, duplicate reviewer score evidence, rejection reason completeness, parseable appeal windows, and audit evidence. Conflicted reviewer scores are excluded from threshold scoring while the conflict remains auditable, and repeated reviewer identities are deduplicated before quorum or threshold scoring. Unfair or incomplete screening decisions are held for remediation before challenge access changes.
 
 ## Run
 

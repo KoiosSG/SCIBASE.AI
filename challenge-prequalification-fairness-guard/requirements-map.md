@@ -2,7 +2,7 @@
 
 ## Challenge Posting Portal
 
-- Verifies that prequalification rounds use published criteria, nonnegative weights, valid weight totals, and pass thresholds.
+- Verifies that prequalification rounds use published criteria, nonnegative weights, valid weight totals, and valid 0-100 pass thresholds.
 - Blocks unpublished sponsor preferences from entering solver-screening decisions.
 - Keeps prequalification decisions tied to challenge timelines and parseable appeal windows.
 
@@ -16,6 +16,7 @@
 ## Arbitration And Reward Distribution
 
 - Holds inconsistent threshold decisions for fairness review before a solver is excluded.
+- Holds invalid pass thresholds for fairness review before sponsor accept/reject decisions can take effect.
 - Flags reviewer conflicts, missing rejection reasons, and invalid appeal-window evidence for arbitration-ready remediation.
 - Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.
 - Deduplicates repeated reviewer identities before quorum and weighted threshold scoring while retaining the duplicate-evidence finding.
