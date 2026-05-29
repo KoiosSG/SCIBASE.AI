@@ -14,6 +14,12 @@
       "message": "Conclusion uses definitive language despite exploratory or uncertain evidence."
     },
     {
+      "code": "CONCLUSION_RESULT_DIRECTION_MISMATCH",
+      "severity": "blocker",
+      "target": "abstract.conclusions",
+      "message": "Abstract conclusion implies benefit, but the result packet reports no clear effect."
+    },
+    {
       "code": "ENDPOINT_MISMATCH",
       "severity": "blocker",
       "target": "results.primaryEndpoint",
@@ -63,5 +69,5 @@
     "limitationsBalanced": false
   },
   "assessedAt": "2026-05-28T10:10:00Z",
-  "auditDigest": "0ed398cb28fba2097bcf78440e0cb5d8279ba8edf2fea37c0e69425b040ea17d"
+  "auditDigest": "0a6e4dbcb19540b1ca3ce5a05c92d24ce6ab07778e39e4623a55b96e52c4db24"
 }

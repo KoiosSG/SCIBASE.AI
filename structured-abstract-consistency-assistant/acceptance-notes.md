@@ -16,6 +16,7 @@ Expected evidence:
 - `reports/blocked-packet.json` holds AI peer-review release when abstract claims conflict with methods and results.
 - Same-code findings are preserved when methods and results disagree on different evidence targets.
 - Result-direction checks block abstracts that describe worse or harmful results as improvements.
+- Conclusion-direction checks block reviewer-facing conclusion benefit claims when the result packet records no effect, worse outcomes, or harm.
 - `reports/revision-packet.json` stages an incomplete but otherwise evidence-aligned abstract for author revision.
 - `reports/clean-packet.json` releases a consistent structured abstract with monitoring.
 - `reports/abstract-consistency-report.md` summarizes lanes and finding codes.

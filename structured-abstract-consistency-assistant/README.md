@@ -8,6 +8,7 @@ It evaluates synthetic manuscript packets for:
 - target-specific sample-size mismatches between abstract, methods, and results
 - methods design mismatches
 - primary endpoint and result-direction drift, including negative results described as improvements
+- conclusions that imply benefit even when the results packet records no effect, worse outcomes, or harm
 - conclusions that overstate exploratory or uncertain evidence
 - missing limitation language when confidence intervals cross null or findings are exploratory
 

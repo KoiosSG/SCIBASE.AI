@@ -126,6 +126,15 @@ function assessConclusionBalance(manuscript) {
     }));
   }
 
+  if (resultDirectionConflicts(manuscript.results?.direction, conclusion)) {
+    findings.push(finding({
+      code: 'CONCLUSION_RESULT_DIRECTION_MISMATCH',
+      severity: 'blocker',
+      target: 'abstract.conclusions',
+      message: `Abstract conclusion implies benefit, but the result packet reports ${formatDirection(manuscript.results?.direction)}.`
+    }));
+  }
+
   return findings;
 }
 
@@ -165,7 +174,7 @@ function buildActions(manuscript, findings) {
   if (codes.has('MISSING_ABSTRACT_SECTION')) actions.add(`add_missing_sections:${manuscript.manuscriptId}`);
   if (codes.has('METHODS_DESIGN_MISMATCH') || codes.has('SAMPLE_SIZE_MISMATCH')) actions.add(`revise_methods_summary:${manuscript.manuscriptId}`);
   if (codes.has('ENDPOINT_MISMATCH') || codes.has('RESULT_DIRECTION_MISMATCH')) actions.add(`align_results_with_primary_endpoint:${manuscript.manuscriptId}`);
-  if (codes.has('CONCLUSION_OVERSTATES_EVIDENCE')) actions.add(`tone_down_conclusion:${manuscript.manuscriptId}`);
+  if (codes.has('CONCLUSION_OVERSTATES_EVIDENCE') || codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH')) actions.add(`tone_down_conclusion:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_LIMITATION_LANGUAGE')) actions.add(`add_limitations_to_abstract:${manuscript.manuscriptId}`);
   return [...actions].sort();
 }
@@ -175,7 +184,7 @@ function buildSignals(findings) {
   return {
     sectionsComplete: !codes.has('MISSING_ABSTRACT_SECTION'),
     methodsAligned: !codes.has('METHODS_DESIGN_MISMATCH') && !codes.has('SAMPLE_SIZE_MISMATCH'),
-    resultsAligned: !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH'),
+    resultsAligned: !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
     limitationsBalanced: !codes.has('MISSING_LIMITATION_LANGUAGE') && !codes.has('CONCLUSION_OVERSTATES_EVIDENCE')
   };
 }
