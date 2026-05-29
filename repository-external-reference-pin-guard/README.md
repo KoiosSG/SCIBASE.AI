@@ -11,7 +11,7 @@ This module checks whether a scientific repository can safely publish a DOI, cit
 - API sources use dated snapshots with checksum evidence instead of floating "latest" endpoints.
 - Export bundles do not require authenticated external references.
 - License and attribution metadata are present before DOI publication.
-- Reference verification evidence is fresh enough for release.
+- Reference verification evidence is fresh enough for release and is not future-dated.
 
 ## Commands
 

@@ -162,11 +162,36 @@ function testFloatingVersionAliasDoesNotCountAsDurableIdentifier() {
   assert.equal(packet.referenceSignals.exportable, false);
 }
 
+function testFutureDatedVerificationEvidenceIsNotFresh() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-future-verification',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'dataset-future-verified',
+        kind: 'linked_dataset',
+        target: 'https://doi.org/10.5281/zenodo.7654321',
+        checksum: 'sha256:feedface',
+        doi: '10.5281/zenodo.7654321',
+        license: 'CC-BY-4.0',
+        attribution: 'Example Lab',
+        lastVerifiedAt: '2026-05-29T12:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['STALE_REFERENCE_EVIDENCE']);
+  assert.ok(packet.actions.includes('refresh_reference_verification:dataset-future-verified'));
+  assert.equal(packet.referenceSignals.verificationFresh, false);
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
   testStagesReferencesMissingLicenseAttributionOnly,
-  testFloatingVersionAliasDoesNotCountAsDurableIdentifier
+  testFloatingVersionAliasDoesNotCountAsDurableIdentifier,
+  testFutureDatedVerificationEvidenceIsNotFresh
 ];
 
 for (const test of tests) {

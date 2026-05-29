@@ -92,6 +92,7 @@ function isStale(lastVerifiedAt, assessedAt, maxAgeDays) {
   const verified = Date.parse(lastVerifiedAt);
   const assessed = Date.parse(assessedAt);
   if (Number.isNaN(verified) || Number.isNaN(assessed)) return true;
+  if (verified > assessed) return true;
   const ageDays = Math.max(0, (assessed - verified) / (24 * 60 * 60 * 1000));
   return ageDays > maxAgeDays;
 }
