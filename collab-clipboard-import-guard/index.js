@@ -208,7 +208,8 @@ function isStaleReviewMetadata(block, batch) {
 
   const receivedAt = Date.parse(batch.receivedAt);
   const expiresAt = metadata.expiresAt ? Date.parse(metadata.expiresAt) : null;
-  if (expiresAt && receivedAt && expiresAt < receivedAt) return true;
+  if (metadata.expiresAt && (!Number.isFinite(expiresAt) || !Number.isFinite(receivedAt))) return true;
+  if (Number.isFinite(expiresAt) && Number.isFinite(receivedAt) && expiresAt < receivedAt) return true;
 
   const currentVersion = batch.currentSectionVersions?.[block.sectionId];
   return Boolean(currentVersion && metadata.sectionVersion && metadata.sectionVersion !== currentVersion);

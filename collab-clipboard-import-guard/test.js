@@ -260,6 +260,45 @@ function testTableCellsWithPrivatePathsAreQuarantinedAndRedacted() {
   assert.equal(JSON.stringify(packet).includes('patient-export'), false);
 }
 
+function testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion() {
+  const packet = assessImportBatch({
+    importId: 'import-malformed-review-expiry',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:41:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-review-export',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:review-export'
+    },
+    currentSectionVersions: {
+      discussion: 'sec-discussion-current'
+    },
+    blocks: [
+      {
+        id: 'blk-malformed-review-metadata',
+        type: 'comment',
+        sectionId: 'discussion',
+        anchor: 'discussion-review',
+        content: 'Imported collaborator note.',
+        reviewMetadata: {
+          reviewerId: 'anonymous-reviewer-b',
+          sectionVersion: 'sec-discussion-current',
+          expiresAt: 'not-a-date'
+        }
+      }
+    ]
+  });
+
+  const reviewBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-malformed-review-metadata');
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['STALE_REVIEW_METADATA']);
+  assert.ok(packet.actions.includes('drop_stale_review_metadata:blk-malformed-review-metadata'));
+  assert.equal(reviewBlock.reviewMetadataStatus, 'dropped_stale');
+  assert.equal(Object.hasOwn(reviewBlock, 'reviewMetadata'), false);
+}
+
 function testAllowsTrustedAttestedImportWithStableDigest() {
   const packet = assessImportBatch({
     importId: 'import-clean-zotero-note',
@@ -305,6 +344,7 @@ const tests = [
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
   testTableCellsWithPrivatePathsAreQuarantinedAndRedacted,
+  testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion,
   testAllowsTrustedAttestedImportWithStableDigest
 ];
 

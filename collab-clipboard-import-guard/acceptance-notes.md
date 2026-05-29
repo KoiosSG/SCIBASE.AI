@@ -19,6 +19,7 @@ Expected evidence:
 - Missing or unrecognized source trust metadata stages otherwise clean imports for curator review.
 - Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion.
 - Table-cell local/private paths are quarantined, redacted, and still formula-escaped when needed.
+- Malformed review metadata expiry evidence is dropped before imported comments can enter shared state.
 - `reports/import-provenance-report.md` summarizes insertion lanes and findings.
 - `reports/summary.svg` provides a visual review packet.
 - `reports/demo.mp4` is a short H.264 walkthrough generated from synthetic frames.
