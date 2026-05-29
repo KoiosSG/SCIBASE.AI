@@ -16,6 +16,7 @@ Expected evidence:
 - `reports/unsafe-packet.json` quarantines an untrusted clipboard payload.
 - `reports/partner-review-packet.json` stages a partner import missing a signed source attestation.
 - `reports/clean-packet.json` allows a trusted, attested import.
+- Missing or unrecognized source trust metadata stages otherwise clean imports for curator review.
 - Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion.
 - Table-cell local/private paths are quarantined, redacted, and still formula-escaped when needed.
 - `reports/import-provenance-report.md` summarizes insertion lanes and findings.

@@ -43,6 +43,15 @@ function assessSource(batch) {
     }));
   }
 
+  if (!['trusted', 'partner', 'untrusted'].includes(source.trustLevel)) {
+    findings.push(finding({
+      code: 'UNKNOWN_SOURCE_TRUST',
+      severity: 'warning',
+      blockId: null,
+      message: `Import source ${source.origin || 'unknown'} is missing recognized trust metadata.`
+    }));
+  }
+
   if (source.trustLevel === 'partner' && !source.signedAttestation) {
     findings.push(finding({
       code: 'MISSING_SOURCE_ATTESTATION',
@@ -248,6 +257,7 @@ function buildActions(batch, findings) {
     if (item.code === 'DUPLICATE_ANCHOR') actions.add(`regenerate_anchor:${item.blockId}`);
     if (item.code === 'HIDDEN_INSTRUCTION_TEXT') actions.add(`strip_hidden_instruction_text:${item.blockId}`);
     if (item.code === 'UNTRUSTED_SOURCE') actions.add(`require_curator_source_review:${batch.importId}`);
+    if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
   }
 

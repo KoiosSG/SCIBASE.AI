@@ -121,6 +121,33 @@ function testStagesPartnerImportMissingSignedAttestationForCuratorReview() {
   assert.deepEqual(packet.actions, ['request_signed_source_attestation:import-partner-forward']);
 }
 
+function testStagesImportMissingSourceTrustMetadataForCuratorReview() {
+  const packet = assessImportBatch({
+    importId: 'import-missing-source-trust',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:36:00Z',
+    source: {
+      channel: 'clipboard',
+      origin: 'browser-paste'
+    },
+    blocks: [
+      {
+        id: 'blk-clean-unknown-source',
+        type: 'paragraph',
+        sectionId: 'discussion',
+        anchor: 'unknown-source-clean',
+        content: 'Clean text pasted from an editor with no source trust metadata.'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.equal(packet.insertionLanes.collaborativeInsert, 'curator_review');
+  assert.equal(packet.insertionLanes.reviewerPreview, 'watermarked');
+  assert.deepEqual(findingCodes(packet), ['UNKNOWN_SOURCE_TRUST']);
+  assert.deepEqual(packet.actions, ['require_curator_source_review:import-missing-source-trust']);
+}
+
 function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   const packet = assessImportBatch({
     importId: 'import-anchor-collision',
@@ -274,6 +301,7 @@ function testAllowsTrustedAttestedImportWithStableDigest() {
 const tests = [
   testQuarantinesUnsafeClipboardPayloadBeforeSharedInsert,
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
+  testStagesImportMissingSourceTrustMetadataForCuratorReview,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
   testTableCellsWithPrivatePathsAreQuarantinedAndRedacted,

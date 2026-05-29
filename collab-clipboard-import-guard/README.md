@@ -5,6 +5,7 @@ This module adds a focused issue #12 slice for the real-time collaborative resea
 It evaluates synthetic import batches for:
 
 - untrusted clipboard or file sources
+- missing or unrecognized source trust metadata
 - missing signed source attestations from partner imports
 - hidden instruction-like text that is not visible to collaborators
 - spreadsheet formula cells that could execute after import
