@@ -19,7 +19,7 @@ const riskyRepository = {
       id: 'dataset-lab-export',
       kind: 'linked_dataset',
       target: 'https://data.example.invalid/lab-export.csv',
-      checksum: '',
+      checksum: 'pending',
       doi: '',
       license: 'CC-BY-4.0',
       attribution: 'Example Lab',

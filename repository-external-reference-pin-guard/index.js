@@ -74,7 +74,7 @@ function hasPinnedCommit(reference) {
 }
 
 function hasSnapshotEvidence(reference, assessedAt) {
-  if (!hasText(reference.snapshotDate) || !hasText(reference.checksum)) return false;
+  if (!hasText(reference.snapshotDate) || !hasValidChecksum(reference.checksum)) return false;
   const snapshot = Date.parse(reference.snapshotDate);
   const assessed = Date.parse(assessedAt);
   if (Number.isNaN(snapshot) || Number.isNaN(assessed)) return false;
@@ -86,7 +86,12 @@ function needsDurableIdentifier(reference) {
 }
 
 function hasDurableIdentifier(reference) {
-  return hasText(reference.checksum) || hasText(reference.doi) || hasImmutableVersion(reference.version);
+  return hasValidChecksum(reference.checksum) || hasText(reference.doi) || hasImmutableVersion(reference.version);
+}
+
+function hasValidChecksum(checksum) {
+  return typeof checksum === 'string'
+    && /^(sha256|sha384|sha512):[a-f0-9]{6,}$/i.test(checksum.trim());
 }
 
 function hasImmutableVersion(version) {

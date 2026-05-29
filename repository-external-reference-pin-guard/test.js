@@ -162,6 +162,31 @@ function testFloatingVersionAliasDoesNotCountAsDurableIdentifier() {
   assert.equal(packet.referenceSignals.exportable, false);
 }
 
+function testInvalidChecksumDoesNotCountAsDurableIdentifier() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-invalid-checksum',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'dataset-invalid-checksum',
+        kind: 'linked_dataset',
+        target: 'https://data.example.invalid/lab-export.csv',
+        checksum: 'pending',
+        doi: '',
+        version: '',
+        license: 'CC-BY-4.0',
+        attribution: 'Example Lab',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['MISSING_DURABLE_IDENTIFIER']);
+  assert.ok(packet.actions.includes('add_checksum_or_doi:dataset-invalid-checksum'));
+  assert.equal(packet.referenceSignals.exportable, false);
+}
+
 function testFutureDatedVerificationEvidenceIsNotFresh() {
   const packet = assessExternalReferences({
     repositoryId: 'repo-reference-future-verification',
@@ -208,6 +233,31 @@ function testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence() {
   assert.equal(packet.status, 'hold_repository_release');
   assert.deepEqual(findingCodes(packet), ['FLOATING_API_REFERENCE']);
   assert.ok(packet.actions.includes('pin_external_reference:api-future-snapshot'));
+  assert.equal(packet.referenceSignals.immutablePins, false);
+}
+
+function testInvalidApiSnapshotChecksumDoesNotCountAsPinnedEvidence() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-invalid-api-checksum',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'api-invalid-checksum',
+        kind: 'api_source',
+        target: 'https://api.example.invalid/weather/snapshots/2026-05-01.json',
+        snapshotDate: '2026-05-01',
+        checksum: 'pending',
+        authRequired: false,
+        license: 'CC0-1.0',
+        attribution: 'Example Weather API',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['FLOATING_API_REFERENCE']);
+  assert.ok(packet.actions.includes('pin_external_reference:api-invalid-checksum'));
   assert.equal(packet.referenceSignals.immutablePins, false);
 }
 
@@ -262,8 +312,10 @@ const tests = [
   testAllowsPinnedExportableReferences,
   testStagesReferencesMissingLicenseAttributionOnly,
   testFloatingVersionAliasDoesNotCountAsDurableIdentifier,
+  testInvalidChecksumDoesNotCountAsDurableIdentifier,
   testFutureDatedVerificationEvidenceIsNotFresh,
   testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence,
+  testInvalidApiSnapshotChecksumDoesNotCountAsPinnedEvidence,
   testNullGitCommitShaDoesNotCountAsImmutablePin,
   testMissingVerificationEvidenceBlocksOtherwisePinnedReference
 ];
