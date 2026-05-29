@@ -89,6 +89,25 @@ function testUnicodeAndWhitespaceAliasesMatchCanonicalEntities() {
   assert.equal(event.candidateEntityId, 'entity:mesh:D005260');
 }
 
+function testLanguageTagCaseDoesNotSuppressTrustedAliases() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions.push({
+    id: 'mention-diabetes-es-uppercase',
+    documentId: 'paper-10',
+    text: 'diabetes mellitus',
+    language: 'ES',
+    confidence: 0.92
+  });
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-diabetes-es-uppercase');
+
+  assert.equal(event.decision, 'accept-canonical-entity');
+  assert.equal(event.reason, 'trusted-translated-alias');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D003920');
+  assert.equal(event.preservedLanguageTag, 'ES');
+}
+
 function testLowConfidenceAliasesDoNotDriveRecommendations() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const event = byId(result.mentionDecisions, 'mention-cellule-fr');
@@ -125,6 +144,7 @@ const tests = [
   testFalseFriendMentionsAreHeldForCuratorReview,
   testSameLanguageAliasCollisionsAreHeldForCuratorReview,
   testUnicodeAndWhitespaceAliasesMatchCanonicalEntities,
+  testLanguageTagCaseDoesNotSuppressTrustedAliases,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree

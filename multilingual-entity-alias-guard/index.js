@@ -23,13 +23,17 @@ function normalizeTerm(term) {
   return term.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 }
 
+function normalizeLanguageTag(language) {
+  return String(language || '').normalize('NFKC').trim().toLocaleLowerCase();
+}
+
 function buildAliasIndex(entities) {
   const index = new Map();
 
   for (const entity of entities) {
     for (const [language, terms] of Object.entries(entity.localizedNames)) {
       for (const term of terms) {
-        const key = `${language}:${normalizeTerm(term)}`;
+        const key = `${normalizeLanguageTag(language)}:${normalizeTerm(term)}`;
         const existing = index.get(key);
 
         if (!existing) {
@@ -65,10 +69,11 @@ function buildAliasIndex(entities) {
 }
 
 function mentionDecision(mention, aliasIndex, homographs) {
-  const aliasEntry = aliasIndex.get(`${mention.language}:${normalizeTerm(mention.text)}`);
+  const languageKey = normalizeLanguageTag(mention.language);
+  const aliasEntry = aliasIndex.get(`${languageKey}:${normalizeTerm(mention.text)}`);
   const alias = aliasEntry && aliasEntry.kind === 'alias' ? aliasEntry : null;
   const candidateEntityId = alias ? alias.entity.id : mention.candidateEntityId || null;
-  const homographKey = `${mention.language}:${normalizeTerm(mention.text)}`;
+  const homographKey = `${languageKey}:${normalizeTerm(mention.text)}`;
 
   if (homographs[homographKey]) {
     return {

@@ -14,6 +14,7 @@ Validation coverage:
 - trusted CRISPR aliases in English, German, and Spanish map to one canonical MeSH entity
 - Spanish `control` is held as a homograph/false friend instead of silently creating a statistical control-group edge
 - same-language translated alias collisions are held instead of silently attaching a mention to the wrong canonical entity
+- language-tag case differences do not suppress trusted translated aliases
 - low-confidence French alias output is suppressed from recommendations
 - localized names remain language-tagged on entity packets
 - audit output is deterministic and private-data free
