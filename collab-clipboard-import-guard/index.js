@@ -61,6 +61,15 @@ function assessSource(batch) {
     }));
   }
 
+  if (containsLocalPrivatePath(source.origin)) {
+    findings.push(finding({
+      code: 'LOCAL_PRIVATE_SOURCE',
+      severity: 'blocker',
+      blockId: null,
+      message: 'Import source origin references a local or private filesystem path.'
+    }));
+  }
+
   return findings;
 }
 
@@ -261,6 +270,7 @@ function buildActions(batch, findings) {
     if (item.code === 'STALE_REVIEW_METADATA') actions.add(`drop_stale_review_metadata:${item.blockId}`);
     if (item.code === 'DUPLICATE_ANCHOR') actions.add(`regenerate_anchor:${item.blockId}`);
     if (item.code === 'HIDDEN_INSTRUCTION_TEXT') actions.add(`strip_hidden_instruction_text:${item.blockId}`);
+    if (item.code === 'LOCAL_PRIVATE_SOURCE') actions.add(`redact_source_origin:${batch.importId}`);
     if (item.code === 'UNTRUSTED_SOURCE') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
@@ -278,9 +288,10 @@ function compareFindings(left, right) {
 }
 
 function sanitizeSource(source) {
+  const origin = source.origin || 'unknown';
   return {
     channel: source.channel || 'unknown',
-    origin: source.origin || 'unknown',
+    origin: containsLocalPrivatePath(origin) ? redactLocalPrivatePaths(origin) : origin,
     trustLevel: source.trustLevel || 'unknown',
     attested: hasSignedAttestation(source)
   };

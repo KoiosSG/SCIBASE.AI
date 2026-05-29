@@ -5,7 +5,8 @@ const { assessImportBatch } = require('./index');
 const {
   unsafeClipboardImport,
   partnerForwardImport,
-  cleanTrustedImport
+  cleanTrustedImport,
+  privateSourceOriginImport
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -14,6 +15,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 const packets = [
   ['unsafe-packet.json', assessImportBatch(unsafeClipboardImport)],
   ['partner-review-packet.json', assessImportBatch(partnerForwardImport)],
+  ['source-origin-packet.json', assessImportBatch(privateSourceOriginImport)],
   ['clean-packet.json', assessImportBatch(cleanTrustedImport)]
 ];
 
@@ -54,6 +56,7 @@ function renderMarkdown(packetRows) {
 }
 
 function renderSvg(packetRows) {
+  const height = 108 + packetRows.length * 74 + 54;
   const rows = packetRows.map(([, packet], index) => {
     const y = 108 + index * 74;
     const color = packet.status === 'quarantine_import' ? '#b91c1c' : packet.status === 'stage_for_curator_review' ? '#b45309' : '#15803d';
@@ -67,8 +70,8 @@ function renderSvg(packetRows) {
   }).join('');
 
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="370" viewBox="0 0 1200 370">',
-    '  <rect width="1200" height="370" fill="#eef2f7"/>',
+    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${height}" viewBox="0 0 1200 ${height}">`,
+    `  <rect width="1200" height="${height}" fill="#eef2f7"/>`,
     '  <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Clipboard Import Provenance Guard</text>',
     '  <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Pasted and imported research-editor blocks are gated before collaborative insertion.</text>',
     rows,

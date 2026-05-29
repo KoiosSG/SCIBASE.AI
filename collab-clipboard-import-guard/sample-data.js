@@ -92,8 +92,30 @@ const cleanTrustedImport = {
   ]
 };
 
+const privateSourceOriginImport = {
+  importId: 'import-private-source-origin',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-28T08:39:45Z',
+  source: {
+    channel: 'file-import',
+    origin: 'file:///Users/sam/private-lab/patient-export.docx',
+    trustLevel: 'trusted',
+    signedAttestation: 'sha256:private-origin-export'
+  },
+  blocks: [
+    {
+      id: 'blk-clean-private-source',
+      type: 'paragraph',
+      sectionId: 'methods',
+      anchor: 'private-source-origin',
+      content: 'Clean paragraph content from the imported document.'
+    }
+  ]
+};
+
 module.exports = {
   unsafeClipboardImport,
   partnerForwardImport,
-  cleanTrustedImport
+  cleanTrustedImport,
+  privateSourceOriginImport
 };

@@ -15,11 +15,13 @@ Expected evidence:
 
 - `reports/unsafe-packet.json` quarantines an untrusted clipboard payload.
 - `reports/partner-review-packet.json` stages a partner import missing a signed source attestation.
+- `reports/source-origin-packet.json` quarantines and redacts local/private source-origin metadata.
 - Blank signed source attestation values are treated as missing and stage partner imports for curator review.
 - `reports/clean-packet.json` allows a trusted, attested import.
 - Missing or unrecognized source trust metadata stages otherwise clean imports for curator review.
 - Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion, including collisions with anchors that already exist in shared manuscript state.
 - Table-cell local/private paths are quarantined, redacted, and still formula-escaped when needed.
+- Source-origin local/private paths are quarantined and redacted before reviewer packets are emitted.
 - Malformed review metadata expiry evidence is dropped before imported comments can enter shared state.
 - `reports/import-provenance-report.md` summarizes insertion lanes and findings.
 - `reports/summary.svg` provides a visual review packet.

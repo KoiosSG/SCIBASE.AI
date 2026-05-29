@@ -320,6 +320,37 @@ function testTableCellsWithPrivatePathsAreQuarantinedAndRedacted() {
   assert.equal(JSON.stringify(packet).includes('patient-export'), false);
 }
 
+function testSourceOriginWithPrivatePathIsQuarantinedAndRedacted() {
+  const packet = assessImportBatch({
+    importId: 'import-private-source-origin',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:39:45Z',
+    source: {
+      channel: 'file-import',
+      origin: 'file:///Users/sam/private-lab/patient-export.docx',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:private-origin-export'
+    },
+    blocks: [
+      {
+        id: 'blk-clean-private-source',
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'private-source-origin',
+        content: 'Clean paragraph content from the imported document.'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['LOCAL_PRIVATE_SOURCE']);
+  assert.ok(packet.actions.includes('redact_source_origin:import-private-source-origin'));
+  assert.equal(packet.source.origin, '[redacted-local-path]');
+  assert.equal(JSON.stringify(packet).includes('/Users/sam'), false);
+  assert.equal(JSON.stringify(packet).includes('private-lab'), false);
+  assert.equal(JSON.stringify(packet).includes('patient-export'), false);
+}
+
 function testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion() {
   const packet = assessImportBatch({
     importId: 'import-malformed-review-expiry',
@@ -406,6 +437,7 @@ const tests = [
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
   testTableCellsWithPrivatePathsAreQuarantinedAndRedacted,
+  testSourceOriginWithPrivatePathIsQuarantinedAndRedacted,
   testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion,
   testAllowsTrustedAttestedImportWithStableDigest
 ];

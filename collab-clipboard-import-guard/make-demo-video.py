@@ -66,7 +66,7 @@ def main():
             [
                 "Blocks untrusted rich text from direct collaborative insertion",
                 "Escapes spreadsheet formula cells before renderer handoff",
-                "Redacts private notebook output paths and drops stale review metadata",
+                "Redacts private source origins, notebook paths, and table cells",
             ],
         ),
         (
