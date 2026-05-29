@@ -116,7 +116,7 @@ function sanitizeIdentifier(value, fallback) {
   return hasPrivateContext(value) ? fallback : value;
 }
 
-function sanitizeMetadata(metadata) {
+function sanitizeMetadata(metadata = {}) {
   const safe = {};
   const removedKeys = [];
   const findings = [];

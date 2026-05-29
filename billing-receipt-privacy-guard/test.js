@@ -230,6 +230,37 @@ function testRedactedReceiptIdentifiersRemainDistinct() {
   assert.equal(new Set(result.receipts.map((receipt) => receipt.invoiceId)).size, 2);
 }
 
+function testMissingProviderMetadataIsTreatedAsEmptyMetadata() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-missing-provider-metadata',
+      invoiceId: 'inv-missing-provider-metadata',
+      customerId: 'customer-lab-008',
+      currency: 'USD',
+      totalCents: 31000,
+      lineItems: [
+        {
+          id: 'line-platform-subscription-c',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 1,
+          unit: 'month',
+          amountCents: 31000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+
+  assert.equal(receipt.decision, 'deliver-receipt');
+  assert.deepEqual(receipt.providerMetadata, {});
+  assert.deepEqual(receipt.removedMetadataKeys, []);
+  assert.equal(receipt.findings.length, 0);
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -261,6 +292,7 @@ const tests = [
   testCustomerFacingLineItemFieldsAreRedacted,
   testCustomerFacingReceiptIdentifiersAreRedacted,
   testRedactedReceiptIdentifiersRemainDistinct,
+  testMissingProviderMetadataIsTreatedAsEmptyMetadata,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
