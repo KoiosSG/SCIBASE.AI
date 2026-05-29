@@ -17,7 +17,7 @@
 
 - Holds inconsistent threshold decisions for fairness review before a solver is excluded.
 - Holds invalid pass thresholds for fairness review before sponsor accept/reject decisions can take effect.
-- Flags reviewer conflicts, missing rejection reasons, and invalid appeal-window evidence for arbitration-ready remediation.
+- Flags reviewer conflicts, missing or omitted rejection reason lists, and invalid appeal-window evidence for arbitration-ready remediation.
 - Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.
 - Deduplicates repeated reviewer identities before quorum and weighted threshold scoring while retaining the duplicate-evidence finding.
 - Produces deterministic digests for challenge administrators and third-party reviewers.

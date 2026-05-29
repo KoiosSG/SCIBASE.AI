@@ -111,6 +111,10 @@ function reviewScores(review) {
   return review.scores && typeof review.scores === 'object' ? review.scores : {};
 }
 
+function applicantRejectionReasons(applicant) {
+  return Array.isArray(applicant.rejectionReasons) ? applicant.rejectionReasons : [];
+}
+
 function criteriaWeightTotal(round) {
   return round.criteria.reduce((total, criterion) => total + criterion.weight, 0);
 }
@@ -213,7 +217,7 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('inconsistent-threshold-decision');
   }
 
-  if (applicant.sponsorDecision === 'reject' && applicant.rejectionReasons.length === 0) {
+  if (applicant.sponsorDecision === 'reject' && applicantRejectionReasons(applicant).length === 0) {
     reasons.push('missing-rejection-reason');
   }
 
@@ -307,7 +311,7 @@ function evaluatePrequalificationRound(round) {
       reviewersCounted: nonConflictedReviews.length,
       criteriaApplied: publicCriteriaIds(round),
       reasons,
-      rejectionReasons: applicant.rejectionReasons,
+      rejectionReasons: applicantRejectionReasons(applicant),
       appealStatus: appealStatus(applicant, round),
       auditDigest: digest({
         applicantId: applicant.id,

@@ -289,6 +289,54 @@ function testInvalidPassThresholdHoldsPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testMissingRejectionReasonListHoldsWithoutCrashing() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-missing-rejection-list',
+      sponsorDecision: 'reject',
+      appealDueAt: '2026-06-04T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-missing-rejection-list',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 58,
+        'data-readiness': 60,
+        'safety-plan': 62
+      }
+    },
+    {
+      applicantId: 'applicant-missing-rejection-list',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 59,
+        'data-readiness': 61,
+        'safety-plan': 60
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-missing-rejection-list');
+  const action = byId(result.remediationActions, 'remediate-applicant-missing-rejection-list');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.deepEqual(decision.rejectionReasons, []);
+  assert.equal(decision.reasons.includes('missing-rejection-reason'), true);
+  assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
+}
+
 function testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing() {
   const round = buildSampleRound();
   round.applicants = [
@@ -406,6 +454,7 @@ const tests = [
   testInvalidCriterionWeightsHoldPrequalificationRound,
   testInvalidIndividualCriterionWeightsHoldPrequalificationRound,
   testInvalidPassThresholdHoldsPrequalificationRound,
+  testMissingRejectionReasonListHoldsWithoutCrashing,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree
