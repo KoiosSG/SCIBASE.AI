@@ -138,10 +138,18 @@ function evaluateComment(project, comment) {
   const artifact = findArtifact(project, comment.artifactId);
   const reasons = [];
   let anchorStatus = 'current';
+  const hasUsableAnchor = comment.anchor
+    && typeof comment.anchor.selector === 'string'
+    && typeof comment.anchor.line === 'number';
 
   if (!hasValidTime(comment.submittedAt)) {
     reasons.push('invalid-comment-timestamp');
     anchorStatus = 'stale';
+  }
+
+  if (!hasUsableAnchor) {
+    reasons.push('comment-anchor-metadata-missing');
+    anchorStatus = 'missing';
   }
 
   if (!artifact) {
@@ -153,13 +161,15 @@ function evaluateComment(project, comment) {
       anchorStatus = 'stale';
     }
 
-    const currentAnchor = artifact.currentAnchors[comment.anchor.selector];
-    if (!currentAnchor) {
-      reasons.push('anchor-missing-after-comment');
-      anchorStatus = 'missing';
-    } else if (currentAnchor.line !== comment.anchor.line) {
-      reasons.push('anchor-line-shifted-after-comment');
-      anchorStatus = 'stale';
+    if (hasUsableAnchor) {
+      const currentAnchor = (artifact.currentAnchors || {})[comment.anchor.selector];
+      if (!currentAnchor) {
+        reasons.push('anchor-missing-after-comment');
+        anchorStatus = 'missing';
+      } else if (currentAnchor.line !== comment.anchor.line) {
+        reasons.push('anchor-line-shifted-after-comment');
+        anchorStatus = 'stale';
+      }
     }
   }
 
@@ -172,7 +182,7 @@ function evaluateComment(project, comment) {
     anchorStatus,
     reviewer: reviewerDisplay(comment),
     reasons,
-    anchor: comment.anchor
+    anchor: comment.anchor || null
   };
 }
 

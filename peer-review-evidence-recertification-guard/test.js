@@ -176,6 +176,77 @@ function testInvalidInlineCommentTimestampRequiresRecertification() {
   assert.deepEqual(task.reasons, ['invalid-comment-timestamp']);
 }
 
+function testMissingInlineCommentAnchorMetadataRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-19T09:30:00Z',
+      currentAnchors: {
+        'src/analyze.py#L41': { line: 41 }
+      }
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-missing-anchor-metadata',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-missing-anchor-metadata');
+  const task = byId(result.recertificationTasks, 'recertify-comment-missing-anchor-metadata');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'missing');
+  assert.deepEqual(comment.reasons, ['comment-anchor-metadata-missing']);
+  assert.equal(comment.anchor, null);
+  assert.equal(task.kind, 'inline-comment');
+  assert.deepEqual(task.reasons, ['comment-anchor-metadata-missing']);
+}
+
+function testMissingArtifactAnchorMapRequiresCommentRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-19T09:30:00Z'
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-missing-artifact-anchor-map',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-missing-artifact-anchor-map');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'missing');
+  assert.deepEqual(comment.reasons, ['anchor-missing-after-comment']);
+}
+
 function testInvalidReviewTimestampRequiresRecertification() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -229,6 +300,8 @@ const tests = [
   testInlineCommentsUseArtifactAnchorsForRecertification,
   testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
   testInvalidInlineCommentTimestampRequiresRecertification,
+  testMissingInlineCommentAnchorMetadataRequiresRecertification,
+  testMissingArtifactAnchorMapRequiresCommentRecertification,
   testInvalidReviewTimestampRequiresRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];
