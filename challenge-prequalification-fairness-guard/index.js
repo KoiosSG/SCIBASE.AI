@@ -138,13 +138,20 @@ function appealStatus(applicant, round) {
     return 'missing';
   }
 
-  return applicant.appealDueAt >= round.generatedAt ? 'open' : 'expired';
+  const appealDueAt = Date.parse(applicant.appealDueAt);
+  const generatedAt = Date.parse(round.generatedAt);
+  if (!Number.isFinite(appealDueAt) || !Number.isFinite(generatedAt)) {
+    return 'invalid';
+  }
+
+  return appealDueAt >= generatedAt ? 'open' : 'expired';
 }
 
 function reasonsForApplicant(applicant, reviews, round) {
   const criteriaIds = publicCriteriaIds(round);
   const nonConflictedReviews = countableNonConflictedReviews(reviews);
   const duplicateReviewerIds = duplicateNonConflictedReviewerIds(reviews);
+  const applicantAppealStatus = appealStatus(applicant, round);
   const reasons = [];
 
   if (round.anonymousScreeningRequired && reviews.some((review) => !review.anonymousScreeningObserved)) {
@@ -197,12 +204,16 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-rejection-reason');
   }
 
-  if (applicant.sponsorDecision === 'reject' && appealStatus(applicant, round) === 'missing') {
+  if (applicant.sponsorDecision === 'reject' && applicantAppealStatus === 'missing') {
     reasons.push('missing-appeal-window');
   }
 
-  if (applicant.sponsorDecision === 'reject' && appealStatus(applicant, round) === 'expired') {
+  if (applicant.sponsorDecision === 'reject' && applicantAppealStatus === 'expired') {
     reasons.push('expired-appeal-window');
+  }
+
+  if (applicant.sponsorDecision === 'reject' && applicantAppealStatus === 'invalid') {
+    reasons.push('invalid-appeal-window');
   }
 
   return uniqueSorted(reasons);
@@ -236,7 +247,8 @@ function remediationAction(applicant, reasons) {
   if (
     reasons.includes('missing-rejection-reason') ||
     reasons.includes('missing-appeal-window') ||
-    reasons.includes('expired-appeal-window')
+    reasons.includes('expired-appeal-window') ||
+    reasons.includes('invalid-appeal-window')
   ) {
     return 'publish-rejection-reasons-and-appeal-window';
   }

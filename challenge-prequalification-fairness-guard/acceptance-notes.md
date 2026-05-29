@@ -18,6 +18,7 @@ Validation coverage:
 - conflicted reviewer participation and missing rejection reasons remain auditable
 - conflicted reviewer scores are excluded from weighted threshold evidence
 - unpublished screening criteria are blocked before results are published
+- invalid appeal-window timestamps hold rejected applicants before rejection packets are published
 - invalid individual criterion weights are held even when the total still sums to 100
 - incomplete reviewer score evidence is held for completion without crashing the prequalification packet
 - duplicate reviewer score evidence is held and deduplicated before quorum or weighted threshold scoring

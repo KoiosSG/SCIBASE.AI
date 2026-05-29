@@ -4,7 +4,7 @@
 
 - Verifies that prequalification rounds use published criteria, nonnegative weights, valid weight totals, and pass thresholds.
 - Blocks unpublished sponsor preferences from entering solver-screening decisions.
-- Keeps prequalification decisions tied to challenge timelines and appeal windows.
+- Keeps prequalification decisions tied to challenge timelines and parseable appeal windows.
 
 ## Submission Engine
 
@@ -16,7 +16,7 @@
 ## Arbitration And Reward Distribution
 
 - Holds inconsistent threshold decisions for fairness review before a solver is excluded.
-- Flags reviewer conflicts and missing rejection reasons for arbitration-ready remediation.
+- Flags reviewer conflicts, missing rejection reasons, and invalid appeal-window evidence for arbitration-ready remediation.
 - Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.
 - Deduplicates repeated reviewer identities before quorum and weighted threshold scoring while retaining the duplicate-evidence finding.
 - Produces deterministic digests for challenge administrators and third-party reviewers.

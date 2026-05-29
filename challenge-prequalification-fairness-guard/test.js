@@ -166,6 +166,55 @@ function testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview() {
   assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
 }
 
+function testInvalidAppealWindowHoldsRejectedApplicantForFairnessReview() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-invalid-appeal',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      appealDueAt: 'not-a-date'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-appeal',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      scores: {
+        'domain-fit': 60,
+        'data-readiness': 58,
+        'safety-plan': 62
+      }
+    },
+    {
+      applicantId: 'applicant-invalid-appeal',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      scores: {
+        'domain-fit': 62,
+        'data-readiness': 57,
+        'safety-plan': 61
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-invalid-appeal');
+  const action = byId(result.remediationActions, 'remediate-applicant-invalid-appeal');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.appealStatus, 'invalid');
+  assert.equal(decision.reasons.includes('invalid-appeal-window'), true);
+  assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
+}
+
 function testInvalidCriterionWeightsHoldPrequalificationRound() {
   const round = buildSampleRound();
   round.criteria = [
@@ -339,6 +388,7 @@ const tests = [
   testConflictedReviewerScoresDoNotInflateWeightedScore,
   testHiddenCriteriaAreBlockedBeforeScreeningResultsPublish,
   testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview,
+  testInvalidAppealWindowHoldsRejectedApplicantForFairnessReview,
   testInvalidCriterionWeightsHoldPrequalificationRound,
   testInvalidIndividualCriterionWeightsHoldPrequalificationRound,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
