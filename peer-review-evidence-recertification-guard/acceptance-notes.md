@@ -16,4 +16,5 @@ Validation targets:
 - malformed inline comment timestamps require recertification before comment evidence is treated as current
 - missing inline comment anchor metadata requires recertification instead of crashing evidence evaluation
 - missing artifact anchor maps require comment recertification instead of crashing evidence evaluation
+- stale inline-comment evidence blocks reputation updates even when no stale review is present
 - timeline packets include deterministic audit digests

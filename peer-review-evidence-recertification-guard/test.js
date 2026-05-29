@@ -247,6 +247,43 @@ function testMissingArtifactAnchorMapRequiresCommentRecertification() {
   assert.deepEqual(comment.reasons, ['anchor-missing-after-comment']);
 }
 
+function testStaleInlineCommentsBlockReputationUpdateWithoutStaleReviews() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v4',
+      changedAt: '2026-05-20T09:30:00Z',
+      currentAnchors: {
+        'src/analyze.py#L41': { line: 41 }
+      }
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-only-stale-evidence',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+
+  assert.equal(result.summary.staleReviews, 0);
+  assert.equal(result.summary.staleComments, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+  assert.equal(byId(result.recertificationTasks, 'recertify-comment-only-stale-evidence').kind, 'inline-comment');
+}
+
 function testInvalidReviewTimestampRequiresRecertification() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -302,6 +339,7 @@ const tests = [
   testInvalidInlineCommentTimestampRequiresRecertification,
   testMissingInlineCommentAnchorMetadataRequiresRecertification,
   testMissingArtifactAnchorMapRequiresCommentRecertification,
+  testStaleInlineCommentsBlockReputationUpdateWithoutStaleReviews,
   testInvalidReviewTimestampRequiresRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
 ];

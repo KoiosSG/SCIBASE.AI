@@ -267,7 +267,9 @@ function evaluateRecertification(project) {
       frozenReputationDelta: reputationActions
         .filter((action) => action.action === 'freeze-until-recertified')
         .reduce((sum, action) => sum + action.originalDelta, 0),
-      recommendedAction: staleReviews > 0 ? 'block-reputation-update' : 'allow-reputation-update'
+      recommendedAction: (staleReviews > 0 || staleComments > 0)
+        ? 'block-reputation-update'
+        : 'allow-reputation-update'
     }
   };
 }

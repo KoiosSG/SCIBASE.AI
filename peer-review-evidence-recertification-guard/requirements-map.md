@@ -5,13 +5,14 @@
 - Structured peer-review evidence is tied to reviewed artifact digests.
 - Malformed review submission or recertification timestamps require recertification before review credit is applied.
 - Inline comments track artifact anchors and require recertification when anchors shift, artifact digests change, anchor metadata is missing, artifact anchor maps are missing, or comment timing evidence is malformed.
+- Stale review or inline-comment evidence blocks reputation updates until recertification is complete.
 - Public, semi-private, and double-blind review modes are represented.
 - Review history is emitted in a project timeline packet.
 
 ## Contributor Credits
 
 - Review-derived reputation deltas are preserved as original deltas.
-- Stale evidence freezes effective deltas until recertification.
+- Stale review evidence freezes effective deltas until recertification, and stale inline-comment evidence blocks reputation updates.
 - Audit packets keep enough evidence for profile and citation-page credit decisions.
 
 ## Reputation Scoring
