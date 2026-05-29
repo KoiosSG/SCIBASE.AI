@@ -83,11 +83,46 @@ function testNonCriticalLowContrastRequiresRemediationBeforeRelease() {
   assert.ok(packet.actions.includes('improve_contrast:secondary-storage-trend'));
 }
 
+function testPrivateDataInTableSummaryBlocksRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-private-summary',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:10:00Z',
+    widgets: [
+      {
+        id: 'private-summary-table',
+        type: 'table',
+        title: 'Project review',
+        foreground: '#111827',
+        background: '#ffffff',
+        critical: true,
+        keyboardReachable: true,
+        screenReaderLabel: 'Project review table',
+        tableSummary: 'Rows include restricted project alpha and private lab owner alice@example.edu.',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'blocked');
+  assert.ok(codes(packet).includes('PRIVATE_DATA_IN_ACCESSIBILITY_TEXT'));
+  assert.equal(packet.wcagSignals.understandable, false);
+  assert.ok(packet.actions.includes('redact_accessibility_text:private-summary-table'));
+}
+
 const tests = [
   testCriticalAccessibilityIssuesBlockDashboardRelease,
   testCleanDashboardReleasesWithWcagSignals,
   testWarningsAllowInternalOnlyPreview,
-  testNonCriticalLowContrastRequiresRemediationBeforeRelease
+  testNonCriticalLowContrastRequiresRemediationBeforeRelease,
+  testPrivateDataInTableSummaryBlocksRelease
 ];
 
 for (const test of tests) {

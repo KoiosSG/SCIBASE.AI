@@ -59,7 +59,7 @@ function assessVisualAndOperableComponents(dashboard) {
       findings.push(finding(component, 'KEYBOARD_TRAP', 'blocker', 'Keyboard users cannot reach or leave this component predictably.'));
     }
 
-    if (component.ariaTextContainsPrivateData || containsPrivateData(component.screenReaderLabel)) {
+    if (component.ariaTextContainsPrivateData || containsPrivateData(accessibilityText(component))) {
       findings.push(finding(component, 'PRIVATE_DATA_IN_ACCESSIBILITY_TEXT', 'blocker', 'Accessibility text exposes private user, lab, or project data.'));
     }
 
@@ -158,6 +158,9 @@ function buildActions(dashboard, findings) {
     ) {
       actions.add(`improve_contrast:${item.componentId}`);
     }
+    if (item.code === 'PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') {
+      actions.add(`redact_accessibility_text:${item.componentId}`);
+    }
   }
 
   return [...actions].sort();
@@ -204,6 +207,10 @@ function relativeLuminance({ r, g, b }) {
 
 function containsPrivateData(value = '') {
   return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|private lab|restricted project/i.test(value);
+}
+
+function accessibilityText(component) {
+  return [component.screenReaderLabel, component.tableSummary].filter(Boolean).join(' ');
 }
 
 function digestPacket(packet) {

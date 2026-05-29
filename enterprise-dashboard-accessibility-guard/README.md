@@ -9,7 +9,7 @@ This module evaluates institutional admin dashboard releases before they are sho
 - Critical metric color contrast and warning-level contrast checks for noncritical content
 - Missing screen-reader labels
 - Keyboard reachability and focus traps
-- Private user or project data embedded in accessibility text
+- Private user or project data embedded in screen-reader labels, table summaries, or export summaries
 - Missing table and export summaries
 - Heading-order skips
 - Missing reduced-motion fallbacks for animated dashboard content

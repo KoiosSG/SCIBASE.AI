@@ -63,7 +63,8 @@
     "add_table_summary:private-project-table",
     "add_table_summary:weekly-admin-export",
     "block_release:enterprise-admin-overview",
-    "improve_contrast:webhook-failure-alert"
+    "improve_contrast:webhook-failure-alert",
+    "redact_accessibility_text:compute-usage-critical"
   ],
   "wcagSignals": {
     "perceivable": false,
@@ -72,5 +73,5 @@
     "robust": false
   },
   "assessedAt": "2026-05-27T13:00:00Z",
-  "auditDigest": "08fe3d5920f0e34baf7e2c3d0919ac2a322e0b3bd2bc92602de6e6b201e8dfc5"
+  "auditDigest": "99f76262882d98d054a07949f72bd391fce08701fc36c67821b2d0be13f39300"
 }
