@@ -112,8 +112,18 @@ function receiptIdentifierFindings(receipt) {
   }));
 }
 
+function receiptEnvelopeFindings(receipt) {
+  return findingsForText(stableStringify({
+    currency: receipt.currency
+  }));
+}
+
 function sanitizeIdentifier(value, fallback) {
   return hasPrivateContext(value) ? fallback : value;
+}
+
+function sanitizeCurrency(value) {
+  return hasPrivateContext(value) ? 'XXX' : value;
 }
 
 function sanitizeMetadata(metadata = {}) {
@@ -157,17 +167,19 @@ function evaluateReceipt(receipt, index) {
   const redactedLineItems = receipt.lineItems.map((lineItem, index) => sanitizeLineItem(lineItem, index));
   const lineFindings = redactedLineItems.flatMap((lineItem) => lineItem.findings);
   const identifierFindings = receiptIdentifierFindings(receipt);
+  const envelopeFindings = receiptEnvelopeFindings(receipt);
   const metadata = sanitizeMetadata(receipt.providerMetadata);
-  const findings = Array.from(new Set([...lineFindings, ...identifierFindings, ...metadata.findings])).sort();
+  const findings = Array.from(new Set([...lineFindings, ...identifierFindings, ...envelopeFindings, ...metadata.findings])).sort();
   const decision = findings.length > 0 ? 'hold-for-finance-review' : 'deliver-receipt';
   const safeReceiptId = sanitizeIdentifier(receipt.id, `receipt-redacted-${index + 1}`);
   const safeInvoiceId = sanitizeIdentifier(receipt.invoiceId, `invoice-redacted-${index + 1}`);
   const safeCustomerId = sanitizeIdentifier(receipt.customerId, `customer-redacted-${index + 1}`);
+  const safeCurrency = sanitizeCurrency(receipt.currency);
 
   const customerCopy = {
     receiptId: safeReceiptId,
     customerId: safeCustomerId,
-    currency: receipt.currency,
+    currency: safeCurrency,
     totalCents: receipt.totalCents,
     lineItems: redactedLineItems.map((lineItem) => ({
       id: lineItem.id,

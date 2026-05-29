@@ -7,6 +7,7 @@
 - Scans nested provider metadata values so allowlisted keys cannot hide private workspace context.
 - Treats omitted provider metadata as an empty provider packet instead of crashing receipt review.
 - Redacts receipt, invoice, and customer identifiers when they carry private project, dataset, or collaborator context.
+- Redacts unsafe customer-facing currency labels when they carry restricted dataset context.
 - Redacts customer-facing line-item identifiers and units when they carry restricted dataset context.
 - Preserves customer-useful totals, billing period, plan, and invoice references after redaction.
 

@@ -18,6 +18,7 @@ Validation coverage:
 - restricted dataset details are replaced with usage-category-safe wording
 - receipt, invoice, and customer identifiers are redacted when they expose private context
 - redacted receipt identifiers remain distinct for finance review correlation
+- customer-facing currency labels are replaced with `XXX` when they carry restricted dataset context
 - customer-facing line-item identifiers and units are redacted when they contain restricted dataset context
 - missing provider metadata is treated as an empty provider packet instead of crashing receipt review
 - unsafe provider metadata keys are removed before delivery

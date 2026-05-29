@@ -261,6 +261,43 @@ function testMissingProviderMetadataIsTreatedAsEmptyMetadata() {
   assert.equal(receipt.findings.length, 0);
 }
 
+function testCustomerFacingCurrencyLabelsAreRedacted() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-currency-leak',
+      invoiceId: 'inv-currency-leak',
+      customerId: 'customer-lab-009',
+      currency: 'USD GSE-private cohort',
+      totalCents: 27000,
+      providerMetadata: {
+        accountRef: 'acct-lab-009',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-currency-leak',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-platform-subscription-d',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 1,
+          unit: 'month',
+          amountCents: 27000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('restricted-dataset-reference'), true);
+  assert.equal(receipt.customerCopy.currency, 'XXX');
+  assert.equal(JSON.stringify(result).includes('GSE-private'), false);
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -293,6 +330,7 @@ const tests = [
   testCustomerFacingReceiptIdentifiersAreRedacted,
   testRedactedReceiptIdentifiersRemainDistinct,
   testMissingProviderMetadataIsTreatedAsEmptyMetadata,
+  testCustomerFacingCurrencyLabelsAreRedacted,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
