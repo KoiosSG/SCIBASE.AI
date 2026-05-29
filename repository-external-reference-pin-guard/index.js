@@ -35,7 +35,7 @@ function assessReference(reference, assessedAt, policy) {
     findings.push(finding(reference, 'FLOATING_GIT_REFERENCE', 'blocker', 'Git reference must be pinned to an immutable commit SHA before release.'));
   }
 
-  if (reference.kind === 'api_source' && !hasSnapshotEvidence(reference)) {
+  if (reference.kind === 'api_source' && !hasSnapshotEvidence(reference, assessedAt)) {
     findings.push(finding(reference, 'FLOATING_API_REFERENCE', 'blocker', 'API source must reference a dated snapshot with checksum evidence.'));
   }
 
@@ -70,8 +70,12 @@ function hasPinnedCommit(reference) {
   return /^[a-f0-9]{40}$/i.test(reference.commitSha || '');
 }
 
-function hasSnapshotEvidence(reference) {
-  return hasText(reference.snapshotDate) && hasText(reference.checksum);
+function hasSnapshotEvidence(reference, assessedAt) {
+  if (!hasText(reference.snapshotDate) || !hasText(reference.checksum)) return false;
+  const snapshot = Date.parse(reference.snapshotDate);
+  const assessed = Date.parse(assessedAt);
+  if (Number.isNaN(snapshot) || Number.isNaN(assessed)) return false;
+  return snapshot <= assessed;
 }
 
 function needsDurableIdentifier(reference) {

@@ -186,12 +186,38 @@ function testFutureDatedVerificationEvidenceIsNotFresh() {
   assert.equal(packet.referenceSignals.verificationFresh, false);
 }
 
+function testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-future-api-snapshot',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'api-future-snapshot',
+        kind: 'api_source',
+        target: 'https://api.example.invalid/weather/snapshots/2026-06-01.json',
+        snapshotDate: '2026-06-01',
+        checksum: 'sha256:abcdef',
+        authRequired: false,
+        license: 'CC0-1.0',
+        attribution: 'Example Weather API',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['FLOATING_API_REFERENCE']);
+  assert.ok(packet.actions.includes('pin_external_reference:api-future-snapshot'));
+  assert.equal(packet.referenceSignals.immutablePins, false);
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
   testStagesReferencesMissingLicenseAttributionOnly,
   testFloatingVersionAliasDoesNotCountAsDurableIdentifier,
-  testFutureDatedVerificationEvidenceIsNotFresh
+  testFutureDatedVerificationEvidenceIsNotFresh,
+  testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence
 ];
 
 for (const test of tests) {
