@@ -25,4 +25,5 @@ Validation coverage:
 - missing rejection reason lists are normalized to an auditable fairness hold instead of crashing the prequalification packet
 - incomplete reviewer score evidence is held for completion without crashing the prequalification packet
 - duplicate reviewer score evidence is held and deduplicated before quorum or weighted threshold scoring
+- missing or blank reviewer identities are held and excluded from reviewer quorum until evidence is completed
 - audit digests are deterministic and private-data free

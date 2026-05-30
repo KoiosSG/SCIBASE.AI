@@ -94,6 +94,10 @@ function duplicateNonConflictedReviewerIds(reviews) {
   );
 }
 
+function hasMissingReviewerIdentity(reviews) {
+  return reviews.some((review) => !reviewerIdFor(review));
+}
+
 function countableNonConflictedReviews(reviews) {
   const seenReviewerIds = new Set();
 
@@ -104,7 +108,7 @@ function countableNonConflictedReviews(reviews) {
 
     const reviewerId = reviewerIdFor(review);
     if (!reviewerId) {
-      return true;
+      return false;
     }
 
     if (seenReviewerIds.has(reviewerId)) {
@@ -195,6 +199,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (duplicateReviewerIds.length > 0) {
     reasons.push('duplicate-reviewer-score-evidence');
+  }
+
+  if (hasMissingReviewerIdentity(reviews)) {
+    reasons.push('missing-reviewer-identity');
   }
 
   if (criteriaWeightTotal(round) !== 100) {
@@ -300,6 +308,10 @@ function remediationAction(applicant, reasons) {
     return 'complete-prequalification-evidence';
   }
 
+  if (reasons.includes('missing-reviewer-identity')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('inconsistent-threshold-decision')) {
     return 'reconcile-score-threshold-decision';
   }
@@ -361,6 +373,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('reviewer-conflict') ||
         decision.reasons.includes('duplicate-published-criterion') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
+        decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||
         decision.reasons.includes('criteria-weight-value-invalid') ||
@@ -435,6 +448,12 @@ function buildSampleRound() {
       {
         id: 'applicant-sponsor-alumni',
         sponsorDecision: 'reject',
+        rejectionReasons: [],
+        appealDueAt: null
+      },
+      {
+        id: 'applicant-missing-reviewer-identity',
+        sponsorDecision: 'accept',
         rejectionReasons: [],
         appealDueAt: null
       }
@@ -516,6 +535,31 @@ function buildSampleRound() {
           'domain-fit': 70,
           'data-readiness': 68,
           'safety-plan': 73
+        }
+      },
+      {
+        applicantId: 'applicant-missing-reviewer-identity',
+        reviewerId: '   ',
+        anonymousScreeningObserved: true,
+        conflict: false,
+        recommendedDecision: 'accept',
+        rejectionReasons: [],
+        scores: {
+          'domain-fit': 94,
+          'data-readiness': 95,
+          'safety-plan': 93
+        }
+      },
+      {
+        applicantId: 'applicant-missing-reviewer-identity',
+        anonymousScreeningObserved: true,
+        conflict: false,
+        recommendedDecision: 'accept',
+        rejectionReasons: [],
+        scores: {
+          'domain-fit': 92,
+          'data-readiness': 94,
+          'safety-plan': 91
         }
       }
     ]

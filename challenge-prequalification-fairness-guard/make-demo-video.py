@@ -28,7 +28,7 @@ def draw_frame_with_pillow():
   draw.text((96, 102), "Challenge Prequalification Fairness Guard", fill="white", font=title_font)
   draw.text((96, 190), "Published criteria plus weighted threshold checks", fill="#dff5d5", font=body_font)
   draw.text((96, 248), "Anonymous screening leaks and conflicts are held", fill="#dff5d5", font=body_font)
-  draw.text((96, 306), "Missing rejection reasons create remediation actions", fill="#dff5d5", font=body_font)
+  draw.text((96, 306), "Missing reviewer identities cannot satisfy quorum", fill="#dff5d5", font=body_font)
   draw.text((96, 402), "Synthetic data only. No sponsor, solver, payout, or identity systems are called.", fill="#ffd37a", font=note_font)
 
   image.save(FRAME)

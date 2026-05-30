@@ -69,6 +69,29 @@
       "rejectionReasons": [],
       "appealStatus": "missing",
       "auditDigest": "sha256:155ac57faaf2c7ccabbb1799d38d4f73c1ed458c2da1a0bfc8fe49a2f4120dee"
+    },
+    {
+      "id": "applicant-missing-reviewer-identity",
+      "applicantId": "applicant-missing-reviewer-identity",
+      "challengeId": "challenge-18-prequalification-rna-biomarker",
+      "decision": "hold-for-fairness-review",
+      "sponsorDecision": "accept",
+      "weightedScore": 0,
+      "passThreshold": 75,
+      "reviewersCounted": 0,
+      "criteriaApplied": [
+        "domain-fit",
+        "data-readiness",
+        "safety-plan"
+      ],
+      "reasons": [
+        "inconsistent-threshold-decision",
+        "missing-reviewer-identity",
+        "reviewer-quorum-shortfall"
+      ],
+      "rejectionReasons": [],
+      "appealStatus": "not-required",
+      "auditDigest": "sha256:155b16a3cbdbb41a53a5df5faf6e7e64e6854dbac37beb448deb2a829e4edeec"
     }
   ],
   "remediationActions": [
@@ -93,13 +116,24 @@
         "reviewer-conflict",
         "reviewer-quorum-shortfall"
       ]
+    },
+    {
+      "id": "remediate-applicant-missing-reviewer-identity",
+      "applicantId": "applicant-missing-reviewer-identity",
+      "action": "complete-prequalification-evidence",
+      "priority": "high",
+      "reasons": [
+        "inconsistent-threshold-decision",
+        "missing-reviewer-identity",
+        "reviewer-quorum-shortfall"
+      ]
     }
   ],
   "summary": {
     "accepted": 1,
-    "held": 2,
+    "held": 3,
     "rejectedWithAudit": 0,
-    "remediationActions": 2
+    "remediationActions": 3
   },
-  "auditDigest": "sha256:d2c3f92e0cbdf23779537887ca5da9ecd84c708b359cab01999f38ed79b40b1e"
+  "auditDigest": "sha256:5ec541696fa83ff5f5ac49891dbb4bdf0e1174638039f2a2e7b6e65f2df49d16"
 }

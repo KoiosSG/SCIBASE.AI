@@ -495,6 +495,56 @@ function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
   assert.equal(action.priority, 'high');
 }
 
+function testMissingReviewerIdentityDoesNotSatisfyQuorum() {
+  const round = buildSampleRound();
+  round.minReviewers = 2;
+  round.applicants = [
+    {
+      id: 'applicant-missing-reviewer-identity',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-missing-reviewer-identity',
+      reviewerId: '   ',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 96,
+        'data-readiness': 94,
+        'safety-plan': 95
+      }
+    },
+    {
+      applicantId: 'applicant-missing-reviewer-identity',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 93,
+        'safety-plan': 94
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-missing-reviewer-identity');
+  const action = byId(result.remediationActions, 'remediate-applicant-missing-reviewer-identity');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reviewersCounted, 0);
+  assert.equal(decision.reasons.includes('missing-reviewer-identity'), true);
+  assert.equal(decision.reasons.includes('reviewer-quorum-shortfall'), true);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const first = evaluatePrequalificationRound(buildSampleRound());
   const second = evaluatePrequalificationRound(buildSampleRound());
@@ -502,7 +552,7 @@ function testAuditDigestIsDeterministicAndPrivateFree() {
   assert.equal(first.auditDigest, second.auditDigest);
   assert.ok(first.auditDigest.startsWith('sha256:'));
   assert.equal(first.summary.accepted, 1);
-  assert.equal(first.summary.held, 2);
+  assert.equal(first.summary.held, 3);
   assert.equal(JSON.stringify(first).includes('private@'), false);
   assert.equal(JSON.stringify(first).includes('government_id'), false);
 }
@@ -522,6 +572,7 @@ const tests = [
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
+  testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 
