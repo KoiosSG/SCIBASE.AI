@@ -8,6 +8,7 @@ It evaluates synthetic manuscript packets for:
 - target-specific sample-size mismatches between abstract, methods, and results, while accepting normal comma-formatted counts such as `1,200`
 - methods design mismatches
 - primary endpoint and bidirectional result-direction drift, including negative/no-effect results described as improvements and improved results described as worsened or harmful
+- result-section certainty overclaims, such as statistically significant or clinically meaningful, when evidence is exploratory or confidence intervals cross null
 - conclusions that imply benefit with improvement/lower/shorter/faster language even when the results packet records no effect, worse outcomes, or harm
 - safety-benefit conclusions such as safe, well tolerated, or tolerable when adverse-outcome evidence worsens
 - negated safety-concern conclusions, such as no safety concerns or no adverse events, when adverse-outcome evidence worsens

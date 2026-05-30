@@ -100,13 +100,22 @@ function assessResultsAlignment(manuscript) {
     }));
   }
 
+  if (hasUncertainEvidence(manuscript) && overstatesResultCertainty(abstractResults)) {
+    findings.push(finding({
+      code: 'RESULT_OVERSTATES_EVIDENCE',
+      severity: 'blocker',
+      target: 'abstract.results',
+      message: 'Abstract results use certainty language despite exploratory or null-crossing evidence.'
+    }));
+  }
+
   return findings;
 }
 
 function assessConclusionBalance(manuscript) {
   const findings = [];
   const conclusion = normalize(manuscript.abstract?.conclusions);
-  const uncertainEvidence = manuscript.results?.exploratory || manuscript.methods?.confidenceIntervalCrossesNull;
+  const uncertainEvidence = hasUncertainEvidence(manuscript);
 
   if (uncertainEvidence && !hasLimitations(manuscript, conclusion)) {
     findings.push(finding({
@@ -174,6 +183,7 @@ function buildActions(manuscript, findings) {
   if (codes.has('MISSING_ABSTRACT_SECTION')) actions.add(`add_missing_sections:${manuscript.manuscriptId}`);
   if (codes.has('METHODS_DESIGN_MISMATCH') || codes.has('SAMPLE_SIZE_MISMATCH')) actions.add(`revise_methods_summary:${manuscript.manuscriptId}`);
   if (codes.has('ENDPOINT_MISMATCH') || codes.has('RESULT_DIRECTION_MISMATCH')) actions.add(`align_results_with_primary_endpoint:${manuscript.manuscriptId}`);
+  if (codes.has('RESULT_OVERSTATES_EVIDENCE')) actions.add(`revise_results_certainty:${manuscript.manuscriptId}`);
   if (codes.has('CONCLUSION_OVERSTATES_EVIDENCE') || codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH')) actions.add(`tone_down_conclusion:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_LIMITATION_LANGUAGE')) actions.add(`add_limitations_to_abstract:${manuscript.manuscriptId}`);
   return [...actions].sort();
@@ -184,7 +194,7 @@ function buildSignals(findings) {
   return {
     sectionsComplete: !codes.has('MISSING_ABSTRACT_SECTION'),
     methodsAligned: !codes.has('METHODS_DESIGN_MISMATCH') && !codes.has('SAMPLE_SIZE_MISMATCH'),
-    resultsAligned: !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
+    resultsAligned: !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
     limitationsBalanced: !codes.has('MISSING_LIMITATION_LANGUAGE') && !codes.has('CONCLUSION_OVERSTATES_EVIDENCE')
   };
 }
@@ -276,6 +286,19 @@ function resultDirectionConflicts(direction, abstractResults) {
   ) || (
     impliesWorseOutcome(abstractResults) && isPositiveDirection(normalizedDirection)
   );
+}
+
+function hasUncertainEvidence(manuscript) {
+  return Boolean(
+    manuscript.results?.exploratory
+    || manuscript.results?.confidenceIntervalCrossesNull
+    || manuscript.methods?.confidenceIntervalCrossesNull
+  );
+}
+
+function overstatesResultCertainty(value) {
+  if (/\b(not|non[- ]?|no)\s+(statistically\s+)?significant\b/i.test(value)) return false;
+  return /\b(statistically significant|clinically meaningful|robust|definitive|conclusive|confirmed|proven)\b/i.test(value);
 }
 
 function isNegativeOrNoEffectDirection(direction) {

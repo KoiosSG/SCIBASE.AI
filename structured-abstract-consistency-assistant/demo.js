@@ -5,6 +5,7 @@ const { assessStructuredAbstract } = require('./index');
 const {
   blockedManuscript,
   revisionManuscript,
+  resultCertaintyOverclaimManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -14,6 +15,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 const packets = [
   ['blocked-packet.json', assessStructuredAbstract(blockedManuscript)],
   ['revision-packet.json', assessStructuredAbstract(revisionManuscript)],
+  ['result-certainty-packet.json', assessStructuredAbstract(resultCertaintyOverclaimManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 
@@ -54,6 +56,7 @@ function renderMarkdown(packetRows) {
 }
 
 function renderSvg(packetRows) {
+  const height = 108 + packetRows.length * 74 + 40;
   const rows = packetRows.map(([, packet], index) => {
     const y = 108 + index * 74;
     const color = packet.status === 'hold_peer_review_packet' ? '#b91c1c' : packet.status === 'stage_for_author_revision' ? '#b45309' : '#15803d';
@@ -67,8 +70,8 @@ function renderSvg(packetRows) {
   }).join('');
 
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="370" viewBox="0 0 1200 370">',
-    '  <rect width="1200" height="370" fill="#eef2f7"/>',
+    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${height}" viewBox="0 0 1200 ${height}">`,
+    `  <rect width="1200" height="${height}" fill="#eef2f7"/>`,
     '  <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Structured Abstract Consistency Assistant</text>',
     '  <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Abstracts are checked against methods, results, and limitations before AI review release.</text>',
     rows,

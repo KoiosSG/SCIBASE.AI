@@ -66,7 +66,7 @@ def main():
             [
                 "Sample size and study design differ from the methods packet",
                 "Result text implies improvement despite no clear effect",
-                "Conclusion overstates exploratory and uncertain evidence",
+                "Result or conclusion text overstates uncertain evidence",
             ],
         ),
         (

@@ -315,6 +315,37 @@ function testBlocksNegatedSafetyConcernConclusionWhenAdverseResultsWorsen() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksResultCertaintyClaimWhenEvidenceCrossesNull() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-result-certainty-overclaim',
+    assessedAt: '2026-05-30T02:55:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, showed a statistically significant and clinically meaningful improvement in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings but requires validation.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: true
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['confidence interval crosses null']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['RESULT_OVERSTATES_EVIDENCE']);
+  assert.ok(packet.actions.includes('revise_results_certainty:ms-abstract-result-certainty-overclaim'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testBlocksWorseOutcomeClaimWhenResultsShowImprovement() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-wording-drift',
@@ -523,6 +554,7 @@ const tests = [
   testAllowsAccurateAdverseIncreaseWhenResultsShowWorseDirection,
   testBlocksSafetyBenefitConclusionWhenAdverseResultsWorsen,
   testBlocksNegatedSafetyConcernConclusionWhenAdverseResultsWorsen,
+  testBlocksResultCertaintyClaimWhenEvidenceCrossesNull,
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,
