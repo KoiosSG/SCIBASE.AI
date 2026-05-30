@@ -35,6 +35,10 @@ Held or suppressed mentions are not allowed to drive entity-page recommendations
 
 Sparse ontology or corpus exports that omit localized names, mention lists, or homograph policy still produce deterministic graph review evidence. The sparse fixture emitted 1 entity packet and 0 mention decisions.
 
+## Candidate Alias Conflict Guard
+
+Extractor candidates that disagree with trusted multilingual alias lookup are held for curator review instead of silently overriding the upstream candidate. The conflict fixture decision is hold-for-curator-review with reason candidate-alias-conflict.
+
 ## Safety
 
 All fixtures are synthetic. The module does not call live ontologies, identity providers, external APIs, private corpora, search indexes, or recommendation systems.

@@ -62,6 +62,36 @@ function testSameLanguageAliasCollisionsAreHeldForCuratorReview() {
   assert.equal(action.action, 'review-multilingual-alias-collision');
 }
 
+function testConflictingExtractorCandidateAndAliasLookupAreHeld() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions = [
+    {
+      id: 'mention-diabetes-conflicting-candidate',
+      documentId: 'paper-17',
+      text: 'diabetes mellitus',
+      language: 'es',
+      confidence: 0.93,
+      candidateEntityId: 'entity:stat:control-group'
+    }
+  ];
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-diabetes-conflicting-candidate');
+  const action = byId(result.curatorActions, 'curate-mention-diabetes-conflicting-candidate');
+  const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
+
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'candidate-alias-conflict');
+  assert.deepEqual(event.candidateEntityIds, [
+    'entity:mesh:D003920',
+    'entity:stat:control-group'
+  ]);
+  assert.equal(action.action, 'review-multilingual-candidate-alias-conflict');
+  assert.equal(action.priority, 'high');
+  assert.equal(diabetes.mentions.length, 0);
+  assert.equal(result.recommendationGuards.safeEntityIds.includes('entity:mesh:D003920'), false);
+}
+
 function testUnicodeAndWhitespaceAliasesMatchCanonicalEntities() {
   const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
   corpus.entities.push({
@@ -339,6 +369,7 @@ const tests = [
   testTrustedTranslatedAliasesBecomeCanonicalGraphNodes,
   testFalseFriendMentionsAreHeldForCuratorReview,
   testSameLanguageAliasCollisionsAreHeldForCuratorReview,
+  testConflictingExtractorCandidateAndAliasLookupAreHeld,
   testUnicodeAndWhitespaceAliasesMatchCanonicalEntities,
   testLanguageTagCaseDoesNotSuppressTrustedAliases,
   testRegionalLanguageTagsUseBaseAliasLookup,

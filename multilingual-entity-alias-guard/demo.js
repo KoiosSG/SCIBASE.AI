@@ -18,14 +18,31 @@ const sparseResult = evaluateAliasGuard({
     }
   ]
 });
+const conflictResult = evaluateAliasGuard({
+  ...buildSampleCorpus(),
+  corpusId: 'kg-candidate-alias-conflict-17',
+  generatedAt: '2026-05-30T12:30:00Z',
+  mentions: [
+    {
+      id: 'mention-diabetes-conflicting-candidate',
+      documentId: 'paper-17',
+      text: 'diabetes mellitus',
+      language: 'es',
+      confidence: 0.93,
+      candidateEntityId: 'entity:stat:control-group'
+    }
+  ]
+});
 
 const packetPath = path.join(reportsDir, 'alias-guard-packet.json');
 const sparsePacketPath = path.join(reportsDir, 'sparse-alias-guard-packet.json');
+const conflictPacketPath = path.join(reportsDir, 'candidate-alias-conflict-packet.json');
 const reportPath = path.join(reportsDir, 'alias-guard-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(sparsePacketPath, `${JSON.stringify(sparseResult, null, 2)}\n`);
+fs.writeFileSync(conflictPacketPath, `${JSON.stringify(conflictResult, null, 2)}\n`);
 
 const accepted = result.mentionDecisions
   .filter((decision) => decision.decision === 'accept-canonical-entity')
@@ -65,6 +82,10 @@ Held or suppressed mentions are not allowed to drive entity-page recommendations
 
 Sparse ontology or corpus exports that omit localized names, mention lists, or homograph policy still produce deterministic graph review evidence. The sparse fixture emitted ${sparseResult.summary.entityPackets} entity packet and ${sparseResult.mentionDecisions.length} mention decisions.
 
+## Candidate Alias Conflict Guard
+
+Extractor candidates that disagree with trusted multilingual alias lookup are held for curator review instead of silently overriding the upstream candidate. The conflict fixture decision is ${conflictResult.mentionDecisions[0].decision} with reason ${conflictResult.mentionDecisions[0].reason}.
+
 ## Safety
 
 All fixtures are synthetic. The module does not call live ontologies, identity providers, external APIs, private corpora, search indexes, or recommendation systems.
@@ -90,6 +111,7 @@ fs.writeFileSync(svgPath, svg);
 
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, sparsePacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, conflictPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Accepted mentions: ${result.summary.acceptedMentions}`);

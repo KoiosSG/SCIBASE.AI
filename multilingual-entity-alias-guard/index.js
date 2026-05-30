@@ -199,6 +199,21 @@ function mentionDecision(mention, aliasIndex, homographs) {
     };
   }
 
+  if (alias && mention.candidateEntityId && mention.candidateEntityId !== alias.entity.id) {
+    return {
+      id: mention.id,
+      language: mention.language,
+      text: mention.text,
+      documentId: mention.documentId,
+      decision: 'hold-for-curator-review',
+      reason: 'candidate-alias-conflict',
+      candidateEntityId: null,
+      candidateEntityIds: [alias.entity.id, mention.candidateEntityId].sort(),
+      confidence: mention.confidence,
+      preservedLanguageTag: mention.language
+    };
+  }
+
   if (!alias || confidence === null || confidence < 0.8) {
     return {
       id: mention.id,
@@ -239,6 +254,8 @@ function curatorActionForDecision(decision) {
     action:
       decision.reason === 'alias-collision'
         ? 'review-multilingual-alias-collision'
+        : decision.reason === 'candidate-alias-conflict'
+        ? 'review-multilingual-candidate-alias-conflict'
         : decision.reason === 'script-confusable-alias'
         ? 'review-multilingual-script-confusable'
         : decision.reason === 'false-friend-or-homograph'
@@ -247,6 +264,7 @@ function curatorActionForDecision(decision) {
     priority:
       decision.reason === 'false-friend-or-homograph' ||
       decision.reason === 'alias-collision' ||
+      decision.reason === 'candidate-alias-conflict' ||
       decision.reason === 'script-confusable-alias'
         ? 'high'
         : 'normal',

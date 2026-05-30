@@ -14,6 +14,7 @@ Validation coverage:
 - trusted CRISPR aliases in English, German, and Spanish map to one canonical MeSH entity
 - Spanish `control` is held as a homograph/false friend instead of silently creating a statistical control-group edge
 - same-language translated alias collisions are held instead of silently attaching a mention to the wrong canonical entity
+- extractor candidate IDs that disagree with multilingual alias lookup are held instead of silently overriding either signal
 - language-tag case differences do not suppress trusted translated aliases
 - regional language tags such as `es-MX` use base-language alias and homograph policy while preserving the original tag
 - underscore regional language tags such as `es_MX` use the same base-language alias and homograph policy while preserving the original tag
