@@ -37,6 +37,14 @@ function assessExternalReferences(repository) {
 function assessReference(reference, assessedAt, policy) {
   const findings = [];
 
+  if (hasInvalidChecksumEvidence(reference)) {
+    findings.push(finding(reference, 'INVALID_CHECKSUM_EVIDENCE', 'blocker', 'Checksum evidence must use a supported algorithm and full-length hexadecimal digest.'));
+  }
+
+  if (hasInvalidDoiEvidence(reference)) {
+    findings.push(finding(reference, 'INVALID_DOI_EVIDENCE', 'blocker', 'DOI evidence must be a parseable DOI or DOI URL before release.'));
+  }
+
   if (isGitReference(reference) && !hasPinnedCommit(reference)) {
     findings.push(finding(reference, 'FLOATING_GIT_REFERENCE', 'blocker', 'Git reference must be pinned to an immutable commit SHA before release.'));
   }
@@ -110,6 +118,14 @@ function hasValidDoi(doi) {
   return /^10\.\d{4,9}\/\S+$/i.test(normalized);
 }
 
+function hasInvalidChecksumEvidence(reference) {
+  return hasText(reference.checksum) && !hasValidChecksum(reference.checksum);
+}
+
+function hasInvalidDoiEvidence(reference) {
+  return hasText(reference.doi) && !hasValidDoi(reference.doi);
+}
+
 function hasImmutableVersion(version) {
   if (!hasText(version)) return false;
   return !/^(latest|main|master|head|current|stable|dev|nightly)$/i.test(version.trim());
@@ -173,6 +189,7 @@ function buildActions(repository, findings) {
   for (const [referenceId, codes] of byReference.entries()) {
     if (codes.has('AUTH_REQUIRED_REFERENCE')) actions.add(`replace_or_snapshot_auth_reference:${referenceId}`);
     if (codes.has('FLOATING_GIT_REFERENCE') || codes.has('FLOATING_API_REFERENCE')) actions.add(`pin_external_reference:${referenceId}`);
+    if (codes.has('INVALID_CHECKSUM_EVIDENCE') || codes.has('INVALID_DOI_EVIDENCE')) actions.add(`repair_reference_evidence:${referenceId}`);
     if (codes.has('MISSING_DURABLE_IDENTIFIER')) actions.add(`add_checksum_or_doi:${referenceId}`);
     if (codes.has('STALE_REFERENCE_EVIDENCE')) actions.add(`refresh_reference_verification:${referenceId}`);
     if (codes.has('MISSING_LICENSE') || codes.has('MISSING_ATTRIBUTION')) actions.add(`complete_license_attribution:${referenceId}`);
@@ -185,7 +202,10 @@ function buildSignals(findings) {
   const codes = new Set(findings.map((finding) => finding.code));
   return {
     immutablePins: !codes.has('FLOATING_GIT_REFERENCE') && !codes.has('FLOATING_API_REFERENCE'),
-    exportable: !codes.has('AUTH_REQUIRED_REFERENCE') && !codes.has('MISSING_DURABLE_IDENTIFIER'),
+    exportable: !codes.has('AUTH_REQUIRED_REFERENCE')
+      && !codes.has('MISSING_DURABLE_IDENTIFIER')
+      && !codes.has('INVALID_CHECKSUM_EVIDENCE')
+      && !codes.has('INVALID_DOI_EVIDENCE'),
     attributionComplete: !codes.has('MISSING_LICENSE') && !codes.has('MISSING_ATTRIBUTION'),
     verificationFresh: !codes.has('STALE_REFERENCE_EVIDENCE')
   };

@@ -182,8 +182,12 @@ function testInvalidChecksumDoesNotCountAsDurableIdentifier() {
   });
 
   assert.equal(packet.status, 'hold_repository_release');
-  assert.deepEqual(findingCodes(packet), ['MISSING_DURABLE_IDENTIFIER']);
+  assert.deepEqual(findingCodes(packet), [
+    'INVALID_CHECKSUM_EVIDENCE',
+    'MISSING_DURABLE_IDENTIFIER'
+  ]);
   assert.ok(packet.actions.includes('add_checksum_or_doi:dataset-invalid-checksum'));
+  assert.ok(packet.actions.includes('repair_reference_evidence:dataset-invalid-checksum'));
   assert.equal(packet.referenceSignals.exportable, false);
 }
 
@@ -207,8 +211,12 @@ function testDoiPlaceholderDoesNotCountAsDurableIdentifier() {
   });
 
   assert.equal(packet.status, 'hold_repository_release');
-  assert.deepEqual(findingCodes(packet), ['MISSING_DURABLE_IDENTIFIER']);
+  assert.deepEqual(findingCodes(packet), [
+    'INVALID_DOI_EVIDENCE',
+    'MISSING_DURABLE_IDENTIFIER'
+  ]);
   assert.ok(packet.actions.includes('add_checksum_or_doi:dataset-invalid-doi'));
+  assert.ok(packet.actions.includes('repair_reference_evidence:dataset-invalid-doi'));
   assert.equal(packet.referenceSignals.exportable, false);
 }
 
@@ -281,8 +289,12 @@ function testInvalidApiSnapshotChecksumDoesNotCountAsPinnedEvidence() {
   });
 
   assert.equal(packet.status, 'hold_repository_release');
-  assert.deepEqual(findingCodes(packet), ['FLOATING_API_REFERENCE']);
+  assert.deepEqual(findingCodes(packet), [
+    'FLOATING_API_REFERENCE',
+    'INVALID_CHECKSUM_EVIDENCE'
+  ]);
   assert.ok(packet.actions.includes('pin_external_reference:api-invalid-checksum'));
+  assert.ok(packet.actions.includes('repair_reference_evidence:api-invalid-checksum'));
   assert.equal(packet.referenceSignals.immutablePins, false);
 }
 
@@ -306,8 +318,12 @@ function testTruncatedApiSnapshotChecksumDoesNotCountAsPinnedEvidence() {
   });
 
   assert.equal(packet.status, 'hold_repository_release');
-  assert.deepEqual(findingCodes(packet), ['FLOATING_API_REFERENCE']);
+  assert.deepEqual(findingCodes(packet), [
+    'FLOATING_API_REFERENCE',
+    'INVALID_CHECKSUM_EVIDENCE'
+  ]);
   assert.ok(packet.actions.includes('pin_external_reference:api-truncated-checksum'));
+  assert.ok(packet.actions.includes('repair_reference_evidence:api-truncated-checksum'));
   assert.equal(packet.referenceSignals.immutablePins, false);
 }
 
@@ -357,6 +373,45 @@ function testMissingVerificationEvidenceBlocksOtherwisePinnedReference() {
   assert.equal(packet.referenceSignals.verificationFresh, false);
 }
 
+function testMalformedOptionalEvidenceBlocksEvenWhenAnotherIdentifierIsValid() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-poisoned-evidence',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'dataset-poisoned-evidence',
+        kind: 'linked_dataset',
+        target: 'https://doi.org/10.5281/zenodo.3456789',
+        checksum: 'sha256:abcdef',
+        doi: '10.5281/zenodo.3456789',
+        license: 'CC-BY-4.0',
+        attribution: 'Example Lab',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      },
+      {
+        id: 'model-poisoned-citation',
+        kind: 'model_weights',
+        target: 'https://models.example.invalid/model-v4.bin',
+        checksum: 'sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+        doi: 'pending',
+        version: 'v4.0.0',
+        license: 'Apache-2.0',
+        attribution: 'Example Model Lab',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), [
+    'INVALID_CHECKSUM_EVIDENCE',
+    'INVALID_DOI_EVIDENCE'
+  ]);
+  assert.ok(packet.actions.includes('repair_reference_evidence:dataset-poisoned-evidence'));
+  assert.ok(packet.actions.includes('repair_reference_evidence:model-poisoned-citation'));
+  assert.equal(packet.referenceSignals.exportable, false);
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
@@ -369,7 +424,8 @@ const tests = [
   testInvalidApiSnapshotChecksumDoesNotCountAsPinnedEvidence,
   testTruncatedApiSnapshotChecksumDoesNotCountAsPinnedEvidence,
   testNullGitCommitShaDoesNotCountAsImmutablePin,
-  testMissingVerificationEvidenceBlocksOtherwisePinnedReference
+  testMissingVerificationEvidenceBlocksOtherwisePinnedReference,
+  testMalformedOptionalEvidenceBlocksEvenWhenAnotherIdentifierIsValid
 ];
 
 for (const test of tests) {

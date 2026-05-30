@@ -27,6 +27,22 @@
       "referenceId": "dataset-lab-export",
       "kind": "linked_dataset",
       "target": "https://data.example.invalid/lab-export.csv",
+      "code": "INVALID_CHECKSUM_EVIDENCE",
+      "severity": "blocker",
+      "message": "Checksum evidence must use a supported algorithm and full-length hexadecimal digest."
+    },
+    {
+      "referenceId": "dataset-lab-export",
+      "kind": "linked_dataset",
+      "target": "https://data.example.invalid/lab-export.csv",
+      "code": "INVALID_DOI_EVIDENCE",
+      "severity": "blocker",
+      "message": "DOI evidence must be a parseable DOI or DOI URL before release."
+    },
+    {
+      "referenceId": "dataset-lab-export",
+      "kind": "linked_dataset",
+      "target": "https://data.example.invalid/lab-export.csv",
       "code": "MISSING_DURABLE_IDENTIFIER",
       "severity": "blocker",
       "message": "External data or model reference needs a checksum, DOI, or immutable version."
@@ -53,6 +69,7 @@
     "pin_external_reference:api-weather-source",
     "pin_external_reference:submodule-analysis-tools",
     "refresh_reference_verification:dataset-lab-export",
+    "repair_reference_evidence:dataset-lab-export",
     "replace_or_snapshot_auth_reference:api-weather-source"
   ],
   "referenceSignals": {
@@ -70,5 +87,5 @@
     }
   },
   "assessedAt": "2026-05-28T12:00:00Z",
-  "auditDigest": "845fc5612c82a4a307ac3b4d65af240e262d5e164c709f43462cc2b9586c30c6"
+  "auditDigest": "0cb0a30094dfe5515aec52b275734cc495e22ef6e44921295fac7d26c6f21a52"
 }
