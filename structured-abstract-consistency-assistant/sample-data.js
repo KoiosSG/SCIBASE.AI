@@ -238,6 +238,30 @@ const hyphenatedMeasurementSampleSizeManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const ordinalSampleSizeManuscript = {
+  manuscriptId: 'ms-abstract-ordinal-sample-size',
+  assessedAt: '2026-05-30T13:05:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'The median manuscript was at the 96th percentile in a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, improved at the 96th percentile.',
+    conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: false
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const cleanManuscript = {
   manuscriptId: 'ms-abstract-clean',
   assessedAt: '2026-05-28T10:20:00Z',
@@ -273,5 +297,6 @@ module.exports = {
   decimalSampleSizeManuscript,
   durationSampleSizeManuscript,
   hyphenatedMeasurementSampleSizeManuscript,
+  ordinalSampleSizeManuscript,
   cleanManuscript
 };

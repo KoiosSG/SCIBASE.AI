@@ -12,6 +12,7 @@
 | decimal-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | duration-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | hyphenated-measurement-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
+| ordinal-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | clean-packet.json | release_peer_review_packet | allowed | allowed | allowed | none |
 
 All packets use synthetic manuscript records and deterministic SHA-256 audit digests.

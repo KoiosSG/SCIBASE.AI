@@ -13,6 +13,7 @@ const {
   decimalSampleSizeManuscript,
   durationSampleSizeManuscript,
   hyphenatedMeasurementSampleSizeManuscript,
+  ordinalSampleSizeManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -30,6 +31,7 @@ const packets = [
   ['decimal-sample-size-packet.json', assessStructuredAbstract(decimalSampleSizeManuscript)],
   ['duration-sample-size-packet.json', assessStructuredAbstract(durationSampleSizeManuscript)],
   ['hyphenated-measurement-sample-size-packet.json', assessStructuredAbstract(hyphenatedMeasurementSampleSizeManuscript)],
+  ['ordinal-sample-size-packet.json', assessStructuredAbstract(ordinalSampleSizeManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 
