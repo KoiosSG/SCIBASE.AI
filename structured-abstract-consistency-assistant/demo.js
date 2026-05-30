@@ -8,6 +8,7 @@ const {
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,
+  weakLimitationHedgeManuscript,
   percentageSampleSizeManuscript,
   cleanManuscript
 } = require('./sample-data');
@@ -21,6 +22,7 @@ const packets = [
   ['result-certainty-packet.json', assessStructuredAbstract(resultCertaintyOverclaimManuscript)],
   ['mixed-certainty-packet.json', assessStructuredAbstract(mixedCertaintyOverclaimManuscript)],
   ['conclusion-certainty-packet.json', assessStructuredAbstract(conclusionCertaintyOverclaimManuscript)],
+  ['weak-limitation-packet.json', assessStructuredAbstract(weakLimitationHedgeManuscript)],
   ['percentage-sample-size-packet.json', assessStructuredAbstract(percentageSampleSizeManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];

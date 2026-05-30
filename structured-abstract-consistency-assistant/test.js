@@ -408,6 +408,37 @@ function testBlocksConclusionCertaintyClaimWhenEvidenceCrossesNull() {
   assert.equal(packet.abstractSignals.limitationsBalanced, false);
 }
 
+function testRequiresSpecificLimitationLanguageBeyondWeakHedging() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-weak-limitation-hedge',
+    assessedAt: '2026-05-30T09:05:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: true
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: true
+    },
+    limitations: ['confidence interval crosses null']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['MISSING_LIMITATION_LANGUAGE']);
+  assert.ok(packet.actions.includes('add_limitations_to_abstract:ms-abstract-weak-limitation-hedge'));
+  assert.equal(packet.abstractSignals.limitationsBalanced, false);
+}
+
 function testBlocksWorseOutcomeClaimWhenResultsShowImprovement() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-wording-drift',
@@ -658,6 +689,7 @@ const tests = [
   testBlocksResultCertaintyClaimWhenEvidenceCrossesNull,
   testBlocksMixedNegatedAndPositiveCertaintyClaimWhenEvidenceCrossesNull,
   testBlocksConclusionCertaintyClaimWhenEvidenceCrossesNull,
+  testRequiresSpecificLimitationLanguageBeyondWeakHedging,
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,

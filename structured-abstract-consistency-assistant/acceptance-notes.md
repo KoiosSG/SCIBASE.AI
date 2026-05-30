@@ -22,6 +22,7 @@ Expected evidence:
 - Result-section certainty overclaims such as statistically significant or clinically meaningful are blocked when evidence is exploratory or confidence intervals cross null.
 - Mixed result-section certainty phrasing such as not statistically significant but clinically meaningful is blocked instead of being cleared by the negated significant phrase.
 - Conclusion-section certainty overclaims such as statistically significant or clinically meaningful are blocked when evidence is exploratory or confidence intervals cross null.
+- Weak conclusion hedges such as "may" alone do not satisfy limitation-language requirements for exploratory or null-crossing evidence.
 - Conclusion-direction checks block reviewer-facing conclusion benefit claims when the result packet records no effect, worse outcomes, or harm.
 - Conclusion-direction checks block safety-benefit claims such as safe or well tolerated when adverse-outcome evidence worsens.
 - Conclusion-direction checks block negated safety-concern claims such as no safety concerns when adverse-outcome evidence worsens.
@@ -33,6 +34,7 @@ Expected evidence:
 - `reports/result-certainty-packet.json` holds an abstract whose results overstate uncertain or null-crossing evidence.
 - `reports/mixed-certainty-packet.json` holds an abstract whose results mix negated statistical significance with an asserted clinical-meaningfulness overclaim.
 - `reports/conclusion-certainty-packet.json` holds an abstract whose conclusion overstates uncertain or null-crossing evidence.
+- `reports/weak-limitation-packet.json` holds an abstract whose conclusion only weakly hedges uncertain evidence.
 - `reports/percentage-sample-size-packet.json` holds an abstract that uses percentage wording where required sample-size counts should appear.
 - `reports/clean-packet.json` releases a consistent structured abstract with monitoring.
 - `reports/abstract-consistency-report.md` summarizes lanes and finding codes.

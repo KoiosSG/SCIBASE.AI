@@ -343,7 +343,7 @@ function overstatesConclusion(value) {
 }
 
 function hasLimitations(manuscript, conclusion) {
-  return /\b(may|exploratory|limited|uncertain|pilot|retrospective|requires validation)\b/i.test(conclusion);
+  return /\b(exploratory|limited|uncertain|pilot|retrospective|requires validation|needs validation|confidence interval|crosses null)\b/i.test(conclusion);
 }
 
 function digestPacket(packet) {

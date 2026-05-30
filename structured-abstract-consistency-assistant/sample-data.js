@@ -118,6 +118,30 @@ const conclusionCertaintyOverclaimManuscript = {
   limitations: ['confidence interval crosses null']
 };
 
+const weakLimitationHedgeManuscript = {
+  manuscriptId: 'ms-abstract-weak-limitation-hedge',
+  assessedAt: '2026-05-30T09:05:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+    conclusions: 'The assistant may reduce comment triage time in similar settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: true
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: true
+  },
+  limitations: ['confidence interval crosses null']
+};
+
 const percentageSampleSizeManuscript = {
   manuscriptId: 'ms-abstract-percentage-sample-size',
   assessedAt: '2026-05-30T08:12:00Z',
@@ -172,6 +196,7 @@ module.exports = {
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,
+  weakLimitationHedgeManuscript,
   percentageSampleSizeManuscript,
   cleanManuscript
 };

@@ -17,7 +17,7 @@ It evaluates synthetic manuscript packets for:
 - conclusions that describe worse/no-effect outcomes when the results packet records improvement
 - accurate adverse-outcome wording, such as increased adverse events, without mistaking it for a benefit claim when the result packet also records a worse direction
 - conclusions that overstate exploratory or uncertain evidence
-- missing limitation language when confidence intervals cross null or findings are exploratory
+- missing limitation language when confidence intervals cross null or findings are exploratory, with weak hedges such as `may` alone treated as insufficient
 
 The assistant emits reviewer lanes, findings, remediation actions, abstract consistency signals, and a stable SHA-256 audit digest.
 

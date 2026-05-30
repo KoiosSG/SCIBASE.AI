@@ -7,6 +7,7 @@
 | result-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | RESULT_OVERSTATES_EVIDENCE |
 | mixed-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | RESULT_OVERSTATES_EVIDENCE |
 | conclusion-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | CONCLUSION_OVERSTATES_EVIDENCE |
+| weak-limitation-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | MISSING_LIMITATION_LANGUAGE |
 | percentage-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | clean-packet.json | release_peer_review_packet | allowed | allowed | allowed | none |
 
