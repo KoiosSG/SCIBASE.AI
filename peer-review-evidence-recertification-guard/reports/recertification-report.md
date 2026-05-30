@@ -25,6 +25,10 @@ Generated: 2026-05-28T06:00:00Z
 - recertify-review-blind-data (peer-review, normal): confirm-review-still-applies-to-current-artifact
 - recertify-comment-code-line-41 (inline-comment, normal): confirm-comment-anchor-still-matches-current-artifact
 
+## Sparse Snapshot Guard
+
+Sparse project payloads that omit review, comment, or artifact collections still produce deterministic audit packets instead of runtime failures. The empty evidence fixture recommends allow-reputation-update and emits 0 timeline events.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.

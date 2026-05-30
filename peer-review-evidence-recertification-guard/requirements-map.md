@@ -10,6 +10,7 @@
 - Public, semi-private, and double-blind review modes are represented, with blind and fully anonymous labels normalized across hyphenated, underscored, and space-separated variants.
 - Public and semi-private review credit requires a concrete reviewer identity before reputation deltas are applied.
 - Review history is emitted in a project timeline packet.
+- Sparse project snapshots that omit review, comment, or artifact collections are evaluated as empty or missing evidence instead of runtime failures.
 
 ## Contributor Credits
 
@@ -23,6 +24,7 @@
 - Stale reviews are blocked from leaderboards, badges, and score updates.
 - Reviews without non-blind reviewer identity are blocked from leaderboards, badges, and score updates until the identity is recertified.
 - Recertification tasks explain which evidence must be refreshed.
+- Empty evidence snapshots produce an allow decision with zero frozen reputation delta and no synthetic tasks.
 
 ## Privacy And Trust
 

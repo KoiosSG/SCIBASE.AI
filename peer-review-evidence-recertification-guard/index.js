@@ -55,8 +55,12 @@ function reviewerDisplay(item) {
   return hasText(item.reviewerId) ? `reviewer:${item.reviewerId.trim()}` : 'reviewer:unverified';
 }
 
+function evidenceList(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 function findArtifact(project, artifactId) {
-  return project.artifacts.find((artifact) => artifact.id === artifactId);
+  return evidenceList(project.artifacts).find((artifact) => artifact.id === artifactId);
 }
 
 function evaluateReview(project, review) {
@@ -281,14 +285,16 @@ function buildTimelinePacket(project, reviewDecisions, commentDecisions) {
 }
 
 function evaluateRecertification(project) {
-  const reviewDecisions = project.reviews.map((review) => evaluateReview(project, review));
-  const reputationActions = project.reviews.map((review, index) =>
+  const reviews = evidenceList(project.reviews);
+  const inlineComments = evidenceList(project.inlineComments);
+  const reviewDecisions = reviews.map((review) => evaluateReview(project, review));
+  const reputationActions = reviews.map((review, index) =>
     reputationActionForReview(review, reviewDecisions[index])
   );
-  const commentDecisions = project.inlineComments.map((comment) => evaluateComment(project, comment));
+  const commentDecisions = inlineComments.map((comment) => evaluateComment(project, comment));
   const recertificationTasks = [
-    ...project.reviews.map((review, index) => taskForReview(review, reviewDecisions[index])),
-    ...project.inlineComments.map((comment, index) => taskForComment(comment, commentDecisions[index]))
+    ...reviews.map((review, index) => taskForReview(review, reviewDecisions[index])),
+    ...inlineComments.map((comment, index) => taskForComment(comment, commentDecisions[index]))
   ].filter(Boolean);
   const staleReviews = reviewDecisions.filter((decision) => decision.status !== 'current').length;
   const staleComments = commentDecisions.filter((decision) => decision.status !== 'current').length;

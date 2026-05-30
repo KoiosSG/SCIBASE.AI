@@ -7,12 +7,20 @@ fs.mkdirSync(reportsDir, { recursive: true });
 
 const project = buildSampleProject();
 const result = evaluateRecertification(project);
+const emptyEvidenceProject = {
+  projectId: 'project-empty-reputation-evidence',
+  asOf: '2026-05-30T12:00:00Z',
+  artifacts: []
+};
+const emptyEvidenceResult = evaluateRecertification(emptyEvidenceProject);
 
 const packetPath = path.join(reportsDir, 'recertification-packet.json');
+const emptyPacketPath = path.join(reportsDir, 'empty-evidence-packet.json');
 const reportPath = path.join(reportsDir, 'recertification-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
+fs.writeFileSync(emptyPacketPath, `${JSON.stringify(emptyEvidenceResult, null, 2)}\n`);
 
 const staleReviewList = result.reviewDecisions
   .filter((decision) => decision.status !== 'current')
@@ -45,6 +53,10 @@ ${staleReviewList}
 
 ${taskList}
 
+## Sparse Snapshot Guard
+
+Sparse project payloads that omit review, comment, or artifact collections still produce deterministic audit packets instead of runtime failures. The empty evidence fixture recommends ${emptyEvidenceResult.summary.recommendedAction} and emits ${emptyEvidenceResult.timelinePacket.events.length} timeline events.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.
@@ -69,6 +81,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" v
 fs.writeFileSync(svgPath, svg);
 
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
+console.log(`Wrote ${path.relative(__dirname, emptyPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Recommended action: ${result.summary.recommendedAction}`);

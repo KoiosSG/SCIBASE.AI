@@ -644,6 +644,60 @@ function testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles() {
   assert.ok(!JSON.stringify(result.timelinePacket).includes('private@'));
 }
 
+function testMissingReviewAndCommentListsEvaluateAsEmptyEvidence() {
+  const project = {
+    projectId: 'project-empty-reputation-evidence',
+    asOf: '2026-05-30T12:00:00Z',
+    artifacts: []
+  };
+
+  const result = evaluateRecertification(project);
+
+  assert.deepEqual(result.reviewDecisions, []);
+  assert.deepEqual(result.commentDecisions, []);
+  assert.deepEqual(result.reputationActions, []);
+  assert.deepEqual(result.recertificationTasks, []);
+  assert.equal(result.summary.totalReviews, 0);
+  assert.equal(result.summary.staleReviews, 0);
+  assert.equal(result.summary.staleComments, 0);
+  assert.equal(result.summary.frozenReputationDelta, 0);
+  assert.equal(result.summary.recommendedAction, 'allow-reputation-update');
+  assert.equal(result.timelinePacket.events.length, 0);
+}
+
+function testMissingArtifactListRequiresRecertificationInsteadOfCrashing() {
+  const project = {
+    projectId: 'project-missing-artifact-list',
+    asOf: '2026-05-30T12:10:00Z',
+    reviews: [
+      {
+        id: 'review-without-artifact-list',
+        artifactId: 'supplementary-methods',
+        mode: 'public',
+        reviewerId: 'orcid:0000-0002-9999-8888',
+        submittedAt: '2026-05-29T09:00:00Z',
+        evidenceDigest: 'sha256:methods-v1',
+        reputationDelta: 9
+      }
+    ],
+    inlineComments: []
+  };
+
+  const result = evaluateRecertification(project);
+  const review = byId(result.reviewDecisions, 'review-without-artifact-list');
+  const action = byId(result.reputationActions, 'review-without-artifact-list');
+  const task = byId(result.recertificationTasks, 'recertify-review-without-artifact-list');
+
+  assert.equal(review.status, 'recertification-required');
+  assert.deepEqual(review.reasons, ['artifact-missing']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['artifact-missing']);
+  assert.equal(result.summary.staleReviews, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 const tests = [
   testStaleReviewsFreezeReputationUntilRecertified,
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
@@ -664,7 +718,9 @@ const tests = [
   testInvalidArtifactTimestampRequiresReviewRecertification,
   testMissingArtifactTimestampRequiresReviewRecertification,
   testInvalidArtifactTimestampRequiresCommentRecertification,
-  testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles
+  testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles,
+  testMissingReviewAndCommentListsEvaluateAsEmptyEvidence,
+  testMissingArtifactListRequiresRecertificationInsteadOfCrashing
 ];
 
 for (const test of tests) {
