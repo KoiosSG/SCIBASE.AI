@@ -31,6 +31,10 @@ Generated: 2026-05-28T07:00:00Z
 
 Held or suppressed mentions are not allowed to drive entity-page recommendations until a curator verifies the alias mapping.
 
+## Sparse Corpus Guard
+
+Sparse ontology or corpus exports that omit localized names, mention lists, or homograph policy still produce deterministic graph review evidence. The sparse fixture emitted 1 entity packet and 0 mention decisions.
+
 ## Safety
 
 All fixtures are synthetic. The module does not call live ontologies, identity providers, external APIs, private corpora, search indexes, or recommendation systems.

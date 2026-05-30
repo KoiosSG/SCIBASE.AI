@@ -8,6 +8,7 @@
 - Holds false friends and homographs before creating graph edges.
 - Holds same-language alias collisions when ontology entries reuse the same translated term.
 - Holds Latin-language mentions with Cyrillic or Greek lookalike characters, including lowercase Greek confusables, for curator review before creating graph edges.
+- Treats omitted localized-name maps, mention lists, and homograph policies as sparse graph evidence instead of crashing corpus review.
 - Emits schema.org-style `DefinedTerm` JSON-LD packets for entity pages.
 
 ## Knowledge Navigation

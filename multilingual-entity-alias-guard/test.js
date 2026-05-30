@@ -249,6 +249,70 @@ function testMissingConfidenceAliasesDoNotDriveRecommendations() {
   assert.equal(diabetes.mentions.length, 0);
 }
 
+function testMissingLocalizedNamesEmitEmptyEntityAliasPacket() {
+  const corpus = {
+    corpusId: 'kg-sparse-ontology-export-17',
+    generatedAt: '2026-05-30T12:00:00Z',
+    entities: [
+      {
+        id: 'entity:mesh:D012345',
+        canonicalName: 'Sparse Ontology Entity',
+        ontology: 'MeSH',
+        identifier: 'D012345'
+      }
+    ],
+    homographs: {},
+    mentions: []
+  };
+
+  const result = evaluateAliasGuard(corpus);
+  const entity = byId(result.entityPackets, 'entity:mesh:D012345');
+
+  assert.deepEqual(entity.localizedNames, {});
+  assert.deepEqual(entity.jsonLd.alternateName, []);
+  assert.deepEqual(entity.mentions, []);
+  assert.equal(result.summary.entityPackets, 1);
+  assert.equal(result.summary.acceptedMentions, 0);
+  assert.ok(result.auditDigest.startsWith('sha256:'));
+}
+
+function testMissingMentionListProducesEmptyAliasReview() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  delete corpus.mentions;
+
+  const result = evaluateAliasGuard(corpus);
+
+  assert.deepEqual(result.mentionDecisions, []);
+  assert.deepEqual(result.curatorActions, []);
+  assert.deepEqual(result.recommendationGuards.suppressedMentionIds, []);
+  assert.equal(result.summary.acceptedMentions, 0);
+  assert.equal(result.summary.heldMentions, 0);
+  assert.equal(result.summary.suppressedMentions, 0);
+  assert.equal(result.summary.entityPackets, corpus.entities.length);
+}
+
+function testMissingHomographPolicyDefaultsToEmptyPolicy() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  delete corpus.homographs;
+  corpus.mentions = [
+    {
+      id: 'mention-diabetes-without-homographs',
+      documentId: 'paper-16',
+      text: 'diabetes mellitus',
+      language: 'es',
+      confidence: 0.93
+    }
+  ];
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-diabetes-without-homographs');
+
+  assert.equal(event.decision, 'accept-canonical-entity');
+  assert.equal(event.reason, 'trusted-translated-alias');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D003920');
+  assert.deepEqual(result.curatorActions, []);
+}
+
 function testLanguageTaggedSynonymsArePreservedForEntityPages() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
@@ -284,6 +348,9 @@ const tests = [
   testLowercaseGreekLookalikeLatinMentionsAreHeldForCuratorReview,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testMissingConfidenceAliasesDoNotDriveRecommendations,
+  testMissingLocalizedNamesEmitEmptyEntityAliasPacket,
+  testMissingMentionListProducesEmptyAliasReview,
+  testMissingHomographPolicyDefaultsToEmptyPolicy,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

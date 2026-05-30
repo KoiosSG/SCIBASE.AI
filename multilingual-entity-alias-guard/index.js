@@ -19,6 +19,20 @@ function digest(value) {
   return `sha256:${crypto.createHash('sha256').update(stableStringify(value)).digest('hex')}`;
 }
 
+function evidenceList(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function localizedNamesFor(entity) {
+  return entity.localizedNames && typeof entity.localizedNames === 'object'
+    ? entity.localizedNames
+    : {};
+}
+
+function evidenceObject(value) {
+  return value && typeof value === 'object' ? value : {};
+}
+
 const LATIN_SCRIPT_LANGUAGES = new Set([
   'ca',
   'cs',
@@ -89,9 +103,9 @@ function confidenceScore(value) {
 function buildAliasIndex(entities) {
   const index = new Map();
 
-  for (const entity of entities) {
-    for (const [language, terms] of Object.entries(entity.localizedNames)) {
-      for (const term of terms) {
+  for (const entity of evidenceList(entities)) {
+    for (const [language, terms] of Object.entries(localizedNamesFor(entity))) {
+      for (const term of evidenceList(terms)) {
         const key = `${normalizeLanguageTag(language)}:${normalizeTerm(term)}`;
         const existing = index.get(key);
 
@@ -245,7 +259,8 @@ function curatorActionForDecision(decision) {
 }
 
 function buildEntityPackets(entities, decisions) {
-  return entities.map((entity) => {
+  return evidenceList(entities).map((entity) => {
+    const localizedNames = localizedNamesFor(entity);
     const accepted = decisions.filter(
       (decision) =>
         decision.decision === 'accept-canonical-entity' && decision.candidateEntityId === entity.id
@@ -265,14 +280,14 @@ function buildEntityPackets(entities, decisions) {
         documentId: decision.documentId,
         confidence: decision.confidence
       })),
-      localizedNames: entity.localizedNames,
+      localizedNames,
       jsonLd: {
         '@context': 'https://schema.org',
         '@type': 'DefinedTerm',
         name: entity.canonicalName,
         identifier: `${entity.ontology}:${entity.identifier}`,
         inDefinedTermSet: entity.ontology,
-        alternateName: Object.values(entity.localizedNames).flat()
+        alternateName: Object.values(localizedNames).flat()
       },
       schemaOrg: {
         '@type': 'ScholarlyArticle',
@@ -289,8 +304,8 @@ function buildEntityPackets(entities, decisions) {
 
 function evaluateAliasGuard(corpus) {
   const aliasIndex = buildAliasIndex(corpus.entities);
-  const mentionDecisions = corpus.mentions.map((mention) =>
-    mentionDecision(mention, aliasIndex, corpus.homographs)
+  const mentionDecisions = evidenceList(corpus.mentions).map((mention) =>
+    mentionDecision(mention, aliasIndex, evidenceObject(corpus.homographs))
   );
   const curatorActions = mentionDecisions.map(curatorActionForDecision).filter(Boolean);
   const entityPackets = buildEntityPackets(corpus.entities, mentionDecisions);

@@ -20,5 +20,6 @@ Validation coverage:
 - mixed-script Latin-language aliases such as Cyrillic-lookalike `CRISPR` text or lowercase Greek-alpha `CRISPR-Cαs9` text are held for curator review instead of becoming quiet unknowns
 - low-confidence French alias output is suppressed from recommendations
 - missing or non-numeric confidence evidence is suppressed before graph recommendations
+- sparse ontology/corpus exports with omitted localized names, mention lists, or homograph policies do not crash corpus review
 - localized names remain language-tagged on entity packets
 - audit output is deterministic and private-data free

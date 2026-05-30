@@ -6,12 +6,26 @@ const reportsDir = path.join(__dirname, 'reports');
 fs.mkdirSync(reportsDir, { recursive: true });
 
 const result = evaluateAliasGuard(buildSampleCorpus());
+const sparseResult = evaluateAliasGuard({
+  corpusId: 'kg-sparse-ontology-export-17',
+  generatedAt: '2026-05-30T12:00:00Z',
+  entities: [
+    {
+      id: 'entity:mesh:D012345',
+      canonicalName: 'Sparse Ontology Entity',
+      ontology: 'MeSH',
+      identifier: 'D012345'
+    }
+  ]
+});
 
 const packetPath = path.join(reportsDir, 'alias-guard-packet.json');
+const sparsePacketPath = path.join(reportsDir, 'sparse-alias-guard-packet.json');
 const reportPath = path.join(reportsDir, 'alias-guard-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
+fs.writeFileSync(sparsePacketPath, `${JSON.stringify(sparseResult, null, 2)}\n`);
 
 const accepted = result.mentionDecisions
   .filter((decision) => decision.decision === 'accept-canonical-entity')
@@ -47,6 +61,10 @@ ${held}
 
 Held or suppressed mentions are not allowed to drive entity-page recommendations until a curator verifies the alias mapping.
 
+## Sparse Corpus Guard
+
+Sparse ontology or corpus exports that omit localized names, mention lists, or homograph policy still produce deterministic graph review evidence. The sparse fixture emitted ${sparseResult.summary.entityPackets} entity packet and ${sparseResult.mentionDecisions.length} mention decisions.
+
 ## Safety
 
 All fixtures are synthetic. The module does not call live ontologies, identity providers, external APIs, private corpora, search indexes, or recommendation systems.
@@ -71,6 +89,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" v
 fs.writeFileSync(svgPath, svg);
 
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
+console.log(`Wrote ${path.relative(__dirname, sparsePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Accepted mentions: ${result.summary.acceptedMentions}`);
