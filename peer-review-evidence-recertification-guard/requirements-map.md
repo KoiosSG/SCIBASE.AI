@@ -5,7 +5,7 @@
 - Structured peer-review evidence is tied to reviewed artifact digests.
 - Missing or malformed review submission or recertification timestamps require recertification before review credit is applied.
 - Missing or malformed artifact change timestamps require review and inline-comment recertification before review credit or comment evidence is applied.
-- Inline comments track artifact anchors and require recertification when anchors shift, artifact digests change, artifact timing evidence is missing or malformed, anchor metadata is missing, artifact anchor maps are missing, or comment timing evidence is missing or malformed.
+- Inline comments track artifact anchors and require recertification when anchors shift, artifact digests change, artifact timestamps postdate the comment, artifact timing evidence is missing or malformed, anchor metadata is missing, artifact anchor maps are missing, or comment timing evidence is missing or malformed.
 - Stale review or inline-comment evidence blocks reputation updates until recertification is complete.
 - Public, semi-private, and double-blind review modes are represented, with blind and fully anonymous labels normalized across hyphenated, underscored, and space-separated variants.
 - Public and semi-private review credit requires a concrete reviewer identity before reputation deltas are applied.

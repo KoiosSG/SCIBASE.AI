@@ -10,7 +10,7 @@ Generated: 2026-05-28T06:00:00Z
 - Stale inline comments requiring anchor review: 1
 - Frozen reputation delta: 41
 - Recommended action: block-reputation-update
-- Timeline audit digest: sha256:ca8b5b6b76b387794fe73c846c2fb4e558f0cc7dcf195fd4a09560a6a11d1d7b
+- Timeline audit digest: sha256:1b0987a020a04c8f099d4b2b06835c92e4a97862b9de96d13834e3ca4e62107f
 
 ## Stale Review Evidence
 

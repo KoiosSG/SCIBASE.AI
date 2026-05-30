@@ -15,6 +15,7 @@ Validation targets:
 - public or semi-private reviews without reviewer identity are frozen for recertification instead of applying credit to an undefined profile
 - stale inline comment anchors generate comment-specific recertification tasks
 - artifact digest changes mark inline comment anchors stale even when the selector line is unchanged
+- artifact updates after inline comments require recertification even when digest and selector evidence still match
 - missing or malformed inline comment timestamps require recertification before comment evidence is treated as current
 - missing inline comment anchor metadata requires recertification instead of crashing evidence evaluation
 - missing artifact anchor maps require comment recertification instead of crashing evidence evaluation

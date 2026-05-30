@@ -80,6 +80,7 @@
       "reviewer": "reviewer:orcid:0000-0002-reviewer-b",
       "reasons": [
         "artifact-digest-changed",
+        "artifact-updated-after-comment",
         "anchor-line-shifted-after-comment"
       ],
       "anchor": {
@@ -194,6 +195,7 @@
       "requiredAction": "confirm-comment-anchor-still-matches-current-artifact",
       "reasons": [
         "artifact-digest-changed",
+        "artifact-updated-after-comment",
         "anchor-line-shifted-after-comment"
       ]
     }
@@ -258,11 +260,12 @@
         "status": "recertification-required",
         "reasons": [
           "artifact-digest-changed",
+          "artifact-updated-after-comment",
           "anchor-line-shifted-after-comment"
         ]
       }
     ],
-    "auditDigest": "sha256:ca8b5b6b76b387794fe73c846c2fb4e558f0cc7dcf195fd4a09560a6a11d1d7b"
+    "auditDigest": "sha256:1b0987a020a04c8f099d4b2b06835c92e4a97862b9de96d13834e3ca4e62107f"
   },
   "summary": {
     "totalReviews": 5,

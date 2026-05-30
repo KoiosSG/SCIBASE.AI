@@ -157,13 +157,20 @@ function evaluateComment(project, comment) {
   const artifact = findArtifact(project, comment.artifactId);
   const reasons = [];
   let anchorStatus = 'current';
+  const commentTimeIsValid = hasValidTime(comment.submittedAt);
+  const commentedAt = commentTimeIsValid ? isoTime(comment.submittedAt) : null;
+  const markStale = () => {
+    if (anchorStatus !== 'missing') {
+      anchorStatus = 'stale';
+    }
+  };
   const hasUsableAnchor = comment.anchor
     && typeof comment.anchor.selector === 'string'
     && typeof comment.anchor.line === 'number';
 
-  if (!hasValidTime(comment.submittedAt)) {
+  if (!commentTimeIsValid) {
     reasons.push('invalid-comment-timestamp');
-    anchorStatus = 'stale';
+    markStale();
   }
 
   if (!hasUsableAnchor) {
@@ -177,12 +184,12 @@ function evaluateComment(project, comment) {
   } else {
     if (!hasValidTime(artifact.changedAt)) {
       reasons.push('invalid-artifact-timestamp');
-      anchorStatus = 'stale';
+      markStale();
     }
 
     if (artifact.currentDigest !== comment.anchorDigest) {
       reasons.push('artifact-digest-changed');
-      anchorStatus = 'stale';
+      markStale();
     }
 
     if (hasUsableAnchor) {
@@ -190,9 +197,20 @@ function evaluateComment(project, comment) {
       if (!currentAnchor) {
         reasons.push('anchor-missing-after-comment');
         anchorStatus = 'missing';
-      } else if (currentAnchor.line !== comment.anchor.line) {
-        reasons.push('anchor-line-shifted-after-comment');
-        anchorStatus = 'stale';
+      } else {
+        if (
+          commentTimeIsValid
+          && hasValidTime(artifact.changedAt)
+          && isoTime(artifact.changedAt) > commentedAt
+        ) {
+          reasons.push('artifact-updated-after-comment');
+          markStale();
+        }
+
+        if (currentAnchor.line !== comment.anchor.line) {
+          reasons.push('anchor-line-shifted-after-comment');
+          markStale();
+        }
       }
     }
   }

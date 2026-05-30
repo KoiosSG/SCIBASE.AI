@@ -131,6 +131,7 @@ function testInlineCommentsUseArtifactAnchorsForRecertification() {
   assert.equal(comment.anchorStatus, 'stale');
   assert.deepEqual(comment.reasons, [
     'artifact-digest-changed',
+    'artifact-updated-after-comment',
     'anchor-line-shifted-after-comment'
   ]);
 
@@ -173,7 +174,50 @@ function testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift() {
 
   assert.equal(comment.status, 'recertification-required');
   assert.equal(comment.anchorStatus, 'stale');
-  assert.deepEqual(comment.reasons, ['artifact-digest-changed']);
+  assert.deepEqual(comment.reasons, [
+    'artifact-digest-changed',
+    'artifact-updated-after-comment'
+  ]);
+}
+
+function testArtifactUpdatedAfterInlineCommentRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-20T09:30:00Z',
+      currentAnchors: {
+        'src/analyze.py#L41': { line: 41 }
+      }
+    }
+  ];
+  project.reviews = [];
+  project.inlineComments = [
+    {
+      id: 'comment-after-artifact-update',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  ];
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'comment-after-artifact-update');
+  const task = byId(result.recertificationTasks, 'recertify-comment-after-artifact-update');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'stale');
+  assert.deepEqual(comment.reasons, ['artifact-updated-after-comment']);
+  assert.equal(task.kind, 'inline-comment');
+  assert.deepEqual(task.reasons, ['artifact-updated-after-comment']);
 }
 
 function testInvalidInlineCommentTimestampRequiresRecertification() {
@@ -608,6 +652,7 @@ const tests = [
   testBlindModeRedactionAcceptsSpaceSeparatedModes,
   testInlineCommentsUseArtifactAnchorsForRecertification,
   testInlineCommentDigestChangeStalesAnchorEvenWithoutLineShift,
+  testArtifactUpdatedAfterInlineCommentRequiresRecertification,
   testInvalidInlineCommentTimestampRequiresRecertification,
   testMissingInlineCommentTimestampRequiresRecertification,
   testMissingInlineCommentAnchorMetadataRequiresRecertification,
