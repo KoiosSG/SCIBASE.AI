@@ -571,6 +571,55 @@ function testInvalidReviewerScoreValuesHoldPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testInvalidSponsorDecisionHoldsPrequalificationRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-invalid-sponsor-decision',
+      sponsorDecision: 'waitlist',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-sponsor-decision',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 94
+      }
+    },
+    {
+      applicantId: 'applicant-invalid-sponsor-decision',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 93
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-invalid-sponsor-decision');
+  const action = byId(result.remediationActions, 'remediate-applicant-invalid-sponsor-decision');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('sponsor-decision-invalid'), true);
+  assert.equal(action.action, 'publish-valid-sponsor-decision');
+  assert.equal(action.priority, 'high');
+}
+
 function testMissingRejectionReasonListHoldsWithoutCrashing() {
   const round = buildSampleRound();
   round.applicants = [
@@ -840,6 +889,7 @@ const tests = [
   testInvalidPassThresholdHoldsPrequalificationRound,
   testInvalidReviewerQuorumHoldsPrequalificationRound,
   testInvalidReviewerScoreValuesHoldPrequalificationRound,
+  testInvalidSponsorDecisionHoldsPrequalificationRound,
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testBlankRejectionReasonTextHoldsRejectedApplicant,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,

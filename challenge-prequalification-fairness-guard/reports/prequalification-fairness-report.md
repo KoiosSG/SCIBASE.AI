@@ -57,6 +57,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: publish-valid-reviewer-quorum
 - Audit digest: sha256:61801b0cd7cf7c62fc38b0f6e62415e770d388bf3844e2132b8a379183e74ca1
 
+## Invalid Sponsor Decision Packet
+
+- Applicant: applicant-invalid-sponsor-decision
+- Decision: hold-for-fairness-review
+- Reasons: sponsor-decision-invalid
+- Remediation: publish-valid-sponsor-decision
+- Audit digest: sha256:030c1d99cb355c21fb3d67e9876997fd4a8bb2042a76d205fe3c3b79beaeccc3
+
 ## Blank Rejection Reason Packet
 
 - Applicant: applicant-blank-rejection-reason

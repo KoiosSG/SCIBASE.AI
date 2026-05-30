@@ -10,6 +10,7 @@ const missingCriterionResult = evaluatePrequalificationRound(buildMissingCriteri
 const normalizedCriterionResult = evaluatePrequalificationRound(buildNormalizedCriterionIdRound());
 const invalidScoreResult = evaluatePrequalificationRound(buildInvalidReviewerScoreRound());
 const invalidQuorumResult = evaluatePrequalificationRound(buildInvalidReviewerQuorumRound());
+const invalidSponsorDecisionResult = evaluatePrequalificationRound(buildInvalidSponsorDecisionRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
 
 const packetPath = path.join(reportsDir, 'prequalification-fairness-packet.json');
@@ -17,6 +18,10 @@ const missingCriterionPacketPath = path.join(reportsDir, 'missing-criterion-id-p
 const normalizedCriterionPacketPath = path.join(reportsDir, 'normalized-criterion-id-packet.json');
 const invalidScorePacketPath = path.join(reportsDir, 'invalid-reviewer-score-packet.json');
 const invalidQuorumPacketPath = path.join(reportsDir, 'invalid-reviewer-quorum-packet.json');
+const invalidSponsorDecisionPacketPath = path.join(
+  reportsDir,
+  'invalid-sponsor-decision-packet.json'
+);
 const blankRejectionReasonPacketPath = path.join(reportsDir, 'blank-rejection-reason-packet.json');
 const reportPath = path.join(reportsDir, 'prequalification-fairness-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
@@ -26,6 +31,10 @@ fs.writeFileSync(missingCriterionPacketPath, `${JSON.stringify(missingCriterionR
 fs.writeFileSync(normalizedCriterionPacketPath, `${JSON.stringify(normalizedCriterionResult, null, 2)}\n`);
 fs.writeFileSync(invalidScorePacketPath, `${JSON.stringify(invalidScoreResult, null, 2)}\n`);
 fs.writeFileSync(invalidQuorumPacketPath, `${JSON.stringify(invalidQuorumResult, null, 2)}\n`);
+fs.writeFileSync(
+  invalidSponsorDecisionPacketPath,
+  `${JSON.stringify(invalidSponsorDecisionResult, null, 2)}\n`
+);
 fs.writeFileSync(blankRejectionReasonPacketPath, `${JSON.stringify(blankRejectionReasonResult, null, 2)}\n`);
 
 const decisions = result.decisions
@@ -95,6 +104,14 @@ ${actions}
 - Remediation: ${invalidQuorumResult.remediationActions[0].action}
 - Audit digest: ${invalidQuorumResult.auditDigest}
 
+## Invalid Sponsor Decision Packet
+
+- Applicant: ${invalidSponsorDecisionResult.decisions[0].applicantId}
+- Decision: ${invalidSponsorDecisionResult.decisions[0].decision}
+- Reasons: ${invalidSponsorDecisionResult.decisions[0].reasons.join(', ')}
+- Remediation: ${invalidSponsorDecisionResult.remediationActions[0].action}
+- Audit digest: ${invalidSponsorDecisionResult.auditDigest}
+
 ## Blank Rejection Reason Packet
 
 - Applicant: ${blankRejectionReasonResult.decisions[0].applicantId}
@@ -117,8 +134,9 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" v
   <text x="96" y="208" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Accepted applicants: ${result.summary.accepted}</text>
   <text x="96" y="258" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Held for fairness review: ${result.summary.held}</text>
   <text x="96" y="308" fill="#dff5d5" font-family="Arial, sans-serif" font-size="28">Remediation actions: ${result.summary.remediationActions}</text>
-  <text x="96" y="380" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">Checks: complete/unique criteria, valid scores, reviewer identity/quorum, thresholds, anonymity, conflicts, appeals</text>
-  <text x="96" y="448" fill="#ffd37a" font-family="Arial, sans-serif" font-size="26">Unfair screening decisions are held before applicants are accepted or rejected.</text>
+  <text x="96" y="372" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">Checks: criteria, sponsor decisions, valid scores, reviewer identity/quorum</text>
+  <text x="96" y="410" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">thresholds, anonymity, conflicts, appeals</text>
+  <text x="96" y="478" fill="#ffd37a" font-family="Arial, sans-serif" font-size="26">Unfair screening decisions are held before applicants are accepted or rejected.</text>
   <text x="96" y="574" fill="#a6d7c3" font-family="Arial, sans-serif" font-size="18">${result.auditDigest}</text>
 </svg>
 `;
@@ -130,6 +148,7 @@ console.log(`Wrote ${path.relative(__dirname, missingCriterionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, normalizedCriterionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidScorePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidQuorumPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, invalidSponsorDecisionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
@@ -315,6 +334,47 @@ function buildInvalidReviewerQuorumRound() {
       scores: {
         'domain-fit': 94,
         'data-readiness': 96,
+        'safety-plan': 93
+      }
+    }
+  ];
+  return round;
+}
+
+function buildInvalidSponsorDecisionRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-invalid-sponsor-decision',
+      sponsorDecision: 'waitlist',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-sponsor-decision',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 94
+      }
+    },
+    {
+      applicantId: 'applicant-invalid-sponsor-decision',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
         'safety-plan': 93
       }
     }

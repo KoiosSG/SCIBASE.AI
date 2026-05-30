@@ -181,6 +181,10 @@ function reviewerQuorumIsInvalid(round) {
   return !Number.isInteger(round.minReviewers) || round.minReviewers < 1;
 }
 
+function sponsorDecisionIsInvalid(applicant) {
+  return !['accept', 'reject'].includes(applicant.sponsorDecision);
+}
+
 function reviewUsesHiddenCriteria(review, criteriaIds) {
   return Object.keys(reviewScores(review)).some((criterionId) => !criteriaIds.includes(criterionId));
 }
@@ -264,6 +268,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('reviewer-quorum-shortfall');
   }
 
+  if (sponsorDecisionIsInvalid(applicant)) {
+    reasons.push('sponsor-decision-invalid');
+  }
+
   if (reviews.some((review) => reviewUsesHiddenCriteria(review, criteriaIds))) {
     reasons.push('unpublished-screening-criterion');
   }
@@ -340,6 +348,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('reviewer-quorum-invalid')) {
     return 'publish-valid-reviewer-quorum';
+  }
+
+  if (reasons.includes('sponsor-decision-invalid')) {
+    return 'publish-valid-sponsor-decision';
   }
 
   if (reasons.includes('reviewer-score-value-invalid')) {
@@ -439,6 +451,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('criteria-weight-value-invalid') ||
         decision.reasons.includes('pass-threshold-invalid') ||
         decision.reasons.includes('reviewer-quorum-invalid') ||
+        decision.reasons.includes('sponsor-decision-invalid') ||
         decision.reasons.includes('reviewer-score-value-invalid')
           ? 'high'
           : 'normal',

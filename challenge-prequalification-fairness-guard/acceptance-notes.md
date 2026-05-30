@@ -25,6 +25,7 @@ Validation coverage:
 - missing or blank published criterion IDs are held before unauditable rubric evidence can drive acceptance or rejection
 - invalid pass thresholds are held before sponsor accept/reject decisions can take effect
 - invalid reviewer quorum requirements are held before sponsor accept/reject decisions can take effect
+- invalid sponsor decision values are held before malformed accept/reject evidence can change solver access
 - invalid reviewer score values outside the finite 0-100 range are held before malformed scoring evidence can drive acceptance or rejection
 - missing rejection reason lists are normalized to an auditable fairness hold instead of crashing the prequalification packet
 - blank rejection reason text is normalized away and held as missing applicant-facing rejection evidence
