@@ -33,7 +33,7 @@ function groupBy(items, getKey) {
 function scoreForCriterion(reviews, criterionId) {
   const scores = reviews
     .map((review) => reviewScores(review)[criterionId])
-    .filter((score) => typeof score === 'number');
+    .filter((score) => isValidReviewerScore(score));
 
   if (scores.length === 0) {
     return null;
@@ -134,6 +134,10 @@ function reviewScores(review) {
   return review.scores && typeof review.scores === 'object' ? review.scores : {};
 }
 
+function isValidReviewerScore(score) {
+  return typeof score === 'number' && Number.isFinite(score) && score >= 0 && score <= 100;
+}
+
 function applicantRejectionReasons(applicant) {
   return Array.isArray(applicant.rejectionReasons) ? applicant.rejectionReasons : [];
 }
@@ -163,6 +167,15 @@ function passThresholdIsInvalid(round) {
 
 function reviewUsesHiddenCriteria(review, criteriaIds) {
   return Object.keys(reviewScores(review)).some((criterionId) => !criteriaIds.includes(criterionId));
+}
+
+function reviewHasInvalidPublishedScoreValues(review, criteriaIds) {
+  const scores = reviewScores(review);
+  return criteriaIds.some(
+    (criterionId) =>
+      Object.prototype.hasOwnProperty.call(scores, criterionId) &&
+      !isValidReviewerScore(scores[criterionId])
+  );
 }
 
 function appealStatus(applicant, round) {
@@ -243,6 +256,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-published-criterion-score');
   }
 
+  if (reviews.some((review) => reviewHasInvalidPublishedScoreValues(review, criteriaIds))) {
+    reasons.push('reviewer-score-value-invalid');
+  }
+
   const score = weightedScore(round.criteria, nonConflictedReviews);
   const passesThreshold = score >= round.passThreshold;
 
@@ -299,6 +316,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('pass-threshold-invalid')) {
     return 'publish-valid-prequalification-threshold';
+  }
+
+  if (reasons.includes('reviewer-score-value-invalid')) {
+    return 'publish-valid-reviewer-score-evidence';
   }
 
   if (reasons.includes('reviewer-conflict')) {
@@ -392,7 +413,8 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||
         decision.reasons.includes('criteria-weight-value-invalid') ||
-        decision.reasons.includes('pass-threshold-invalid')
+        decision.reasons.includes('pass-threshold-invalid') ||
+        decision.reasons.includes('reviewer-score-value-invalid')
           ? 'high'
           : 'normal',
       reasons: decision.reasons

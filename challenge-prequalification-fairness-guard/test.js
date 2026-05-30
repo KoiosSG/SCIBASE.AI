@@ -419,6 +419,55 @@ function testInvalidPassThresholdHoldsPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testInvalidReviewerScoreValuesHoldPrequalificationRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-invalid-reviewer-score',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-reviewer-score',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 140,
+        'data-readiness': 96,
+        'safety-plan': 94
+      }
+    },
+    {
+      applicantId: 'applicant-invalid-reviewer-score',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 93
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-invalid-reviewer-score');
+  const action = byId(result.remediationActions, 'remediate-applicant-invalid-reviewer-score');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('reviewer-score-value-invalid'), true);
+  assert.equal(action.action, 'publish-valid-reviewer-score-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testMissingRejectionReasonListHoldsWithoutCrashing() {
   const round = buildSampleRound();
   round.applicants = [
@@ -636,6 +685,7 @@ const tests = [
   testDuplicatePublishedCriterionIdsHoldPrequalificationRound,
   testMissingPublishedCriterionIdsHoldPrequalificationRound,
   testInvalidPassThresholdHoldsPrequalificationRound,
+  testInvalidReviewerScoreValuesHoldPrequalificationRound,
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,

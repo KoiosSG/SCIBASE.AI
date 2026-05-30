@@ -10,13 +10,14 @@
 
 - Protects anonymous or named participation settings during prequalification review.
 - Requires distinct reviewer quorum before a solver team is accepted or rejected, and excludes missing or blank reviewer identities from quorum until reviewer evidence is completed.
-- Holds incomplete reviewer score packets for evidence completion instead of letting malformed review records crash or drive decisions.
+- Holds incomplete reviewer score packets and invalid finite 0-100 score values for evidence completion instead of letting malformed review records crash or drive decisions.
 - Preserves audit evidence for each applicant before access to private challenge workspaces changes.
 
 ## Arbitration And Reward Distribution
 
 - Holds inconsistent threshold decisions for fairness review before a solver is excluded.
 - Holds invalid pass thresholds for fairness review before sponsor accept/reject decisions can take effect.
+- Holds invalid reviewer score values for fairness review before malformed score evidence can drive sponsor decisions.
 - Holds duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds missing or blank published criterion identifiers for fairness review before unauditable rubric evidence can drive sponsor decisions.
 - Flags reviewer conflicts, missing or omitted rejection reason lists, and invalid appeal-window evidence for arbitration-ready remediation.
