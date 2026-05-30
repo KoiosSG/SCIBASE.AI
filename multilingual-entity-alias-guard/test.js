@@ -193,6 +193,30 @@ function testMixedScriptLatinLanguageMentionsAreHeldForCuratorReview() {
   assert.equal(action.action, 'review-multilingual-script-confusable');
 }
 
+function testLowercaseGreekLookalikeLatinMentionsAreHeldForCuratorReview() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions = [
+    {
+      id: 'mention-crispr-greek-alpha-spoof',
+      documentId: 'paper-15',
+      text: 'CRISPR-C\u03B1s9',
+      language: 'en',
+      confidence: 0.97,
+      candidateEntityId: 'entity:mesh:D000077768'
+    }
+  ];
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-crispr-greek-alpha-spoof');
+  const action = byId(result.curatorActions, 'curate-mention-crispr-greek-alpha-spoof');
+
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'script-confusable-alias');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D000077768');
+  assert.equal(action.priority, 'high');
+  assert.equal(action.action, 'review-multilingual-script-confusable');
+}
+
 function testLowConfidenceAliasesDoNotDriveRecommendations() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const event = byId(result.mentionDecisions, 'mention-cellule-fr');
@@ -242,7 +266,7 @@ function testAuditDigestIsDeterministicAndPrivateFree() {
 
   assert.ok(result.auditDigest.startsWith('sha256:'));
   assert.equal(result.summary.acceptedMentions, 6);
-  assert.equal(result.summary.heldMentions, 2);
+  assert.equal(result.summary.heldMentions, 3);
   assert.equal(result.summary.suppressedMentions, 1);
   assert.ok(!JSON.stringify(result).includes('private@'));
 }
@@ -257,6 +281,7 @@ const tests = [
   testRegionalLanguageTagsStillUseBaseHomographHolds,
   testUnderscoreRegionalLanguageTagsUseBaseAliasAndHomographRules,
   testMixedScriptLatinLanguageMentionsAreHeldForCuratorReview,
+  testLowercaseGreekLookalikeLatinMentionsAreHeldForCuratorReview,
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testMissingConfidenceAliasesDoNotDriveRecommendations,
   testLanguageTaggedSynonymsArePreservedForEntityPages,

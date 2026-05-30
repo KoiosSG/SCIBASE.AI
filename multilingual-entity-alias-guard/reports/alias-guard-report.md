@@ -6,10 +6,10 @@ Generated: 2026-05-28T07:00:00Z
 ## Summary
 
 - Accepted mentions: 6
-- Held curator-review mentions: 2
+- Held curator-review mentions: 3
 - Suppressed low-confidence mentions: 1
 - Entity packets emitted: 3
-- Audit digest: sha256:58b1b2b3395ce6655f497a7bd521b57f00def5458b200200c46fa0f76ad854db
+- Audit digest: sha256:48d59a0c5224f91e46bbcd93174e2ce12a6f0008946fbcea6f7608abd6798778
 
 ## Accepted Canonical Mappings
 
@@ -25,6 +25,7 @@ Generated: 2026-05-28T07:00:00Z
 - curate-mention-control-es: review-multilingual-homograph (es:control)
 - curate-mention-cellule-fr: verify-translated-alias-before-recommendation (fr:cellule)
 - curate-mention-crispr-cyrillic-spoof: review-multilingual-script-confusable (en:СRISPR-Cas9)
+- curate-mention-crispr-greek-alpha-spoof: review-multilingual-script-confusable (en:CRISPR-Cαs9)
 
 ## Recommendation Guard
 

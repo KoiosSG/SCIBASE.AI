@@ -7,7 +7,7 @@
 - Normalizes language-tag casing plus hyphenated or underscored regional subtags for alias lookup while preserving the original tag on decisions.
 - Holds false friends and homographs before creating graph edges.
 - Holds same-language alias collisions when ontology entries reuse the same translated term.
-- Holds Latin-language mentions with Cyrillic or Greek lookalike characters for curator review before creating graph edges.
+- Holds Latin-language mentions with Cyrillic or Greek lookalike characters, including lowercase Greek confusables, for curator review before creating graph edges.
 - Emits schema.org-style `DefinedTerm` JSON-LD packets for entity pages.
 
 ## Knowledge Navigation

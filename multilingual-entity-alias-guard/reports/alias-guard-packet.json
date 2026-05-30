@@ -127,6 +127,20 @@
       ],
       "confidence": 0.97,
       "preservedLanguageTag": "en"
+    },
+    {
+      "id": "mention-crispr-greek-alpha-spoof",
+      "language": "en",
+      "text": "CRISPR-Cαs9",
+      "documentId": "paper-10",
+      "decision": "hold-for-curator-review",
+      "reason": "script-confusable-alias",
+      "candidateEntityId": "entity:mesh:D000077768",
+      "candidateEntityIds": [
+        "entity:mesh:D000077768"
+      ],
+      "confidence": 0.97,
+      "preservedLanguageTag": "en"
     }
   ],
   "entityPackets": [
@@ -365,13 +379,27 @@
         "entity:mesh:D000077768"
       ],
       "reason": "script-confusable-alias"
+    },
+    {
+      "id": "curate-mention-crispr-greek-alpha-spoof",
+      "mentionId": "mention-crispr-greek-alpha-spoof",
+      "action": "review-multilingual-script-confusable",
+      "priority": "high",
+      "language": "en",
+      "text": "CRISPR-Cαs9",
+      "candidateEntityId": "entity:mesh:D000077768",
+      "candidateEntityIds": [
+        "entity:mesh:D000077768"
+      ],
+      "reason": "script-confusable-alias"
     }
   ],
   "recommendationGuards": {
     "suppressedMentionIds": [
       "mention-control-es",
       "mention-cellule-fr",
-      "mention-crispr-cyrillic-spoof"
+      "mention-crispr-cyrillic-spoof",
+      "mention-crispr-greek-alpha-spoof"
     ],
     "safeEntityIds": [
       "entity:mesh:D000077768",
@@ -380,9 +408,9 @@
   },
   "summary": {
     "acceptedMentions": 6,
-    "heldMentions": 2,
+    "heldMentions": 3,
     "suppressedMentions": 1,
     "entityPackets": 3
   },
-  "auditDigest": "sha256:58b1b2b3395ce6655f497a7bd521b57f00def5458b200200c46fa0f76ad854db"
+  "auditDigest": "sha256:48d59a0c5224f91e46bbcd93174e2ce12a6f0008946fbcea6f7608abd6798778"
 }

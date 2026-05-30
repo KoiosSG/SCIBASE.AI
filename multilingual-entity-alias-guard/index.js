@@ -46,7 +46,7 @@ const LATIN_SCRIPT_LANGUAGES = new Set([
 
 const LATIN_LETTER_RE = /[A-Za-z\u00C0-\u024F]/u;
 const CYRILLIC_LATIN_CONFUSABLE_RE = /[\u0405\u0410\u0412\u0415\u041A\u041C\u041D\u041E\u0420\u0421\u0422\u0425\u0430\u0435\u043E\u0440\u0441\u0445\u0455]/u;
-const GREEK_LATIN_CONFUSABLE_RE = /[\u0391\u0392\u0395\u0396\u0397\u0399\u039A\u039C\u039D\u039F\u03A1\u03A4\u03A5\u03A7]/u;
+const GREEK_LATIN_CONFUSABLE_RE = /[\u0391\u0392\u0395\u0396\u0397\u0399\u039A\u039C\u039D\u039F\u03A1\u03A4\u03A5\u03A7\u03B1\u03B5\u03B9\u03BA\u03BC\u03BD\u03BF\u03C1\u03C4\u03C5\u03C7]/u;
 
 function normalizeTerm(term) {
   return term.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
@@ -441,6 +441,14 @@ function buildSampleCorpus() {
         id: 'mention-crispr-cyrillic-spoof',
         documentId: 'paper-9',
         text: '\u0421RISPR-Cas9',
+        language: 'en',
+        confidence: 0.97,
+        candidateEntityId: 'entity:mesh:D000077768'
+      },
+      {
+        id: 'mention-crispr-greek-alpha-spoof',
+        documentId: 'paper-10',
+        text: 'CRISPR-C\u03B1s9',
         language: 'en',
         confidence: 0.97,
         candidateEntityId: 'entity:mesh:D000077768'

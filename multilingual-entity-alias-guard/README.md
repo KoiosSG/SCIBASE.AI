@@ -2,7 +2,7 @@
 
 This module adds a focused Scientific Knowledge Graph Integration slice for SCIBASE issue #17. It normalizes multilingual scientific mentions before they become graph nodes, entity-page aliases, or recommendation signals.
 
-The guard accepts trusted translated aliases only when numeric confidence evidence is present, preserves original language tags, normalizes language-tag casing and underscore or hyphen regional separators for lookup, falls back from regional language tags to their base language, emits JSON-LD-style entity packets, holds homographs, false friends, same-language alias collisions, and mixed-script Latin-language lookalikes for curator review, and suppresses low-confidence or missing-confidence aliases before recommendations are shown.
+The guard accepts trusted translated aliases only when numeric confidence evidence is present, preserves original language tags, normalizes language-tag casing and underscore or hyphen regional separators for lookup, falls back from regional language tags to their base language, emits JSON-LD-style entity packets, holds homographs, false friends, same-language alias collisions, and mixed-script Latin-language lookalikes including lowercase Greek or Cyrillic confusables for curator review, and suppresses low-confidence or missing-confidence aliases before recommendations are shown.
 
 ## Run
 
