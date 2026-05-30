@@ -239,12 +239,18 @@ function mentionsSampleSize(text, sampleSize) {
     const previousCharacter = comparableText[countStart - 1] || '';
     const nextCharacter = comparableText[countEnd] || '';
     const nextMeaningfulCharacter = comparableText.slice(countEnd).trimStart()[0] || '';
+    const followingText = comparableText.slice(countEnd).trimStart();
     if (previousCharacter === '.') continue;
     if (nextMeaningfulCharacter === '%') continue;
     if (nextCharacter === '.' && /\d/.test(comparableText[countEnd + 1] || '')) continue;
+    if (isMeasurementValueNotSampleSize(followingText)) continue;
     return true;
   }
   return false;
+}
+
+function isMeasurementValueNotSampleSize(followingText) {
+  return /^(milliseconds?|seconds?|secs?|minutes?|mins?|hours?|days?|weeks?|months?|years?|ms|fold|points?|scores?|ratio|odds|hazard|confidence|ci)\b/i.test(followingText);
 }
 
 function hasText(value) {
