@@ -13,6 +13,7 @@ const invalidQuorumResult = evaluatePrequalificationRound(buildInvalidReviewerQu
 const invalidSponsorDecisionResult = evaluatePrequalificationRound(buildInvalidSponsorDecisionRound());
 const missingApplicantIdentityResult = evaluatePrequalificationRound(buildMissingApplicantIdentityRound());
 const missingReviewListResult = evaluatePrequalificationRound(buildMissingReviewListRound());
+const missingCriteriaListResult = evaluatePrequalificationRound(buildMissingCriteriaListRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
 
 const packetPath = path.join(reportsDir, 'prequalification-fairness-packet.json');
@@ -29,6 +30,7 @@ const missingApplicantIdentityPacketPath = path.join(
   'missing-applicant-identity-packet.json'
 );
 const missingReviewListPacketPath = path.join(reportsDir, 'missing-review-list-packet.json');
+const missingCriteriaListPacketPath = path.join(reportsDir, 'missing-criteria-list-packet.json');
 const blankRejectionReasonPacketPath = path.join(reportsDir, 'blank-rejection-reason-packet.json');
 const reportPath = path.join(reportsDir, 'prequalification-fairness-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
@@ -47,6 +49,10 @@ fs.writeFileSync(
   `${JSON.stringify(missingApplicantIdentityResult, null, 2)}\n`
 );
 fs.writeFileSync(missingReviewListPacketPath, `${JSON.stringify(missingReviewListResult, null, 2)}\n`);
+fs.writeFileSync(
+  missingCriteriaListPacketPath,
+  `${JSON.stringify(missingCriteriaListResult, null, 2)}\n`
+);
 fs.writeFileSync(blankRejectionReasonPacketPath, `${JSON.stringify(blankRejectionReasonResult, null, 2)}\n`);
 
 const decisions = result.decisions
@@ -140,6 +146,14 @@ ${actions}
 - Remediation: ${missingReviewListResult.remediationActions[0].action}
 - Audit digest: ${missingReviewListResult.auditDigest}
 
+## Missing Criteria List Packet
+
+- Applicant: ${missingCriteriaListResult.decisions[0].applicantId}
+- Decision: ${missingCriteriaListResult.decisions[0].decision}
+- Reasons: ${missingCriteriaListResult.decisions[0].reasons.join(', ')}
+- Remediation: ${missingCriteriaListResult.remediationActions[0].action}
+- Audit digest: ${missingCriteriaListResult.auditDigest}
+
 ## Blank Rejection Reason Packet
 
 - Applicant: ${blankRejectionReasonResult.decisions[0].applicantId}
@@ -179,6 +193,7 @@ console.log(`Wrote ${path.relative(__dirname, invalidQuorumPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidSponsorDecisionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingApplicantIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingReviewListPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, missingCriteriaListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
@@ -464,6 +479,48 @@ function buildMissingReviewListRound() {
     }
   ];
   delete round.reviews;
+  return round;
+}
+
+function buildMissingCriteriaListRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-missing-criteria-list',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-missing-criteria-list',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-missing-criteria-list',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+  delete round.criteria;
   return round;
 }
 

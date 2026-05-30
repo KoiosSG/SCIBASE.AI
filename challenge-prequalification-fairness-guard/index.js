@@ -63,7 +63,7 @@ function criterionIdFor(criterion) {
 }
 
 function duplicatePublishedCriterionIds(round) {
-  const criterionCounts = round.criteria.reduce((counts, criterion) => {
+  const criterionCounts = criteriaListFor(round).reduce((counts, criterion) => {
     const criterionId = criterionIdFor(criterion);
     counts[criterionId] = (counts[criterionId] || 0) + 1;
     return counts;
@@ -77,7 +77,7 @@ function duplicatePublishedCriterionIds(round) {
 }
 
 function hasMissingPublishedCriterionIds(round) {
-  return round.criteria.some(
+  return criteriaListFor(round).some(
     (criterion) => typeof criterion.id !== 'string' || criterion.id.trim().length === 0
   );
 }
@@ -104,6 +104,14 @@ function reviewListFor(round) {
 
 function reviewListIsMissing(round) {
   return !Array.isArray(round.reviews);
+}
+
+function criteriaListFor(round) {
+  return Array.isArray(round.criteria) ? round.criteria : [];
+}
+
+function criteriaListIsMissing(round) {
+  return !Array.isArray(round.criteria);
 }
 
 function outputApplicantIdFor(applicant) {
@@ -156,7 +164,7 @@ function countableNonConflictedReviews(reviews) {
 }
 
 function publicCriteriaIds(round) {
-  return round.criteria.map((criterion) => criterion.id);
+  return criteriaListFor(round).map((criterion) => criterion.id);
 }
 
 function reviewScores(review) {
@@ -179,11 +187,11 @@ function applicantRejectionReasons(applicant) {
 }
 
 function criteriaWeightTotal(round) {
-  return round.criteria.reduce((total, criterion) => total + criterion.weight, 0);
+  return criteriaListFor(round).reduce((total, criterion) => total + criterion.weight, 0);
 }
 
 function criteriaWeightsHaveInvalidValues(round) {
-  return round.criteria.some(
+  return criteriaListFor(round).some(
     (criterion) =>
       typeof criterion.weight !== 'number' ||
       !Number.isFinite(criterion.weight) ||
@@ -264,6 +272,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-published-criterion-id');
   }
 
+  if (criteriaListIsMissing(round)) {
+    reasons.push('missing-published-criteria-list');
+  }
+
   if (duplicateReviewerIds.length > 0) {
     reasons.push('duplicate-reviewer-score-evidence');
   }
@@ -320,7 +332,7 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('reviewer-score-value-invalid');
   }
 
-  const score = weightedScore(round.criteria, nonConflictedReviews);
+  const score = weightedScore(criteriaListFor(round), nonConflictedReviews);
   const passesThreshold = score >= round.passThreshold;
 
   if (
@@ -352,6 +364,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 function remediationAction(applicant, reasons) {
   if (reasons.includes('anonymous-screening-leak')) {
     return 'rerun-blinded-prequalification-review';
+  }
+
+  if (reasons.includes('missing-published-criteria-list')) {
+    return 'publish-complete-screening-criteria';
   }
 
   if (reasons.includes('unpublished-screening-criterion')) {
@@ -438,7 +454,7 @@ function evaluatePrequalificationRound(round) {
     const applicantId = outputApplicantIdFor(applicant);
     const nonConflictedReviews = countableNonConflictedReviews(reviews);
     const reasons = reasonsForApplicant(applicant, reviews, round);
-    const score = weightedScore(round.criteria, nonConflictedReviews);
+    const score = weightedScore(criteriaListFor(round), nonConflictedReviews);
     const decision =
       reasons.length > 0
         ? 'hold-for-fairness-review'
@@ -485,6 +501,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('reviewer-conflict') ||
         decision.reasons.includes('duplicate-published-criterion') ||
         decision.reasons.includes('missing-published-criterion-id') ||
+        decision.reasons.includes('missing-published-criteria-list') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('missing-review-list') ||
@@ -512,7 +529,7 @@ function evaluatePrequalificationRound(round) {
   return {
     challengeId: round.challengeId,
     generatedAt: round.generatedAt,
-    criteriaDigest: digest(round.criteria),
+    criteriaDigest: digest(criteriaListFor(round)),
     decisions,
     remediationActions,
     summary,

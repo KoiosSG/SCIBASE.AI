@@ -81,6 +81,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-prequalification-evidence
 - Audit digest: sha256:205a2e89821f1f3e7c9b83e959f0b123967d8af29b659d89af898e473ed4033d
 
+## Missing Criteria List Packet
+
+- Applicant: applicant-missing-criteria-list
+- Decision: hold-for-fairness-review
+- Reasons: criteria-weight-total-invalid, inconsistent-threshold-decision, missing-published-criteria-list, unpublished-screening-criterion
+- Remediation: publish-complete-screening-criteria
+- Audit digest: sha256:c2d8b60e1ca8cc50e8b8c072ee2a22a9a832df09b59e63d60dd21b41b1f17fd3
+
 ## Blank Rejection Reason Packet
 
 - Applicant: applicant-blank-rejection-reason

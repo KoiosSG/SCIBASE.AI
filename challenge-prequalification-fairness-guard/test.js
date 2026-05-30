@@ -832,6 +832,59 @@ function testMissingReviewListHoldsPrequalificationRoundWithoutCrashing() {
   assert.equal(action.priority, 'high');
 }
 
+function testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing() {
+  const round = buildSampleRound();
+  delete round.criteria;
+  round.applicants = [
+    {
+      id: 'applicant-missing-criteria-list',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-missing-criteria-list',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-missing-criteria-list',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-missing-criteria-list');
+  const action = byId(result.remediationActions, 'remediate-applicant-missing-criteria-list');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('missing-published-criteria-list'), true);
+  assert.deepEqual(decision.criteriaApplied, []);
+  assert.equal(decision.weightedScore, 0);
+  assert.equal(action.action, 'publish-complete-screening-criteria');
+  assert.equal(action.priority, 'high');
+  assert.ok(result.criteriaDigest.startsWith('sha256:'));
+}
+
 function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
   const round = buildSampleRound();
   round.minReviewers = 2;
@@ -968,6 +1021,7 @@ const tests = [
   testBlankRejectionReasonTextHoldsRejectedApplicant,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testMissingReviewListHoldsPrequalificationRoundWithoutCrashing,
+  testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree

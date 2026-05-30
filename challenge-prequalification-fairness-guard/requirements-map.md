@@ -2,7 +2,7 @@
 
 ## Challenge Posting Portal
 
-- Verifies that prequalification rounds use published criteria, complete and unique criterion identifiers after trimming, nonnegative weights, valid weight totals, valid 0-100 pass thresholds, valid positive reviewer quorum requirements, explicit sponsor accept/reject decisions, and complete applicant identities.
+- Verifies that prequalification rounds use complete published criteria lists, complete and unique criterion identifiers after trimming, nonnegative weights, valid weight totals, valid 0-100 pass thresholds, valid positive reviewer quorum requirements, explicit sponsor accept/reject decisions, and complete applicant identities.
 - Blocks unpublished sponsor preferences from entering solver-screening decisions.
 - Keeps prequalification decisions tied to challenge timelines and parseable appeal windows.
 
@@ -11,7 +11,7 @@
 - Protects anonymous or named participation settings during prequalification review.
 - Requires a valid positive reviewer quorum before a solver team is accepted or rejected, and excludes missing or blank reviewer identities from quorum until reviewer evidence is completed.
 - Holds missing or blank applicant identities before malformed applicant rows can change solver-team access.
-- Holds missing round-level review lists before sparse prequalification packets can crash or change solver-team access.
+- Holds missing round-level criteria lists and review lists before sparse prequalification packets can crash or change solver-team access.
 - Holds incomplete reviewer score packets and invalid finite 0-100 score values for evidence completion instead of letting malformed review records crash or drive decisions.
 - Preserves audit evidence for each applicant before access to private challenge workspaces changes.
 
@@ -31,6 +31,7 @@
 - Deduplicates repeated reviewer identities before quorum and weighted threshold scoring while retaining the duplicate-evidence finding.
 - Holds missing reviewer identity evidence before anonymous or malformed reviewer rows can satisfy quorum.
 - Holds missing review-list evidence for fairness review before applicant decisions can take effect.
+- Holds missing criteria-list evidence for fairness review before applicant decisions can take effect.
 - Produces deterministic digests for challenge administrators and third-party reviewers.
 
 ## Safety And Scope
