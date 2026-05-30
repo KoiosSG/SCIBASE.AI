@@ -61,17 +61,21 @@ function hasPrivateContext(value) {
 }
 
 function lineItemPrivacyFindings(lineItem) {
-  return findingsForText(
-    stableStringify({
-      id: lineItem.id,
-      description: lineItem.description,
-      projectRef: lineItem.projectRef,
-      quantity: lineItem.quantity,
-      usageCategory: lineItem.usageCategory,
-      unit: lineItem.unit,
-      amountCents: lineItem.amountCents
-    })
-  );
+  return Array.from(new Set([
+    ...findingsForText(
+      stableStringify({
+        id: lineItem.id,
+        description: lineItem.description,
+        projectRef: lineItem.projectRef,
+        quantity: lineItem.quantity,
+        usageCategory: lineItem.usageCategory,
+        unit: lineItem.unit,
+        amountCents: lineItem.amountCents
+      })
+    ),
+    ...numericFieldFindings(lineItem.quantity, 'quantity'),
+    ...numericFieldFindings(lineItem.amountCents, 'cents')
+  ])).sort();
 }
 
 function categoryDescription(lineItem) {
@@ -102,9 +106,9 @@ function sanitizeLineItem(lineItem, index) {
   return {
     id,
     usageCategory,
-    quantity: sanitizeCustomerNumber(lineItem.quantity),
+    quantity: sanitizeCustomerNumber(lineItem.quantity, 'quantity'),
     unit,
-    amountCents: sanitizeCustomerNumber(lineItem.amountCents),
+    amountCents: sanitizeCustomerNumber(lineItem.amountCents, 'cents'),
     description,
     findings
   };
@@ -119,10 +123,13 @@ function receiptIdentifierFindings(receipt) {
 }
 
 function receiptEnvelopeFindings(receipt) {
-  return findingsForText(stableStringify({
-    currency: receipt.currency,
-    totalCents: receipt.totalCents
-  }));
+  return Array.from(new Set([
+    ...findingsForText(stableStringify({
+      currency: receipt.currency,
+      totalCents: receipt.totalCents
+    })),
+    ...numericFieldFindings(receipt.totalCents, 'cents')
+  ])).sort();
 }
 
 function sanitizeIdentifier(value, fallback) {
@@ -133,8 +140,20 @@ function sanitizeCurrency(value) {
   return hasPrivateContext(value) ? 'XXX' : value;
 }
 
-function sanitizeCustomerNumber(value) {
-  return hasPrivateContext(value) ? null : value;
+function sanitizeCustomerNumber(value, kind = 'number') {
+  return hasPrivateContext(value) || numericFieldFindings(value, kind).length > 0 ? null : value;
+}
+
+function numericFieldFindings(value, kind) {
+  if (kind === 'cents') {
+    return Number.isInteger(value) && value >= 0 ? [] : ['invalid-billing-amount'];
+  }
+
+  if (kind === 'quantity') {
+    return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? [] : ['invalid-billing-quantity'];
+  }
+
+  return typeof value === 'number' && Number.isFinite(value) ? [] : ['invalid-billing-number'];
 }
 
 function sanitizeMetadata(metadata = {}) {
@@ -193,7 +212,7 @@ function evaluateReceipt(receipt, index) {
   const safeInvoiceId = sanitizeIdentifier(receipt.invoiceId, `invoice-redacted-${index + 1}`);
   const safeCustomerId = sanitizeIdentifier(receipt.customerId, `customer-redacted-${index + 1}`);
   const safeCurrency = sanitizeCurrency(receipt.currency);
-  const safeTotalCents = sanitizeCustomerNumber(receipt.totalCents);
+  const safeTotalCents = sanitizeCustomerNumber(receipt.totalCents, 'cents');
 
   const customerCopy = {
     receiptId: safeReceiptId,
@@ -243,6 +262,13 @@ function remediationAction(receipt) {
 
   if (receipt.findings.includes('restricted-dataset-reference')) {
     return 'replace-restricted-dataset-detail-with-usage-category';
+  }
+
+  if (
+    receipt.findings.includes('invalid-billing-amount') ||
+    receipt.findings.includes('invalid-billing-quantity')
+  ) {
+    return 'repair-malformed-billing-fields-before-delivery';
   }
 
   return 'redact-private-research-context';

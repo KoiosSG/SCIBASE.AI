@@ -423,6 +423,51 @@ function testCustomerFacingMoneyAndQuantityFieldsAreRedacted() {
   assert.equal(JSON.stringify(result).includes('GSE-private'), false);
 }
 
+function testMalformedCustomerFacingMoneyAndQuantityFieldsAreHeld() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-malformed-numeric-fields',
+      invoiceId: 'inv-malformed-numeric-fields',
+      customerId: 'customer-lab-013',
+      currency: 'USD',
+      totalCents: 'free-form total',
+      providerMetadata: {
+        accountRef: 'acct-lab-013',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-malformed-numeric-fields',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-malformed-quantity',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 'one',
+          unit: 'month',
+          amountCents: -2500
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+  const lineItem = receipt.customerCopy.lineItems[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('invalid-billing-amount'), true);
+  assert.equal(receipt.findings.includes('invalid-billing-quantity'), true);
+  assert.equal(receipt.customerCopy.totalCents, null);
+  assert.equal(lineItem.quantity, null);
+  assert.equal(lineItem.amountCents, null);
+  assert.equal(result.summary.totalCentsReviewed, 0);
+
+  const action = result.remediationActions[0];
+  assert.equal(action.action, 'repair-malformed-billing-fields-before-delivery');
+  assert.equal(action.priority, 'normal');
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -460,6 +505,7 @@ const tests = [
   testMissingLineItemsAreTreatedAsEmptyReceiptLines,
   testCustomerFacingCurrencyLabelsAreRedacted,
   testCustomerFacingMoneyAndQuantityFieldsAreRedacted,
+  testMalformedCustomerFacingMoneyAndQuantityFieldsAreHeld,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

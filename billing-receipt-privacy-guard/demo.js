@@ -10,14 +10,45 @@ const emptyResult = evaluateReceiptPrivacy({
   batchId: 'billing-empty-review-20',
   generatedAt: '2026-05-30T12:00:00Z'
 });
+const malformedResult = evaluateReceiptPrivacy({
+  batchId: 'billing-malformed-fields-review-20',
+  generatedAt: '2026-05-30T12:15:00Z',
+  receipts: [
+    {
+      id: 'receipt-malformed-numeric-fields',
+      invoiceId: 'inv-malformed-numeric-fields',
+      customerId: 'customer-lab-013',
+      currency: 'USD',
+      totalCents: 'free-form total',
+      providerMetadata: {
+        accountRef: 'acct-lab-013',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-malformed-numeric-fields',
+        plan: 'lab-pro'
+      },
+      lineItems: [
+        {
+          id: 'line-malformed-quantity',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 'one',
+          unit: 'month',
+          amountCents: -2500
+        }
+      ]
+    }
+  ]
+});
 
 const packetPath = path.join(reportsDir, 'receipt-privacy-packet.json');
 const emptyPacketPath = path.join(reportsDir, 'empty-receipt-privacy-packet.json');
+const malformedPacketPath = path.join(reportsDir, 'malformed-receipt-privacy-packet.json');
 const reportPath = path.join(reportsDir, 'receipt-privacy-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(emptyPacketPath, `${JSON.stringify(emptyResult, null, 2)}\n`);
+fs.writeFileSync(malformedPacketPath, `${JSON.stringify(malformedResult, null, 2)}\n`);
 
 const receipts = result.receipts
   .map(
@@ -57,6 +88,10 @@ ${actions}
 
 Empty or partially populated provider batches that omit receipt or line-item collections produce deterministic empty review evidence instead of runtime failures. The empty batch fixture reviewed ${emptyResult.receipts.length} receipts and generated ${emptyResult.remediationActions.length} remediation actions.
 
+## Malformed Billing Field Guard
+
+Receipts with non-numeric totals, quantities, or line-item amounts are held before delivery. The malformed fixture decision is ${malformedResult.receipts[0].decision}, and customer-facing numeric fields are redacted to ${malformedResult.receipts[0].customerCopy.totalCents}.
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, customer systems, private workspaces, institutional finance tools, or external APIs.
@@ -81,6 +116,7 @@ fs.writeFileSync(svgPath, svg);
 
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, emptyPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Deliverable receipts: ${result.summary.deliverableReceipts}`);

@@ -20,6 +20,7 @@ Validation coverage:
 - redacted receipt identifiers remain distinct for finance review correlation
 - customer-facing currency labels are replaced with `XXX` when they carry restricted dataset context
 - customer-facing totals, quantities, and line-item amounts are replaced with `null` when they carry restricted dataset context
+- customer-facing totals, quantities, and line-item amounts are replaced with `null` when they are malformed or negative, even without private research text
 - customer-facing line-item identifiers and units are redacted when they contain restricted dataset context
 - missing provider metadata is treated as an empty provider packet instead of crashing receipt review
 - missing receipt and line-item collections are treated as empty billing evidence instead of crashing receipt review

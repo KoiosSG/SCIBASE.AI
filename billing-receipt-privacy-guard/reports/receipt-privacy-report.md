@@ -24,6 +24,10 @@ Generated: 2026-05-28T09:00:00Z
 
 Empty or partially populated provider batches that omit receipt or line-item collections produce deterministic empty review evidence instead of runtime failures. The empty batch fixture reviewed 0 receipts and generated 0 remediation actions.
 
+## Malformed Billing Field Guard
+
+Receipts with non-numeric totals, quantities, or line-item amounts are held before delivery. The malformed fixture decision is hold-for-finance-review, and customer-facing numeric fields are redacted to null.
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, customer systems, private workspaces, institutional finance tools, or external APIs.
