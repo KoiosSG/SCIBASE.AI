@@ -8,6 +8,7 @@
 | placeholder-attestation-packet.json | stage_for_curator_review | curator_review | watermarked | staged | INVALID_SOURCE_ATTESTATION |
 | unsupported-channel-packet.json | stage_for_curator_review | curator_review | watermarked | staged | UNKNOWN_IMPORT_CHANNEL |
 | source-origin-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_SOURCE |
+| lowercase-windows-path-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_PATH |
 | clean-packet.json | allow_collaborative_insert | allowed | allowed | standard | none |
 
 All packets use synthetic import payloads and deterministic SHA-256 audit digests.

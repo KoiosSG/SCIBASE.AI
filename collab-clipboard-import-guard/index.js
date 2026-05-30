@@ -227,7 +227,7 @@ function containsLocalPrivatePath(value = '') {
 function redactLocalPrivatePaths(value = '') {
   return value
     .replace(/file:\/\/[^ \s"')]+/gi, '[redacted-local-path]')
-    .replace(/[A-Z]:\\Users\\[^ \s"')]+/g, '[redacted-local-path]')
+    .replace(/[A-Z]:\\Users\\[^ \s"')]+/gi, '[redacted-local-path]')
     .replace(/\/Users\/[^ \s"')]+/g, '[redacted-local-path]')
     .replace(/\/home\/[^ \s"')]+/g, '[redacted-local-path]')
     .replace(/\b(?:private-lab|patient-export)\b/gi, '[redacted-private-reference]');

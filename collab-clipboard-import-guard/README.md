@@ -10,7 +10,7 @@ It evaluates synthetic import batches for:
 - missing, blank, placeholder, or malformed signed source attestations from trusted and partner imports
 - hidden instruction-like text that is not visible to collaborators
 - spreadsheet formula cells that could execute after import
-- notebook output snippets and table cells containing local or private filesystem paths
+- notebook output snippets and table cells containing local or private filesystem paths, including lowercase Windows user paths
 - source-origin metadata containing local or private filesystem paths
 - stale or malformed collaborator review metadata bound to old section versions or unverifiable expiry evidence
 - duplicate anchors that would collide inside the import payload or with existing shared-document anchors, with every colliding block regenerated before insertion
@@ -28,7 +28,7 @@ npm run check
 
 The demo writes JSON, Markdown, SVG, and MP4 evidence to `reports/`.
 
-Generated packets include unsafe clipboard, partner-review, trusted-attestation, placeholder-attestation, unsupported-channel, private source-origin, and clean trusted import examples.
+Generated packets include unsafe clipboard, partner-review, trusted-attestation, placeholder-attestation, unsupported-channel, private source-origin, lowercase Windows path, and clean trusted import examples.
 
 ## Scope
 

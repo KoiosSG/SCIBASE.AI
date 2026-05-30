@@ -52,6 +52,7 @@ const unsafeClipboardImport = {
 };
 
 const TRUSTED_EXPORT_ATTESTATION = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const NOTEBOOK_OUTPUT_ATTESTATION = 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 const PARTNER_SIGNED_ATTESTATION = 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const PRIVATE_ORIGIN_ATTESTATION = 'sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
 
@@ -179,6 +180,27 @@ const privateSourceOriginImport = {
   ]
 };
 
+const lowercaseWindowsPathImport = {
+  importId: 'import-lowercase-windows-path',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-30T08:50:00Z',
+  source: {
+    channel: 'clipboard',
+    origin: 'trusted-notebook-output',
+    trustLevel: 'trusted',
+    signedAttestation: NOTEBOOK_OUTPUT_ATTESTATION
+  },
+  blocks: [
+    {
+      id: 'blk-lowercase-windows-path',
+      type: 'notebook-output',
+      sectionId: 'results',
+      anchor: 'lowercase-windows-output',
+      content: 'Rendered output to c:\\Users\\sam\\private-lab\\patient-export.csv'
+    }
+  ]
+};
+
 module.exports = {
   unsafeClipboardImport,
   partnerForwardImport,
@@ -186,5 +208,6 @@ module.exports = {
   trustedPlaceholderAttestationImport,
   unsupportedChannelImport,
   cleanTrustedImport,
-  privateSourceOriginImport
+  privateSourceOriginImport,
+  lowercaseWindowsPathImport
 };

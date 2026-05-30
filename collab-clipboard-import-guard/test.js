@@ -371,6 +371,38 @@ function testPrivateReferenceMarkersAreRedactedWithoutFilePaths() {
   );
 }
 
+function testLowercaseWindowsUserPathsAreFullyRedacted() {
+  const packet = assessImportBatch({
+    importId: 'import-lowercase-windows-path',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-30T08:50:00Z',
+    source: {
+      channel: 'clipboard',
+      origin: 'trusted-notebook-output',
+      trustLevel: 'trusted',
+      signedAttestation: NOTEBOOK_OUTPUT_ATTESTATION
+    },
+    blocks: [
+      {
+        id: 'blk-lowercase-windows-path',
+        type: 'notebook-output',
+        sectionId: 'results',
+        anchor: 'lowercase-windows-output',
+        content: 'Rendered output to c:\\Users\\sam\\private-lab\\patient-export.csv'
+      }
+    ]
+  });
+
+  const outputBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-lowercase-windows-path');
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['LOCAL_PRIVATE_PATH']);
+  assert.equal(outputBlock.content, 'Rendered output to [redacted-local-path]');
+  assert.equal(JSON.stringify(packet).includes('c:\\Users\\sam'), false);
+  assert.equal(JSON.stringify(packet).includes('private-lab'), false);
+  assert.equal(JSON.stringify(packet).includes('patient-export'), false);
+}
+
 function testTableCellsWithPrivatePathsAreQuarantinedAndRedacted() {
   const packet = assessImportBatch({
     importId: 'import-private-table-cell',
@@ -528,6 +560,7 @@ const tests = [
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
+  testLowercaseWindowsUserPathsAreFullyRedacted,
   testTableCellsWithPrivatePathsAreQuarantinedAndRedacted,
   testSourceOriginWithPrivatePathIsQuarantinedAndRedacted,
   testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion,

@@ -9,7 +9,8 @@ const {
   trustedPlaceholderAttestationImport,
   unsupportedChannelImport,
   cleanTrustedImport,
-  privateSourceOriginImport
+  privateSourceOriginImport,
+  lowercaseWindowsPathImport
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -22,6 +23,7 @@ const packets = [
   ['placeholder-attestation-packet.json', assessImportBatch(trustedPlaceholderAttestationImport)],
   ['unsupported-channel-packet.json', assessImportBatch(unsupportedChannelImport)],
   ['source-origin-packet.json', assessImportBatch(privateSourceOriginImport)],
+  ['lowercase-windows-path-packet.json', assessImportBatch(lowercaseWindowsPathImport)],
   ['clean-packet.json', assessImportBatch(cleanTrustedImport)]
 ];
 
