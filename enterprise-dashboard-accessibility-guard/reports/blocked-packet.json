@@ -10,6 +10,12 @@
   "findings": [
     {
       "componentId": "compute-usage-critical",
+      "code": "MISSING_VISIBLE_FOCUS_INDICATOR",
+      "severity": "blocker",
+      "message": "Keyboard users need a visible focus indicator on reachable dashboard controls."
+    },
+    {
+      "componentId": "compute-usage-critical",
       "code": "PRIVATE_DATA_IN_ACCESSIBILITY_TEXT",
       "severity": "blocker",
       "message": "Accessibility text exposes private user, lab, or project data."
@@ -68,6 +74,7 @@
     "add_screen_reader_label:private-project-table",
     "add_table_summary:private-project-table",
     "add_table_summary:weekly-admin-export",
+    "add_visible_focus_indicator:compute-usage-critical",
     "block_release:enterprise-admin-overview",
     "improve_contrast:webhook-failure-alert",
     "provide_valid_contrast_evidence:contract-risk-score",
@@ -80,5 +87,5 @@
     "robust": false
   },
   "assessedAt": "2026-05-27T13:00:00Z",
-  "auditDigest": "3a92697e16f9be41158da60c1f880d443a67a58d6e367fa94882fe8874f69864"
+  "auditDigest": "54a2b80eea438f90254991c20ca827636fa16789c652fbef6309e56662e55253"
 }

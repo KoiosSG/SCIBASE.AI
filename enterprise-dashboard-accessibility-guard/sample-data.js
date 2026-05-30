@@ -11,6 +11,7 @@ const blockedDashboard = {
       background: '#f8fafc',
       critical: true,
       keyboardReachable: true,
+      focusVisible: false,
       screenReaderLabel: 'Compute usage for private lab alice@example.edu',
       ariaTextContainsPrivateData: true,
       headingLevel: 2

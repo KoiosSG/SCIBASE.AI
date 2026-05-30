@@ -66,6 +66,10 @@ function assessVisualAndOperableComponents(dashboard) {
       findings.push(finding(component, 'KEYBOARD_TRAP', 'blocker', 'Keyboard users cannot reach or leave this component predictably.'));
     }
 
+    if (component.keyboardReachable !== false && component.focusVisible === false) {
+      findings.push(finding(component, 'MISSING_VISIBLE_FOCUS_INDICATOR', 'blocker', 'Keyboard users need a visible focus indicator on reachable dashboard controls.'));
+    }
+
     if (component.ariaTextContainsPrivateData || containsPrivateData(accessibilityText(component))) {
       findings.push(finding(component, 'PRIVATE_DATA_IN_ACCESSIBILITY_TEXT', 'blocker', 'Accessibility text exposes private user, lab, or project data.'));
     }
@@ -159,6 +163,9 @@ function buildActions(dashboard, findings) {
     if (item.code === 'MISSING_SCREEN_READER_LABEL') {
       actions.add(`add_screen_reader_label:${item.componentId}`);
     }
+    if (item.code === 'MISSING_VISIBLE_FOCUS_INDICATOR') {
+      actions.add(`add_visible_focus_indicator:${item.componentId}`);
+    }
     if (
       item.code === 'LOW_CONTRAST_CRITICAL_METRIC' ||
       item.code === 'LOW_CONTRAST_NONCRITICAL_METRIC'
@@ -184,7 +191,10 @@ function buildWcagSignals(findings) {
       !codes.has('LOW_CONTRAST_CRITICAL_METRIC') &&
       !codes.has('LOW_CONTRAST_NONCRITICAL_METRIC') &&
       !codes.has('MISSING_TABLE_SUMMARY'),
-    operable: !codes.has('KEYBOARD_TRAP') && !codes.has('MISSING_REDUCED_MOTION_FALLBACK'),
+    operable:
+      !codes.has('KEYBOARD_TRAP') &&
+      !codes.has('MISSING_REDUCED_MOTION_FALLBACK') &&
+      !codes.has('MISSING_VISIBLE_FOCUS_INDICATOR'),
     understandable: !codes.has('PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') && !codes.has('HEADING_ORDER_SKIP'),
     robust: !codes.has('MISSING_SCREEN_READER_LABEL')
   };

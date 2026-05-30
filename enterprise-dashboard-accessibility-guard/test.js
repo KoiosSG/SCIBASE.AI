@@ -181,6 +181,40 @@ function testShorthandHexContrastEvidenceRemainsValid() {
   assert.equal(packet.wcagSignals.perceivable, true);
 }
 
+function testMissingVisibleFocusIndicatorBlocksKeyboardRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-hidden-focus',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:25:00Z',
+    widgets: [
+      {
+        id: 'project-risk-filter',
+        type: 'filter',
+        title: 'Project risk filter',
+        foreground: '#111827',
+        background: '#ffffff',
+        critical: true,
+        keyboardReachable: true,
+        focusVisible: false,
+        screenReaderLabel: 'Filter projects by risk status',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'blocked');
+  assert.deepEqual(codes(packet), ['MISSING_VISIBLE_FOCUS_INDICATOR']);
+  assert.equal(packet.wcagSignals.operable, false);
+  assert.ok(packet.actions.includes('add_visible_focus_indicator:project-risk-filter'));
+}
+
 const tests = [
   testCriticalAccessibilityIssuesBlockDashboardRelease,
   testCleanDashboardReleasesWithWcagSignals,
@@ -188,7 +222,8 @@ const tests = [
   testNonCriticalLowContrastRequiresRemediationBeforeRelease,
   testPrivateDataInTableSummaryBlocksRelease,
   testInvalidContrastEvidenceBlocksRelease,
-  testShorthandHexContrastEvidenceRemainsValid
+  testShorthandHexContrastEvidenceRemainsValid,
+  testMissingVisibleFocusIndicatorBlocksKeyboardRelease
 ];
 
 for (const test of tests) {
