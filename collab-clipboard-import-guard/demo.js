@@ -10,7 +10,8 @@ const {
   unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport,
-  lowercaseWindowsPathImport
+  lowercaseWindowsPathImport,
+  forwardSlashWindowsPathImport
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -24,6 +25,7 @@ const packets = [
   ['unsupported-channel-packet.json', assessImportBatch(unsupportedChannelImport)],
   ['source-origin-packet.json', assessImportBatch(privateSourceOriginImport)],
   ['lowercase-windows-path-packet.json', assessImportBatch(lowercaseWindowsPathImport)],
+  ['forward-slash-windows-path-packet.json', assessImportBatch(forwardSlashWindowsPathImport)],
   ['clean-packet.json', assessImportBatch(cleanTrustedImport)]
 ];
 

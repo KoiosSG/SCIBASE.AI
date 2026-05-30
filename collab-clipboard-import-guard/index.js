@@ -221,13 +221,13 @@ function containsHiddenInstruction(value = '') {
 }
 
 function containsLocalPrivatePath(value = '') {
-  return /(?:file:\/\/|[A-Z]:\\Users\\[^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+|private-lab|patient-export)/i.test(value);
+  return /(?:file:\/\/|[A-Z]:[\\/]Users[\\/][^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+|private-lab|patient-export)/i.test(value);
 }
 
 function redactLocalPrivatePaths(value = '') {
   return value
     .replace(/file:\/\/[^ \s"')]+/gi, '[redacted-local-path]')
-    .replace(/[A-Z]:\\Users\\[^ \s"')]+/gi, '[redacted-local-path]')
+    .replace(/[A-Z]:[\\/]Users[\\/][^ \s"')]+/gi, '[redacted-local-path]')
     .replace(/\/Users\/[^ \s"')]+/g, '[redacted-local-path]')
     .replace(/\/home\/[^ \s"')]+/g, '[redacted-local-path]')
     .replace(/\b(?:private-lab|patient-export)\b/gi, '[redacted-private-reference]');

@@ -201,6 +201,27 @@ const lowercaseWindowsPathImport = {
   ]
 };
 
+const forwardSlashWindowsPathImport = {
+  importId: 'import-forward-slash-windows-path',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-30T11:35:00Z',
+  source: {
+    channel: 'clipboard',
+    origin: 'trusted-notebook-output',
+    trustLevel: 'trusted',
+    signedAttestation: NOTEBOOK_OUTPUT_ATTESTATION
+  },
+  blocks: [
+    {
+      id: 'blk-forward-slash-windows-path',
+      type: 'notebook-output',
+      sectionId: 'results',
+      anchor: 'forward-slash-windows-output',
+      content: 'Rendered output to C:/Users/sam/private-lab/patient-export.csv'
+    }
+  ]
+};
+
 module.exports = {
   unsafeClipboardImport,
   partnerForwardImport,
@@ -209,5 +230,6 @@ module.exports = {
   unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport,
-  lowercaseWindowsPathImport
+  lowercaseWindowsPathImport,
+  forwardSlashWindowsPathImport
 };
