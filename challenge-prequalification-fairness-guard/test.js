@@ -809,6 +809,29 @@ function testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing() {
   assert.equal(action.action, 'complete-prequalification-evidence');
 }
 
+function testMissingReviewListHoldsPrequalificationRoundWithoutCrashing() {
+  const round = buildSampleRound();
+  delete round.reviews;
+  round.applicants = [
+    {
+      id: 'applicant-missing-review-list',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-missing-review-list');
+  const action = byId(result.remediationActions, 'remediate-applicant-missing-review-list');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('missing-review-list'), true);
+  assert.equal(decision.reviewersCounted, 0);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
   const round = buildSampleRound();
   round.minReviewers = 2;
@@ -944,6 +967,7 @@ const tests = [
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testBlankRejectionReasonTextHoldsRejectedApplicant,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
+  testMissingReviewListHoldsPrequalificationRoundWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree

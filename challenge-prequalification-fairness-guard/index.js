@@ -98,6 +98,14 @@ function reviewApplicantIdFor(review) {
   return typeof review.applicantId === 'string' ? review.applicantId.trim() : review.applicantId;
 }
 
+function reviewListFor(round) {
+  return Array.isArray(round.reviews) ? round.reviews : [];
+}
+
+function reviewListIsMissing(round) {
+  return !Array.isArray(round.reviews);
+}
+
 function outputApplicantIdFor(applicant) {
   return applicantIdFor(applicant) || 'unidentified-applicant';
 }
@@ -264,6 +272,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-reviewer-identity');
   }
 
+  if (reviewListIsMissing(round)) {
+    reasons.push('missing-review-list');
+  }
+
   if (applicantIdentityIsMissing(applicant)) {
     reasons.push('missing-applicant-identity');
   }
@@ -403,6 +415,10 @@ function remediationAction(applicant, reasons) {
     return 'complete-prequalification-evidence';
   }
 
+  if (reasons.includes('missing-review-list')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('missing-applicant-identity')) {
     return 'complete-prequalification-evidence';
   }
@@ -415,7 +431,7 @@ function remediationAction(applicant, reasons) {
 }
 
 function evaluatePrequalificationRound(round) {
-  const reviewsByApplicant = groupBy(round.reviews, reviewApplicantIdFor);
+  const reviewsByApplicant = groupBy(reviewListFor(round), reviewApplicantIdFor);
 
   const decisions = round.applicants.map((applicant) => {
     const reviews = reviewsByApplicant[applicantIdFor(applicant)] || [];
@@ -471,6 +487,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('missing-published-criterion-id') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
+        decision.reasons.includes('missing-review-list') ||
         decision.reasons.includes('missing-applicant-identity') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||

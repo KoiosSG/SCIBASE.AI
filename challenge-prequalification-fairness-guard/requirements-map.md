@@ -11,6 +11,7 @@
 - Protects anonymous or named participation settings during prequalification review.
 - Requires a valid positive reviewer quorum before a solver team is accepted or rejected, and excludes missing or blank reviewer identities from quorum until reviewer evidence is completed.
 - Holds missing or blank applicant identities before malformed applicant rows can change solver-team access.
+- Holds missing round-level review lists before sparse prequalification packets can crash or change solver-team access.
 - Holds incomplete reviewer score packets and invalid finite 0-100 score values for evidence completion instead of letting malformed review records crash or drive decisions.
 - Preserves audit evidence for each applicant before access to private challenge workspaces changes.
 
@@ -29,6 +30,7 @@
 - Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.
 - Deduplicates repeated reviewer identities before quorum and weighted threshold scoring while retaining the duplicate-evidence finding.
 - Holds missing reviewer identity evidence before anonymous or malformed reviewer rows can satisfy quorum.
+- Holds missing review-list evidence for fairness review before applicant decisions can take effect.
 - Produces deterministic digests for challenge administrators and third-party reviewers.
 
 ## Safety And Scope
