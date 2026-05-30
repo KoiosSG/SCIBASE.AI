@@ -15,6 +15,7 @@ const {
   percentageSampleSizeManuscript,
   decimalSampleSizeManuscript,
   durationSampleSizeManuscript,
+  abbreviatedUnitSampleSizeManuscript,
   hyphenatedMeasurementSampleSizeManuscript,
   ordinalSampleSizeManuscript,
   cleanManuscript
@@ -36,6 +37,7 @@ const packets = [
   ['percentage-sample-size-packet.json', assessStructuredAbstract(percentageSampleSizeManuscript)],
   ['decimal-sample-size-packet.json', assessStructuredAbstract(decimalSampleSizeManuscript)],
   ['duration-sample-size-packet.json', assessStructuredAbstract(durationSampleSizeManuscript)],
+  ['abbreviated-unit-sample-size-packet.json', assessStructuredAbstract(abbreviatedUnitSampleSizeManuscript)],
   ['hyphenated-measurement-sample-size-packet.json', assessStructuredAbstract(hyphenatedMeasurementSampleSizeManuscript)],
   ['ordinal-sample-size-packet.json', assessStructuredAbstract(ordinalSampleSizeManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]

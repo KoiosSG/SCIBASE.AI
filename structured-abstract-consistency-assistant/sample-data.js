@@ -274,6 +274,30 @@ const durationSampleSizeManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const abbreviatedUnitSampleSizeManuscript = {
+  manuscriptId: 'ms-abstract-abbreviated-unit-sample-size',
+  assessedAt: '2026-05-31T00:20:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We observed manuscripts for 96 h in a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, changed after 96 h of follow-up.',
+    conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: false
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const hyphenatedMeasurementSampleSizeManuscript = {
   manuscriptId: 'ms-abstract-hyphenated-measurement-sample-size',
   assessedAt: '2026-05-30T12:25:00Z',
@@ -359,6 +383,7 @@ module.exports = {
   percentageSampleSizeManuscript,
   decimalSampleSizeManuscript,
   durationSampleSizeManuscript,
+  abbreviatedUnitSampleSizeManuscript,
   hyphenatedMeasurementSampleSizeManuscript,
   ordinalSampleSizeManuscript,
   cleanManuscript

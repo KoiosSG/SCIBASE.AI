@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1258" viewBox="0 0 1200 1258">
-  <rect width="1200" height="1258" fill="#eef2f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1332" viewBox="0 0 1200 1332">
+  <rect width="1200" height="1332" fill="#eef2f7"/>
   <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Structured Abstract Consistency Assistant</text>
   <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Abstracts are checked against counts, methods, results, and limitations before AI review release.</text>
 
@@ -78,16 +78,22 @@
       <g transform="translate(48 996)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-abbreviated-unit-sample-size</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest a6fade06f248de27</text>
+      </g>
+      <g transform="translate(48 1070)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-hyphenated-measurement-sample-size</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest 41e20b22c8bcbc94</text>
       </g>
-      <g transform="translate(48 1070)">
+      <g transform="translate(48 1144)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-ordinal-sample-size</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest ea3765bb4adaa5a7</text>
       </g>
-      <g transform="translate(48 1144)">
+      <g transform="translate(48 1218)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#15803d"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-clean</text>

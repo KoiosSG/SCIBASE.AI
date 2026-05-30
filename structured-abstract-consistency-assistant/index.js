@@ -292,7 +292,7 @@ function mentionsSampleSize(text, sampleSize) {
 }
 
 function isMeasurementValueNotSampleSize(followingText) {
-  return /^(?:-\s*)?(?:st|nd|rd|th|milliseconds?|seconds?|secs?|minutes?|mins?|hours?|days?|weeks?|months?|years?|ms|fold|points?|scores?|ratio|odds|hazard|confidence|ci)\b/i.test(followingText);
+  return /^(?:-\s*)?(?:st|nd|rd|th|milliseconds?|seconds?|secs?|s|minutes?|mins?|hours?|hrs?|h|days?|d|weeks?|wks?|months?|mos?|years?|yrs?|ms|mg|g|kg|mcg|ug|\u00b5g|ml|l|mmhg|mm|cm|m|km|iu|fold|points?|scores?|ratio|odds|hazard|confidence|ci)\b/i.test(followingText);
 }
 
 function hasText(value) {

@@ -736,6 +736,44 @@ function testRejectsDurationValuesAsSampleSizeEvidence() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testRejectsAbbreviatedMeasurementUnitsAsSampleSizeEvidence() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-abbreviated-unit-sample-size',
+    assessedAt: '2026-05-31T00:20:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We observed manuscripts for 96 h in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, changed after 96 h of follow-up.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), [
+    'SAMPLE_SIZE_MISMATCH',
+    'SAMPLE_SIZE_MISMATCH'
+  ]);
+  assert.deepEqual(findingTargets(packet, 'SAMPLE_SIZE_MISMATCH'), [
+    'methods.sampleSize',
+    'results.sampleSize'
+  ]);
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testRejectsHyphenatedMeasurementValuesAsSampleSizeEvidence() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-hyphenated-measurement-sample-size',
@@ -936,6 +974,7 @@ const tests = [
   testRejectsPercentagesAsSampleSizeEvidence,
   testRejectsDecimalValuesAsSampleSizeEvidence,
   testRejectsDurationValuesAsSampleSizeEvidence,
+  testRejectsAbbreviatedMeasurementUnitsAsSampleSizeEvidence,
   testRejectsHyphenatedMeasurementValuesAsSampleSizeEvidence,
   testRejectsOrdinalMeasurementsAsSampleSizeEvidence,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,

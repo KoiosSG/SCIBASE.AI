@@ -14,6 +14,7 @@
 | percentage-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | decimal-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | duration-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
+| abbreviated-unit-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | hyphenated-measurement-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | ordinal-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | clean-packet.json | release_peer_review_packet | allowed | allowed | allowed | none |
