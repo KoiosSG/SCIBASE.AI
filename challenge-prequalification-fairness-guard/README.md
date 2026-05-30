@@ -2,7 +2,7 @@
 
 This module adds a focused Scientific Bounty System slice for SCIBASE issue #18. It evaluates sponsor-side prequalification rounds before solver teams are accepted or rejected from a challenge.
 
-The guard checks published screening criteria, complete and unique criterion identifiers, valid criterion weight values and totals, valid pass thresholds, valid reviewer quorum requirements, complete reviewer score evidence, valid finite 0-100 reviewer score values, weighted threshold consistency, anonymous-screening requirements, reviewer conflicts, distinct reviewer quorum, missing reviewer identity evidence, duplicate reviewer score evidence, missing or empty rejection reason lists, parseable appeal windows, and audit evidence. Conflicted reviewer scores are excluded from threshold scoring while the conflict remains auditable, repeated reviewer identities are deduplicated before quorum or threshold scoring, and missing reviewer identities or invalid score values are excluded from scoring until the evidence is completed. Unfair or incomplete screening decisions are held for remediation before challenge access changes.
+The guard checks published screening criteria, complete and unique criterion identifiers after trimming, valid criterion weight values and totals, valid pass thresholds, valid reviewer quorum requirements, complete reviewer score evidence, valid finite 0-100 reviewer score values, weighted threshold consistency, anonymous-screening requirements, reviewer conflicts, distinct reviewer quorum, missing reviewer identity evidence, duplicate reviewer score evidence, missing or empty rejection reason lists, parseable appeal windows, and audit evidence. Conflicted reviewer scores are excluded from threshold scoring while the conflict remains auditable, repeated reviewer identities are deduplicated before quorum or threshold scoring, and missing reviewer identities or invalid score values are excluded from scoring until the evidence is completed. Unfair or incomplete screening decisions are held for remediation before challenge access changes.
 
 ## Run
 
@@ -17,6 +17,7 @@ npm run check
 
 - `reports/prequalification-fairness-packet.json`
 - `reports/missing-criterion-id-packet.json`
+- `reports/normalized-criterion-id-packet.json`
 - `reports/invalid-reviewer-score-packet.json`
 - `reports/invalid-reviewer-quorum-packet.json`
 - `reports/prequalification-fairness-report.md`

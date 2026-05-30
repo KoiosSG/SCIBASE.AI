@@ -33,6 +33,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: publish-complete-screening-criteria
 - Audit digest: sha256:b9df8bf4b4cf0ab259501a17673e27b1537153778f87a19190f026759151b27e
 
+## Normalized Criterion Identifier Packet
+
+- Applicant: applicant-normalized-criterion-id
+- Decision: hold-for-fairness-review
+- Reasons: duplicate-published-criterion
+- Remediation: publish-unique-screening-criteria
+- Audit digest: sha256:fdfd47231c8acfdad73947f357080e3e6967bd11dd622ee60d0ebebb40688ee6
+
 ## Invalid Reviewer Score Packet
 
 - Applicant: applicant-invalid-reviewer-score

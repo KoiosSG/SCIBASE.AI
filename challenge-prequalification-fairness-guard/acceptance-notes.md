@@ -21,6 +21,7 @@ Validation coverage:
 - invalid appeal-window timestamps hold rejected applicants before rejection packets are published
 - invalid individual criterion weights are held even when the total still sums to 100
 - duplicate published criterion IDs are held before ambiguous rubric evidence can drive acceptance or rejection
+- whitespace-variant published criterion IDs such as `domain-fit` and ` domain-fit ` are treated as duplicates before ambiguous rubric evidence can drive acceptance or rejection
 - missing or blank published criterion IDs are held before unauditable rubric evidence can drive acceptance or rejection
 - invalid pass thresholds are held before sponsor accept/reject decisions can take effect
 - invalid reviewer quorum requirements are held before sponsor accept/reject decisions can take effect

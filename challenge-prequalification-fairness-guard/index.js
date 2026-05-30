@@ -58,9 +58,14 @@ function uniqueSorted(values) {
   return Array.from(new Set(values)).sort();
 }
 
+function criterionIdFor(criterion) {
+  return typeof criterion.id === 'string' ? criterion.id.trim() : criterion.id;
+}
+
 function duplicatePublishedCriterionIds(round) {
   const criterionCounts = round.criteria.reduce((counts, criterion) => {
-    counts[criterion.id] = (counts[criterion.id] || 0) + 1;
+    const criterionId = criterionIdFor(criterion);
+    counts[criterionId] = (counts[criterionId] || 0) + 1;
     return counts;
   }, Object.create(null));
 

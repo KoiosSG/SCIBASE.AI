@@ -2,7 +2,7 @@
 
 ## Challenge Posting Portal
 
-- Verifies that prequalification rounds use published criteria, complete and unique criterion identifiers, nonnegative weights, valid weight totals, valid 0-100 pass thresholds, and valid positive reviewer quorum requirements.
+- Verifies that prequalification rounds use published criteria, complete and unique criterion identifiers after trimming, nonnegative weights, valid weight totals, valid 0-100 pass thresholds, and valid positive reviewer quorum requirements.
 - Blocks unpublished sponsor preferences from entering solver-screening decisions.
 - Keeps prequalification decisions tied to challenge timelines and parseable appeal windows.
 
@@ -20,6 +20,7 @@
 - Holds invalid reviewer quorum requirements for fairness review before sponsor accept/reject decisions can take effect.
 - Holds invalid reviewer score values for fairness review before malformed score evidence can drive sponsor decisions.
 - Holds duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
+- Holds whitespace-variant duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds missing or blank published criterion identifiers for fairness review before unauditable rubric evidence can drive sponsor decisions.
 - Flags reviewer conflicts, missing or omitted rejection reason lists, and invalid appeal-window evidence for arbitration-ready remediation.
 - Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.

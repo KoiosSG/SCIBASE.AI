@@ -7,11 +7,13 @@ fs.mkdirSync(reportsDir, { recursive: true });
 
 const result = evaluatePrequalificationRound(buildSampleRound());
 const missingCriterionResult = evaluatePrequalificationRound(buildMissingCriterionIdRound());
+const normalizedCriterionResult = evaluatePrequalificationRound(buildNormalizedCriterionIdRound());
 const invalidScoreResult = evaluatePrequalificationRound(buildInvalidReviewerScoreRound());
 const invalidQuorumResult = evaluatePrequalificationRound(buildInvalidReviewerQuorumRound());
 
 const packetPath = path.join(reportsDir, 'prequalification-fairness-packet.json');
 const missingCriterionPacketPath = path.join(reportsDir, 'missing-criterion-id-packet.json');
+const normalizedCriterionPacketPath = path.join(reportsDir, 'normalized-criterion-id-packet.json');
 const invalidScorePacketPath = path.join(reportsDir, 'invalid-reviewer-score-packet.json');
 const invalidQuorumPacketPath = path.join(reportsDir, 'invalid-reviewer-quorum-packet.json');
 const reportPath = path.join(reportsDir, 'prequalification-fairness-report.md');
@@ -19,6 +21,7 @@ const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(missingCriterionPacketPath, `${JSON.stringify(missingCriterionResult, null, 2)}\n`);
+fs.writeFileSync(normalizedCriterionPacketPath, `${JSON.stringify(normalizedCriterionResult, null, 2)}\n`);
 fs.writeFileSync(invalidScorePacketPath, `${JSON.stringify(invalidScoreResult, null, 2)}\n`);
 fs.writeFileSync(invalidQuorumPacketPath, `${JSON.stringify(invalidQuorumResult, null, 2)}\n`);
 
@@ -65,6 +68,14 @@ ${actions}
 - Remediation: ${missingCriterionResult.remediationActions[0].action}
 - Audit digest: ${missingCriterionResult.auditDigest}
 
+## Normalized Criterion Identifier Packet
+
+- Applicant: ${normalizedCriterionResult.decisions[0].applicantId}
+- Decision: ${normalizedCriterionResult.decisions[0].decision}
+- Reasons: ${normalizedCriterionResult.decisions[0].reasons.join(', ')}
+- Remediation: ${normalizedCriterionResult.remediationActions[0].action}
+- Audit digest: ${normalizedCriterionResult.auditDigest}
+
 ## Invalid Reviewer Score Packet
 
 - Applicant: ${invalidScoreResult.decisions[0].applicantId}
@@ -105,6 +116,7 @@ fs.writeFileSync(svgPath, svg);
 
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingCriterionPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, normalizedCriterionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidScorePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidQuorumPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
@@ -163,6 +175,64 @@ function buildMissingCriterionIdRound() {
       scores: {
         'domain-fit': 96,
         '   ': 94,
+        'safety-plan': 94
+      }
+    }
+  ];
+  return round;
+}
+
+function buildNormalizedCriterionIdRound() {
+  const round = buildSampleRound();
+  round.criteria = [
+    {
+      id: 'domain-fit',
+      label: 'Domain fit for the scientific challenge',
+      weight: 50
+    },
+    {
+      id: ' domain-fit ',
+      label: 'Whitespace-padded duplicate sponsor rubric identifier',
+      weight: 25
+    },
+    {
+      id: 'safety-plan',
+      label: 'Risk, NDA, and responsible-use plan',
+      weight: 25
+    }
+  ];
+  round.applicants = [
+    {
+      id: 'applicant-normalized-criterion-id',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-normalized-criterion-id',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        ' domain-fit ': 95,
+        'safety-plan': 92
+      }
+    },
+    {
+      applicantId: 'applicant-normalized-criterion-id',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 96,
+        ' domain-fit ': 94,
         'safety-plan': 94
       }
     }
