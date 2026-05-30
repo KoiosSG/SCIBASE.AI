@@ -7,6 +7,7 @@
 | result-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | RESULT_OVERSTATES_EVIDENCE |
 | mixed-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | RESULT_OVERSTATES_EVIDENCE |
 | conclusion-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | CONCLUSION_OVERSTATES_EVIDENCE |
+| percentage-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | clean-packet.json | release_peer_review_packet | allowed | allowed | allowed | none |
 
 All packets use synthetic manuscript records and deterministic SHA-256 audit digests.

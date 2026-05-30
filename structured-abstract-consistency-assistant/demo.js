@@ -8,6 +8,7 @@ const {
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,
+  percentageSampleSizeManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -20,6 +21,7 @@ const packets = [
   ['result-certainty-packet.json', assessStructuredAbstract(resultCertaintyOverclaimManuscript)],
   ['mixed-certainty-packet.json', assessStructuredAbstract(mixedCertaintyOverclaimManuscript)],
   ['conclusion-certainty-packet.json', assessStructuredAbstract(conclusionCertaintyOverclaimManuscript)],
+  ['percentage-sample-size-packet.json', assessStructuredAbstract(percentageSampleSizeManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 
@@ -77,7 +79,7 @@ function renderSvg(packetRows) {
     `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${height}" viewBox="0 0 1200 ${height}">`,
     `  <rect width="1200" height="${height}" fill="#eef2f7"/>`,
     '  <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Structured Abstract Consistency Assistant</text>',
-    '  <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Abstracts are checked against methods, results, and limitations before AI review release.</text>',
+    '  <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Abstracts are checked against counts, methods, results, and limitations before AI review release.</text>',
     rows,
     '</svg>',
     ''

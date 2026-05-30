@@ -191,10 +191,13 @@ function buildActions(manuscript, findings) {
 
 function buildSignals(findings) {
   const codes = new Set(findings.map((finding) => finding.code));
+  const hasFinding = (code, targetPrefix) => findings.some(
+    (finding) => finding.code === code && (!targetPrefix || finding.target.startsWith(targetPrefix))
+  );
   return {
     sectionsComplete: !codes.has('MISSING_ABSTRACT_SECTION'),
-    methodsAligned: !codes.has('METHODS_DESIGN_MISMATCH') && !codes.has('SAMPLE_SIZE_MISMATCH'),
-    resultsAligned: !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
+    methodsAligned: !codes.has('METHODS_DESIGN_MISMATCH') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'methods.'),
+    resultsAligned: !hasFinding('SAMPLE_SIZE_MISMATCH', 'results.') && !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
     limitationsBalanced: !codes.has('MISSING_LIMITATION_LANGUAGE') && !codes.has('CONCLUSION_OVERSTATES_EVIDENCE')
   };
 }
@@ -228,7 +231,18 @@ function mentionsSampleSize(text, sampleSize) {
   if (!/^\d+$/.test(expected)) return text.includes(String(sampleSize));
 
   const comparableText = text.replace(/(\d),(?=\d)/g, '$1');
-  return new RegExp(`(^|\\D)${expected}(\\D|$)`).test(comparableText);
+  const countPattern = new RegExp(`(^|\\D)${expected}(\\D|$)`, 'g');
+  let match;
+  while ((match = countPattern.exec(comparableText)) !== null) {
+    const countStart = match.index + match[1].length;
+    const countEnd = countStart + expected.length;
+    const nextCharacter = comparableText[countEnd] || '';
+    const nextMeaningfulCharacter = comparableText.slice(countEnd).trimStart()[0] || '';
+    if (nextMeaningfulCharacter === '%') continue;
+    if (nextCharacter === '.' && /\d/.test(comparableText[countEnd + 1] || '')) continue;
+    return true;
+  }
+  return false;
 }
 
 function hasText(value) {

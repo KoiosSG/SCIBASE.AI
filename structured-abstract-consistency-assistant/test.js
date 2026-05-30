@@ -505,6 +505,45 @@ function testAllowsFormattedSampleSizesInStructuredAbstract() {
   assert.equal(packet.abstractSignals.resultsAligned, true);
 }
 
+function testRejectsPercentagesAsSampleSizeEvidence() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-percentage-sample-size',
+    assessedAt: '2026-05-30T06:05:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated manuscripts in a retrospective cohort; 96% used automated screening.',
+      results: 'The primary endpoint, comment triage time, improved in 96% of manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), [
+    'SAMPLE_SIZE_MISMATCH',
+    'SAMPLE_SIZE_MISMATCH'
+  ]);
+  assert.deepEqual(findingTargets(packet, 'SAMPLE_SIZE_MISMATCH'), [
+    'methods.sampleSize',
+    'results.sampleSize'
+  ]);
+  assert.ok(packet.actions.includes('revise_methods_summary:ms-abstract-percentage-sample-size'));
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testRequiresLimitationLanguageInStructuredAbstractConclusion() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-limitation-outside-abstract',
@@ -622,6 +661,7 @@ const tests = [
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,
+  testRejectsPercentagesAsSampleSizeEvidence,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,
   testAllowsConsistentStructuredAbstractWithStableDigest
