@@ -2,7 +2,7 @@
 
 This module adds a focused Community & User Reputation slice for SCIBASE issue #15. It checks whether peer reviews and inline comments still apply after reviewed documents, datasets, code, or notebooks change.
 
-The guard freezes stale review reputation deltas, blocks reputation updates when review or inline-comment evidence is stale, holds missing or malformed review, artifact, and inline-comment timestamps for review and comment recertification, freezes public or semi-private review credit when the reviewer identity is missing, holds malformed reputation-delta evidence before profile credit is applied, marks inline comment anchors stale when artifact evidence changes or the artifact was updated after the comment even if a selector line did not move, holds missing inline-comment anchor metadata or missing artifact anchor maps for recertification, tolerates omitted review, comment, and artifact collections in sparse project snapshots, generates recertification tasks, preserves anonymous and double-blind reviewer safety across hyphenated, underscored, and space-separated review mode labels, and emits a deterministic project timeline audit packet.
+The guard freezes stale review reputation deltas, blocks reputation updates when review or inline-comment evidence is stale, holds missing or malformed review, artifact, and inline-comment timestamps for review and comment recertification, freezes public or semi-private review credit when the reviewer identity is missing, holds malformed reputation-delta evidence before profile credit is applied, turns malformed review and inline-comment evidence entries into explicit recertification holds, marks inline comment anchors stale when artifact evidence changes or the artifact was updated after the comment even if a selector line did not move, holds missing inline-comment anchor metadata or missing artifact anchor maps for recertification, tolerates omitted review, comment, and artifact collections in sparse project snapshots, generates recertification tasks, preserves anonymous and double-blind reviewer safety across hyphenated, underscored, and space-separated review mode labels, and emits a deterministic project timeline audit packet.
 
 ## Run
 
@@ -18,6 +18,7 @@ npm run check
 - `reports/recertification-packet.json`
 - `reports/empty-evidence-packet.json`
 - `reports/invalid-reputation-delta-packet.json`
+- `reports/malformed-evidence-packet.json`
 - `reports/recertification-report.md`
 - `reports/summary.svg`
 - `reports/demo.mp4`

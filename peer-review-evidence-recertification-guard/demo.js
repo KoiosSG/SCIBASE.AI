@@ -15,16 +15,20 @@ const emptyEvidenceProject = {
 const emptyEvidenceResult = evaluateRecertification(emptyEvidenceProject);
 const invalidReputationDeltaProject = buildInvalidReputationDeltaProject();
 const invalidReputationDeltaResult = evaluateRecertification(invalidReputationDeltaProject);
+const malformedEvidenceProject = buildMalformedEvidenceProject();
+const malformedEvidenceResult = evaluateRecertification(malformedEvidenceProject);
 
 const packetPath = path.join(reportsDir, 'recertification-packet.json');
 const emptyPacketPath = path.join(reportsDir, 'empty-evidence-packet.json');
 const invalidDeltaPacketPath = path.join(reportsDir, 'invalid-reputation-delta-packet.json');
+const malformedEvidencePacketPath = path.join(reportsDir, 'malformed-evidence-packet.json');
 const reportPath = path.join(reportsDir, 'recertification-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(emptyPacketPath, `${JSON.stringify(emptyEvidenceResult, null, 2)}\n`);
 fs.writeFileSync(invalidDeltaPacketPath, `${JSON.stringify(invalidReputationDeltaResult, null, 2)}\n`);
+fs.writeFileSync(malformedEvidencePacketPath, `${JSON.stringify(malformedEvidenceResult, null, 2)}\n`);
 
 const staleReviewList = result.reviewDecisions
   .filter((decision) => decision.status !== 'current')
@@ -65,6 +69,10 @@ Sparse project payloads that omit review, comment, or artifact collections still
 
 Malformed review reputation deltas require recertification before profile credit is applied. The invalid-delta fixture recommends ${invalidReputationDeltaResult.summary.recommendedAction}, emits ${invalidReputationDeltaResult.summary.staleReviews} stale review, and normalizes the frozen reputation delta to ${invalidReputationDeltaResult.summary.frozenReputationDelta}.
 
+## Malformed Evidence Entry Packet
+
+Malformed review and inline-comment entries inside otherwise valid evidence arrays are converted into recertification holds instead of crashing or being silently ignored. The malformed-entry fixture recommends ${malformedEvidenceResult.summary.recommendedAction}, emits ${malformedEvidenceResult.summary.staleReviews} stale review and ${malformedEvidenceResult.summary.staleComments} stale inline comment, and creates ${malformedEvidenceResult.recertificationTasks.length} recertification tasks.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.
@@ -91,6 +99,7 @@ fs.writeFileSync(svgPath, svg);
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, emptyPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidDeltaPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedEvidencePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Recommended action: ${result.summary.recommendedAction}`);
@@ -120,5 +129,23 @@ function buildInvalidReputationDeltaProject() {
       }
     ],
     inlineComments: []
+  };
+}
+
+function buildMalformedEvidenceProject() {
+  return {
+    projectId: 'project-malformed-review-comment-evidence',
+    asOf: '2026-05-30T12:35:00Z',
+    artifacts: [
+      {
+        id: 'analysis-code',
+        type: 'code',
+        currentDigest: 'sha256:code-v3',
+        changedAt: '2026-05-10T10:00:00Z',
+        currentAnchors: {}
+      }
+    ],
+    reviews: [null],
+    inlineComments: [null]
   };
 }

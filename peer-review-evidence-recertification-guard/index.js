@@ -39,6 +39,10 @@ function hasValidReputationDelta(value) {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
+function isRecord(value) {
+  return value && typeof value === 'object' && !Array.isArray(value);
+}
+
 function reputationDeltaFor(review) {
   return hasValidReputationDelta(review.reputationDelta) ? review.reputationDelta : 0;
 }
@@ -67,11 +71,61 @@ function evidenceList(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function evidenceRecords(value) {
+  return evidenceList(value).filter(isRecord);
+}
+
+function normalizeReviewEntries(value) {
+  return evidenceList(value).map((review, index) => {
+    if (isRecord(review)) {
+      return review;
+    }
+
+    return {
+      id: `malformed-review-entry-${index + 1}`,
+      artifactId: null,
+      mode: null,
+      reputationDelta: null,
+      __malformedReviewEntry: true
+    };
+  });
+}
+
+function normalizeInlineCommentEntries(value) {
+  return evidenceList(value).map((comment, index) => {
+    if (isRecord(comment)) {
+      return comment;
+    }
+
+    return {
+      id: `malformed-inline-comment-entry-${index + 1}`,
+      artifactId: null,
+      mode: null,
+      __malformedInlineCommentEntry: true
+    };
+  });
+}
+
 function findArtifact(project, artifactId) {
-  return evidenceList(project.artifacts).find((artifact) => artifact.id === artifactId);
+  return evidenceRecords(project.artifacts).find((artifact) => artifact.id === artifactId);
 }
 
 function evaluateReview(project, review) {
+  if (review.__malformedReviewEntry) {
+    return {
+      id: review.id,
+      artifactId: null,
+      mode: null,
+      reviewer: reviewerDisplay(review),
+      status: 'recertification-required',
+      reasons: ['malformed-review-entry'],
+      submittedAt: null,
+      recertifiedAt: null,
+      evidenceDigest: null,
+      currentArtifactDigest: null
+    };
+  }
+
   const artifact = findArtifact(project, review.artifactId);
   const reasons = [];
   const reviewTime = review.recertifiedAt || review.submittedAt;
@@ -170,6 +224,18 @@ function taskForReview(review, decision) {
 }
 
 function evaluateComment(project, comment) {
+  if (comment.__malformedInlineCommentEntry) {
+    return {
+      id: comment.id,
+      artifactId: null,
+      status: 'recertification-required',
+      anchorStatus: 'missing',
+      reviewer: reviewerDisplay(comment),
+      reasons: ['malformed-inline-comment-entry'],
+      anchor: null
+    };
+  }
+
   const artifact = findArtifact(project, comment.artifactId);
   const reasons = [];
   let anchorStatus = 'current';
@@ -297,8 +363,8 @@ function buildTimelinePacket(project, reviewDecisions, commentDecisions) {
 }
 
 function evaluateRecertification(project) {
-  const reviews = evidenceList(project.reviews);
-  const inlineComments = evidenceList(project.inlineComments);
+  const reviews = normalizeReviewEntries(project.reviews);
+  const inlineComments = normalizeInlineCommentEntries(project.inlineComments);
   const reviewDecisions = reviews.map((review) => evaluateReview(project, review));
   const reputationActions = reviews.map((review, index) =>
     reputationActionForReview(review, reviewDecisions[index])

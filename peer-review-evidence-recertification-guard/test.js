@@ -738,6 +738,68 @@ function testMissingArtifactListRequiresRecertificationInsteadOfCrashing() {
   assert.equal(result.summary.recommendedAction, 'block-reputation-update');
 }
 
+function testMalformedReviewEntriesRequireRecertificationInsteadOfCrashing() {
+  const project = {
+    projectId: 'project-malformed-review-entry',
+    asOf: '2026-05-30T12:20:00Z',
+    artifacts: [
+      {
+        id: 'analysis-code',
+        type: 'code',
+        currentDigest: 'sha256:code-v3',
+        changedAt: '2026-05-10T10:00:00Z',
+        currentAnchors: {}
+      }
+    ],
+    reviews: [null],
+    inlineComments: []
+  };
+
+  const result = evaluateRecertification(project);
+  const review = byId(result.reviewDecisions, 'malformed-review-entry-1');
+  const action = byId(result.reputationActions, 'malformed-review-entry-1');
+  const task = byId(result.recertificationTasks, 'recertify-malformed-review-entry-1');
+
+  assert.equal(review.status, 'recertification-required');
+  assert.deepEqual(review.reasons, ['malformed-review-entry']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['malformed-review-entry']);
+  assert.equal(result.summary.staleReviews, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
+function testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashing() {
+  const project = {
+    projectId: 'project-malformed-inline-comment-entry',
+    asOf: '2026-05-30T12:25:00Z',
+    artifacts: [
+      {
+        id: 'analysis-code',
+        type: 'code',
+        currentDigest: 'sha256:code-v3',
+        changedAt: '2026-05-10T10:00:00Z',
+        currentAnchors: {}
+      }
+    ],
+    reviews: [],
+    inlineComments: [null]
+  };
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'malformed-inline-comment-entry-1');
+  const task = byId(result.recertificationTasks, 'recertify-malformed-inline-comment-entry-1');
+
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'missing');
+  assert.deepEqual(comment.reasons, ['malformed-inline-comment-entry']);
+  assert.equal(task.kind, 'inline-comment');
+  assert.deepEqual(task.reasons, ['malformed-inline-comment-entry']);
+  assert.equal(result.summary.staleComments, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 const tests = [
   testStaleReviewsFreezeReputationUntilRecertified,
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
@@ -761,7 +823,9 @@ const tests = [
   testInvalidArtifactTimestampRequiresCommentRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles,
   testMissingReviewAndCommentListsEvaluateAsEmptyEvidence,
-  testMissingArtifactListRequiresRecertificationInsteadOfCrashing
+  testMissingArtifactListRequiresRecertificationInsteadOfCrashing,
+  testMalformedReviewEntriesRequireRecertificationInsteadOfCrashing,
+  testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashing
 ];
 
 for (const test of tests) {

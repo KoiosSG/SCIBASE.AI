@@ -33,6 +33,10 @@ Sparse project payloads that omit review, comment, or artifact collections still
 
 Malformed review reputation deltas require recertification before profile credit is applied. The invalid-delta fixture recommends block-reputation-update, emits 1 stale review, and normalizes the frozen reputation delta to 0.
 
+## Malformed Evidence Entry Packet
+
+Malformed review and inline-comment entries inside otherwise valid evidence arrays are converted into recertification holds instead of crashing or being silently ignored. The malformed-entry fixture recommends block-reputation-update, emits 1 stale review and 1 stale inline comment, and creates 2 recertification tasks.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.
