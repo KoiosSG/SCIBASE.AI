@@ -152,6 +152,16 @@ function assessBlock(block, batch, duplicateAnchorBlocks) {
     sanitizedBlock.cells = sanitizeCells(block.cells);
   }
 
+  if (hasMalformedTableRows(block)) {
+    findings.push(finding({
+      code: 'MALFORMED_TABLE_ROW',
+      severity: 'warning',
+      blockId: block.id,
+      message: 'Imported table contains a malformed row that cannot enter collaborative state directly.'
+    }));
+    sanitizedBlock.cells = sanitizeCells(block.cells);
+  }
+
   if (containsLocalPrivatePath(block.content) || hasLocalPrivatePathCell(block)) {
     findings.push(finding({
       code: 'LOCAL_PRIVATE_PATH',
@@ -241,17 +251,27 @@ function hasLocalPrivatePathCell(block) {
   ));
 }
 
+function hasMalformedTableRows(block) {
+  return Array.isArray(block.cells) && block.cells.some((row) => !Array.isArray(row));
+}
+
 function sanitizeCells(cells) {
-  return cells.map((row) => row.map((cell) => {
-    if (typeof cell === 'string') {
-      const redacted = containsLocalPrivatePath(cell) ? redactLocalPrivatePaths(cell) : cell;
-      if (/^[=+\-@]/.test(redacted.trim())) {
-        return `'${redacted}`;
-      }
-      return redacted;
+  return cells.map((row) => {
+    if (!Array.isArray(row)) {
+      return [];
     }
-    return cell;
-  }));
+
+    return row.map((cell) => {
+      if (typeof cell === 'string') {
+        const redacted = containsLocalPrivatePath(cell) ? redactLocalPrivatePaths(cell) : cell;
+        if (/^[=+\-@]/.test(redacted.trim())) {
+          return `'${redacted}`;
+        }
+        return redacted;
+      }
+      return cell;
+    });
+  });
 }
 
 function containsHiddenInstruction(value = '') {
@@ -332,6 +352,7 @@ function buildActions(batch, findings) {
     if (item.code === 'UNKNOWN_IMPORT_CHANNEL') actions.add(`require_curator_channel_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCKS') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCK') actions.add(`require_curator_payload_review:${batch.importId}`);
+    if (item.code === 'MALFORMED_TABLE_ROW') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
     if (item.code === 'INVALID_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
   }

@@ -172,6 +172,30 @@ const malformedBlockEntryImport = {
   ]
 };
 
+const malformedTableRowImport = {
+  importId: 'import-malformed-table-row',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-30T18:35:00Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted',
+    signedAttestation: TRUSTED_EXPORT_ATTESTATION
+  },
+  blocks: [
+    {
+      id: 'blk-malformed-table-row',
+      type: 'table',
+      sectionId: 'results',
+      anchor: 'malformed-table-row',
+      cells: [
+        ['metric', 'value'],
+        null
+      ]
+    }
+  ]
+};
+
 const cleanTrustedImport = {
   importId: 'import-clean-zotero-note',
   workspaceId: 'workspace-paper-7',
@@ -264,6 +288,7 @@ module.exports = {
   unsupportedChannelImport,
   malformedBlockListImport,
   malformedBlockEntryImport,
+  malformedTableRowImport,
   cleanTrustedImport,
   privateSourceOriginImport,
   lowercaseWindowsPathImport,
