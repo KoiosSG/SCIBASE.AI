@@ -16,7 +16,7 @@ vf = ",".join(
         f"drawtext=fontfile='{font}':text='Detects stale peer-review evidence after artifact changes':x=95:y=205:fontsize=30:fontcolor=0xd7edf9",
         f"drawtext=fontfile='{font}':text='Freezes outdated reputation deltas until recertified':x=95:y=265:fontsize=30:fontcolor=0xd7edf9",
         f"drawtext=fontfile='{font}':text='Redacts double-blind reviewer identities in task packets':x=95:y=325:fontsize=30:fontcolor=0xd7edf9",
-        f"drawtext=fontfile='{font}':text='Handles sparse project snapshots without runtime failures':x=95:y=385:fontsize=30:fontcolor=0xd7edf9",
+        f"drawtext=fontfile='{font}':text='Blocks malformed reputation deltas before profile credit':x=95:y=385:fontsize=30:fontcolor=0xd7edf9",
         f"drawtext=fontfile='{font}':text='Outputs JSON, Markdown, SVG, and audit digest evidence':x=95:y=445:fontsize=30:fontcolor=0xd7edf9",
         f"drawtext=fontfile='{font}':text='SCIBASE issue #15 community reputation slice':x=95:y=545:fontsize=28:fontcolor=0xffdf7e",
     ]

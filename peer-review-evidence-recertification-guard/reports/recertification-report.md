@@ -29,6 +29,10 @@ Generated: 2026-05-28T06:00:00Z
 
 Sparse project payloads that omit review, comment, or artifact collections still produce deterministic audit packets instead of runtime failures. The empty evidence fixture recommends allow-reputation-update and emits 0 timeline events.
 
+## Invalid Reputation Delta Packet
+
+Malformed review reputation deltas require recertification before profile credit is applied. The invalid-delta fixture recommends block-reputation-update, emits 1 stale review, and normalizes the frozen reputation delta to 0.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.

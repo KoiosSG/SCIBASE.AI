@@ -35,6 +35,14 @@ function hasText(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
+function hasValidReputationDelta(value) {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function reputationDeltaFor(review) {
+  return hasValidReputationDelta(review.reputationDelta) ? review.reputationDelta : 0;
+}
+
 function normalizeReviewMode(mode) {
   return String(mode || '')
     .trim()
@@ -78,6 +86,10 @@ function evaluateReview(project, review) {
     reasons.push('reviewer-identity-missing');
   }
 
+  if (!hasValidReputationDelta(review.reputationDelta)) {
+    reasons.push('invalid-reputation-delta');
+  }
+
   if (!artifact) {
     reasons.push('artifact-missing');
   } else {
@@ -115,7 +127,7 @@ function reputationActionForReview(review, decision) {
   const base = {
     id: review.id,
     appliesTo: reviewerDisplay(review),
-    originalDelta: review.reputationDelta,
+    originalDelta: reputationDeltaFor(review),
     reasonDigest: digest({
       reviewId: review.id,
       reasons: decision.reasons,
@@ -128,7 +140,7 @@ function reputationActionForReview(review, decision) {
     return {
       ...base,
       action: 'apply-current-delta',
-      effectiveDelta: review.reputationDelta
+      effectiveDelta: reputationDeltaFor(review)
     };
   }
 
@@ -150,7 +162,7 @@ function taskForReview(review, decision) {
     reviewId: review.id,
     artifactId: review.artifactId,
     reviewer: decision.reviewer,
-    priority: Math.abs(review.reputationDelta) >= 15 ? 'high' : 'normal',
+    priority: Math.abs(reputationDeltaFor(review)) >= 15 ? 'high' : 'normal',
     requiredAction: 'confirm-review-still-applies-to-current-artifact',
     blockedProfileUpdates: ['reputation-score', 'leaderboards', 'badges'],
     reasons: decision.reasons

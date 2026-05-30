@@ -13,14 +13,18 @@ const emptyEvidenceProject = {
   artifacts: []
 };
 const emptyEvidenceResult = evaluateRecertification(emptyEvidenceProject);
+const invalidReputationDeltaProject = buildInvalidReputationDeltaProject();
+const invalidReputationDeltaResult = evaluateRecertification(invalidReputationDeltaProject);
 
 const packetPath = path.join(reportsDir, 'recertification-packet.json');
 const emptyPacketPath = path.join(reportsDir, 'empty-evidence-packet.json');
+const invalidDeltaPacketPath = path.join(reportsDir, 'invalid-reputation-delta-packet.json');
 const reportPath = path.join(reportsDir, 'recertification-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(emptyPacketPath, `${JSON.stringify(emptyEvidenceResult, null, 2)}\n`);
+fs.writeFileSync(invalidDeltaPacketPath, `${JSON.stringify(invalidReputationDeltaResult, null, 2)}\n`);
 
 const staleReviewList = result.reviewDecisions
   .filter((decision) => decision.status !== 'current')
@@ -57,6 +61,10 @@ ${taskList}
 
 Sparse project payloads that omit review, comment, or artifact collections still produce deterministic audit packets instead of runtime failures. The empty evidence fixture recommends ${emptyEvidenceResult.summary.recommendedAction} and emits ${emptyEvidenceResult.timelinePacket.events.length} timeline events.
 
+## Invalid Reputation Delta Packet
+
+Malformed review reputation deltas require recertification before profile credit is applied. The invalid-delta fixture recommends ${invalidReputationDeltaResult.summary.recommendedAction}, emits ${invalidReputationDeltaResult.summary.staleReviews} stale review, and normalizes the frozen reputation delta to ${invalidReputationDeltaResult.summary.frozenReputationDelta}.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.
@@ -82,6 +90,35 @@ fs.writeFileSync(svgPath, svg);
 
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, emptyPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, invalidDeltaPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Recommended action: ${result.summary.recommendedAction}`);
+
+function buildInvalidReputationDeltaProject() {
+  return {
+    projectId: 'project-invalid-reputation-delta',
+    asOf: '2026-05-30T12:30:00Z',
+    artifacts: [
+      {
+        id: 'analysis-code',
+        type: 'code',
+        currentDigest: 'sha256:code-v3',
+        changedAt: '2026-05-10T10:00:00Z',
+        currentAnchors: {}
+      }
+    ],
+    reviews: [
+      {
+        id: 'review-invalid-reputation-delta',
+        reviewerId: 'orcid:0000-0002-reviewer-c',
+        mode: 'public',
+        artifactId: 'analysis-code',
+        evidenceDigest: 'sha256:code-v3',
+        submittedAt: '2026-05-16T11:00:00Z',
+        reputationDelta: '18'
+      }
+    ],
+    inlineComments: []
+  };
+}

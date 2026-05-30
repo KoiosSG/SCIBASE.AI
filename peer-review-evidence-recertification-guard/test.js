@@ -518,6 +518,46 @@ function testPublicReviewWithoutReviewerIdentityFreezesReputation() {
   assert.deepEqual(task.reasons, ['reviewer-identity-missing']);
 }
 
+function testInvalidReputationDeltaRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-10T10:00:00Z',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-invalid-reputation-delta',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      reputationDelta: '18'
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-invalid-reputation-delta');
+  const task = byId(result.recertificationTasks, 'recertify-review-invalid-reputation-delta');
+  const action = byId(result.reputationActions, 'review-invalid-reputation-delta');
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['invalid-reputation-delta']);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['invalid-reputation-delta']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.originalDelta, 0);
+  assert.equal(action.effectiveDelta, 0);
+  assert.equal(result.summary.frozenReputationDelta, 0);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 function testInvalidArtifactTimestampRequiresReviewRecertification() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -715,6 +755,7 @@ const tests = [
   testInvalidReviewTimestampRequiresRecertification,
   testMissingReviewTimestampRequiresRecertification,
   testPublicReviewWithoutReviewerIdentityFreezesReputation,
+  testInvalidReputationDeltaRequiresRecertification,
   testInvalidArtifactTimestampRequiresReviewRecertification,
   testMissingArtifactTimestampRequiresReviewRecertification,
   testInvalidArtifactTimestampRequiresCommentRecertification,

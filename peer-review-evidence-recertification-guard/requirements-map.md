@@ -15,6 +15,7 @@
 ## Contributor Credits
 
 - Review-derived reputation deltas are preserved as original deltas.
+- Missing or malformed reputation-delta evidence blocks profile credit and is normalized out of frozen-delta summary math until recertified.
 - Stale review evidence freezes effective deltas until recertification, and stale inline-comment evidence blocks reputation updates.
 - Audit packets keep enough evidence for profile and citation-page credit decisions.
 
@@ -22,6 +23,7 @@
 
 - Current reviews apply their transparent reputation delta.
 - Stale reviews are blocked from leaderboards, badges, and score updates.
+- Reviews with malformed reputation deltas are blocked from leaderboards, badges, and score updates until the delta is recertified.
 - Reviews without non-blind reviewer identity are blocked from leaderboards, badges, and score updates until the identity is recertified.
 - Recertification tasks explain which evidence must be refreshed.
 - Empty evidence snapshots produce an allow decision with zero frozen reputation delta and no synthetic tasks.
