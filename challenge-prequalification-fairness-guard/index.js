@@ -144,7 +144,14 @@ function isValidReviewerScore(score) {
 }
 
 function applicantRejectionReasons(applicant) {
-  return Array.isArray(applicant.rejectionReasons) ? applicant.rejectionReasons : [];
+  if (!Array.isArray(applicant.rejectionReasons)) {
+    return [];
+  }
+
+  return applicant.rejectionReasons
+    .filter((reason) => typeof reason === 'string')
+    .map((reason) => reason.trim())
+    .filter(Boolean);
 }
 
 function criteriaWeightTotal(round) {

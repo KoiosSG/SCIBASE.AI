@@ -10,12 +10,14 @@ const missingCriterionResult = evaluatePrequalificationRound(buildMissingCriteri
 const normalizedCriterionResult = evaluatePrequalificationRound(buildNormalizedCriterionIdRound());
 const invalidScoreResult = evaluatePrequalificationRound(buildInvalidReviewerScoreRound());
 const invalidQuorumResult = evaluatePrequalificationRound(buildInvalidReviewerQuorumRound());
+const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
 
 const packetPath = path.join(reportsDir, 'prequalification-fairness-packet.json');
 const missingCriterionPacketPath = path.join(reportsDir, 'missing-criterion-id-packet.json');
 const normalizedCriterionPacketPath = path.join(reportsDir, 'normalized-criterion-id-packet.json');
 const invalidScorePacketPath = path.join(reportsDir, 'invalid-reviewer-score-packet.json');
 const invalidQuorumPacketPath = path.join(reportsDir, 'invalid-reviewer-quorum-packet.json');
+const blankRejectionReasonPacketPath = path.join(reportsDir, 'blank-rejection-reason-packet.json');
 const reportPath = path.join(reportsDir, 'prequalification-fairness-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
@@ -24,6 +26,7 @@ fs.writeFileSync(missingCriterionPacketPath, `${JSON.stringify(missingCriterionR
 fs.writeFileSync(normalizedCriterionPacketPath, `${JSON.stringify(normalizedCriterionResult, null, 2)}\n`);
 fs.writeFileSync(invalidScorePacketPath, `${JSON.stringify(invalidScoreResult, null, 2)}\n`);
 fs.writeFileSync(invalidQuorumPacketPath, `${JSON.stringify(invalidQuorumResult, null, 2)}\n`);
+fs.writeFileSync(blankRejectionReasonPacketPath, `${JSON.stringify(blankRejectionReasonResult, null, 2)}\n`);
 
 const decisions = result.decisions
   .map(
@@ -92,6 +95,14 @@ ${actions}
 - Remediation: ${invalidQuorumResult.remediationActions[0].action}
 - Audit digest: ${invalidQuorumResult.auditDigest}
 
+## Blank Rejection Reason Packet
+
+- Applicant: ${blankRejectionReasonResult.decisions[0].applicantId}
+- Decision: ${blankRejectionReasonResult.decisions[0].decision}
+- Reasons: ${blankRejectionReasonResult.decisions[0].reasons.join(', ')}
+- Remediation: ${blankRejectionReasonResult.remediationActions[0].action}
+- Audit digest: ${blankRejectionReasonResult.auditDigest}
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, identity providers, private workspaces, sponsor systems, or external APIs.
@@ -119,6 +130,7 @@ console.log(`Wrote ${path.relative(__dirname, missingCriterionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, normalizedCriterionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidScorePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidQuorumPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Accepted applicants: ${result.summary.accepted}`);
@@ -304,6 +316,47 @@ function buildInvalidReviewerQuorumRound() {
         'domain-fit': 94,
         'data-readiness': 96,
         'safety-plan': 93
+      }
+    }
+  ];
+  return round;
+}
+
+function buildBlankRejectionReasonRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-blank-rejection-reason',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['   '],
+      appealDueAt: '2026-06-04T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-blank-rejection-reason',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 58,
+        'data-readiness': 60,
+        'safety-plan': 62
+      }
+    },
+    {
+      applicantId: 'applicant-blank-rejection-reason',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 59,
+        'data-readiness': 61,
+        'safety-plan': 60
       }
     }
   ];

@@ -619,6 +619,55 @@ function testMissingRejectionReasonListHoldsWithoutCrashing() {
   assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
 }
 
+function testBlankRejectionReasonTextHoldsRejectedApplicant() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-blank-rejection-reason',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['   '],
+      appealDueAt: '2026-06-04T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-blank-rejection-reason',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 58,
+        'data-readiness': 60,
+        'safety-plan': 62
+      }
+    },
+    {
+      applicantId: 'applicant-blank-rejection-reason',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 59,
+        'data-readiness': 61,
+        'safety-plan': 60
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-blank-rejection-reason');
+  const action = byId(result.remediationActions, 'remediate-applicant-blank-rejection-reason');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.deepEqual(decision.rejectionReasons, []);
+  assert.equal(decision.reasons.includes('missing-rejection-reason'), true);
+  assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
+}
+
 function testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing() {
   const round = buildSampleRound();
   round.applicants = [
@@ -792,6 +841,7 @@ const tests = [
   testInvalidReviewerQuorumHoldsPrequalificationRound,
   testInvalidReviewerScoreValuesHoldPrequalificationRound,
   testMissingRejectionReasonListHoldsWithoutCrashing,
+  testBlankRejectionReasonTextHoldsRejectedApplicant,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,

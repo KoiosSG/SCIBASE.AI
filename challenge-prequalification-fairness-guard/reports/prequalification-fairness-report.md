@@ -57,6 +57,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: publish-valid-reviewer-quorum
 - Audit digest: sha256:61801b0cd7cf7c62fc38b0f6e62415e770d388bf3844e2132b8a379183e74ca1
 
+## Blank Rejection Reason Packet
+
+- Applicant: applicant-blank-rejection-reason
+- Decision: hold-for-fairness-review
+- Reasons: missing-rejection-reason
+- Remediation: publish-rejection-reasons-and-appeal-window
+- Audit digest: sha256:bbd51d47794aadc8faa0eda8231781f66d0e4eacde31bd0362b6e723834a444c
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, identity providers, private workspaces, sponsor systems, or external APIs.

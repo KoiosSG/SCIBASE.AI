@@ -22,7 +22,7 @@
 - Holds duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds whitespace-variant duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds missing or blank published criterion identifiers for fairness review before unauditable rubric evidence can drive sponsor decisions.
-- Flags reviewer conflicts, missing or omitted rejection reason lists, and invalid appeal-window evidence for arbitration-ready remediation.
+- Flags reviewer conflicts, missing, omitted, or blank rejection reason evidence, and invalid appeal-window evidence for arbitration-ready remediation.
 - Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.
 - Deduplicates repeated reviewer identities before quorum and weighted threshold scoring while retaining the duplicate-evidence finding.
 - Holds missing reviewer identity evidence before anonymous or malformed reviewer rows can satisfy quorum.
