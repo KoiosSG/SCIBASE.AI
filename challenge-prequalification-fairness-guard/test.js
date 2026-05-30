@@ -419,6 +419,43 @@ function testInvalidPassThresholdHoldsPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testInvalidReviewerQuorumHoldsPrequalificationRound() {
+  const round = buildSampleRound();
+  round.minReviewers = 0;
+  round.applicants = [
+    {
+      id: 'applicant-invalid-reviewer-quorum',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-reviewer-quorum',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-invalid-reviewer-quorum');
+  const action = byId(result.remediationActions, 'remediate-applicant-invalid-reviewer-quorum');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('reviewer-quorum-invalid'), true);
+  assert.equal(action.action, 'publish-valid-reviewer-quorum');
+  assert.equal(action.priority, 'high');
+}
+
 function testInvalidReviewerScoreValuesHoldPrequalificationRound() {
   const round = buildSampleRound();
   round.applicants = [
@@ -685,6 +722,7 @@ const tests = [
   testDuplicatePublishedCriterionIdsHoldPrequalificationRound,
   testMissingPublishedCriterionIdsHoldPrequalificationRound,
   testInvalidPassThresholdHoldsPrequalificationRound,
+  testInvalidReviewerQuorumHoldsPrequalificationRound,
   testInvalidReviewerScoreValuesHoldPrequalificationRound,
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,

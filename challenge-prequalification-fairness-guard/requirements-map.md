@@ -2,14 +2,14 @@
 
 ## Challenge Posting Portal
 
-- Verifies that prequalification rounds use published criteria, complete and unique criterion identifiers, nonnegative weights, valid weight totals, and valid 0-100 pass thresholds.
+- Verifies that prequalification rounds use published criteria, complete and unique criterion identifiers, nonnegative weights, valid weight totals, valid 0-100 pass thresholds, and valid positive reviewer quorum requirements.
 - Blocks unpublished sponsor preferences from entering solver-screening decisions.
 - Keeps prequalification decisions tied to challenge timelines and parseable appeal windows.
 
 ## Submission Engine
 
 - Protects anonymous or named participation settings during prequalification review.
-- Requires distinct reviewer quorum before a solver team is accepted or rejected, and excludes missing or blank reviewer identities from quorum until reviewer evidence is completed.
+- Requires a valid positive reviewer quorum before a solver team is accepted or rejected, and excludes missing or blank reviewer identities from quorum until reviewer evidence is completed.
 - Holds incomplete reviewer score packets and invalid finite 0-100 score values for evidence completion instead of letting malformed review records crash or drive decisions.
 - Preserves audit evidence for each applicant before access to private challenge workspaces changes.
 
@@ -17,6 +17,7 @@
 
 - Holds inconsistent threshold decisions for fairness review before a solver is excluded.
 - Holds invalid pass thresholds for fairness review before sponsor accept/reject decisions can take effect.
+- Holds invalid reviewer quorum requirements for fairness review before sponsor accept/reject decisions can take effect.
 - Holds invalid reviewer score values for fairness review before malformed score evidence can drive sponsor decisions.
 - Holds duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds missing or blank published criterion identifiers for fairness review before unauditable rubric evidence can drive sponsor decisions.

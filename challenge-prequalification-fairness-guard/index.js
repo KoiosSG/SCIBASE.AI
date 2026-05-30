@@ -165,6 +165,10 @@ function passThresholdIsInvalid(round) {
   );
 }
 
+function reviewerQuorumIsInvalid(round) {
+  return !Number.isInteger(round.minReviewers) || round.minReviewers < 1;
+}
+
 function reviewUsesHiddenCriteria(review, criteriaIds) {
   return Object.keys(reviewScores(review)).some((criterionId) => !criteriaIds.includes(criterionId));
 }
@@ -238,6 +242,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (passThresholdIsInvalid(round)) {
     reasons.push('pass-threshold-invalid');
+  }
+
+  if (reviewerQuorumIsInvalid(round)) {
+    reasons.push('reviewer-quorum-invalid');
   }
 
   if (nonConflictedReviews.length < round.minReviewers) {
@@ -316,6 +324,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('pass-threshold-invalid')) {
     return 'publish-valid-prequalification-threshold';
+  }
+
+  if (reasons.includes('reviewer-quorum-invalid')) {
+    return 'publish-valid-reviewer-quorum';
   }
 
   if (reasons.includes('reviewer-score-value-invalid')) {
@@ -414,6 +426,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('criteria-weight-total-invalid') ||
         decision.reasons.includes('criteria-weight-value-invalid') ||
         decision.reasons.includes('pass-threshold-invalid') ||
+        decision.reasons.includes('reviewer-quorum-invalid') ||
         decision.reasons.includes('reviewer-score-value-invalid')
           ? 'high'
           : 'normal',

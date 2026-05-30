@@ -41,6 +41,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: publish-valid-reviewer-score-evidence
 - Audit digest: sha256:806cf8166a6f1d58824929c4964ec009b6d6a8ce4d613b9e357a1e0e684fda69
 
+## Invalid Reviewer Quorum Packet
+
+- Applicant: applicant-invalid-reviewer-quorum
+- Decision: hold-for-fairness-review
+- Reasons: reviewer-quorum-invalid
+- Remediation: publish-valid-reviewer-quorum
+- Audit digest: sha256:61801b0cd7cf7c62fc38b0f6e62415e770d388bf3844e2132b8a379183e74ca1
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, identity providers, private workspaces, sponsor systems, or external APIs.

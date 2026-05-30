@@ -8,16 +8,19 @@ fs.mkdirSync(reportsDir, { recursive: true });
 const result = evaluatePrequalificationRound(buildSampleRound());
 const missingCriterionResult = evaluatePrequalificationRound(buildMissingCriterionIdRound());
 const invalidScoreResult = evaluatePrequalificationRound(buildInvalidReviewerScoreRound());
+const invalidQuorumResult = evaluatePrequalificationRound(buildInvalidReviewerQuorumRound());
 
 const packetPath = path.join(reportsDir, 'prequalification-fairness-packet.json');
 const missingCriterionPacketPath = path.join(reportsDir, 'missing-criterion-id-packet.json');
 const invalidScorePacketPath = path.join(reportsDir, 'invalid-reviewer-score-packet.json');
+const invalidQuorumPacketPath = path.join(reportsDir, 'invalid-reviewer-quorum-packet.json');
 const reportPath = path.join(reportsDir, 'prequalification-fairness-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(missingCriterionPacketPath, `${JSON.stringify(missingCriterionResult, null, 2)}\n`);
 fs.writeFileSync(invalidScorePacketPath, `${JSON.stringify(invalidScoreResult, null, 2)}\n`);
+fs.writeFileSync(invalidQuorumPacketPath, `${JSON.stringify(invalidQuorumResult, null, 2)}\n`);
 
 const decisions = result.decisions
   .map(
@@ -70,6 +73,14 @@ ${actions}
 - Remediation: ${invalidScoreResult.remediationActions[0].action}
 - Audit digest: ${invalidScoreResult.auditDigest}
 
+## Invalid Reviewer Quorum Packet
+
+- Applicant: ${invalidQuorumResult.decisions[0].applicantId}
+- Decision: ${invalidQuorumResult.decisions[0].decision}
+- Reasons: ${invalidQuorumResult.decisions[0].reasons.join(', ')}
+- Remediation: ${invalidQuorumResult.remediationActions[0].action}
+- Audit digest: ${invalidQuorumResult.auditDigest}
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, identity providers, private workspaces, sponsor systems, or external APIs.
@@ -95,6 +106,7 @@ fs.writeFileSync(svgPath, svg);
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingCriterionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidScorePacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, invalidQuorumPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Accepted applicants: ${result.summary.accepted}`);
@@ -192,6 +204,35 @@ function buildInvalidReviewerScoreRound() {
       scores: {
         'domain-fit': 92,
         'data-readiness': 94,
+        'safety-plan': 93
+      }
+    }
+  ];
+  return round;
+}
+
+function buildInvalidReviewerQuorumRound() {
+  const round = buildSampleRound();
+  round.minReviewers = 0;
+  round.applicants = [
+    {
+      id: 'applicant-invalid-reviewer-quorum',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-reviewer-quorum',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
         'safety-plan': 93
       }
     }
