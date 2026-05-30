@@ -4,7 +4,7 @@
 | --- | --- |
 | Real-time collaborative editor shared state | Gates pasted/imported blocks before they become collaborative manuscript state. |
 | Markdown, scientific blocks, and WYSIWYG workflows | Models paragraph, table, notebook-output, and comment blocks from clipboard and file-import paths. |
-| Real-time collaboration trust boundary | Stages imports with missing source trust metadata, unsupported import channels, or missing/blank trusted and partner attestations for curator review before collaborative insertion, and quarantines source-origin metadata that exposes local/private paths. |
+| Real-time collaboration trust boundary | Stages imports with missing source trust metadata, unsupported import channels, or missing/blank/malformed trusted and partner attestations for curator review before collaborative insertion, and quarantines source-origin metadata that exposes local/private paths. |
 | Inline comments, suggestions, and review metadata | Detects stale or malformed review metadata before imported comments are trusted. |
 | Version history and controlled sections | Compares imported review metadata against current section versions and drops unverifiable expiry evidence. |
 | Scientific rigor and formatting fidelity | Escapes spreadsheet formulas, regenerates every colliding duplicate or existing-document anchor, and redacts private source-origin, notebook, and table-cell paths while preserving clean content. |

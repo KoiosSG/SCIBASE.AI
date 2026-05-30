@@ -51,6 +51,10 @@ const unsafeClipboardImport = {
   ]
 };
 
+const TRUSTED_EXPORT_ATTESTATION = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const PARTNER_SIGNED_ATTESTATION = 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+const PRIVATE_ORIGIN_ATTESTATION = 'sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+
 const partnerForwardImport = {
   importId: 'import-partner-forward',
   workspaceId: 'workspace-paper-7',
@@ -91,6 +95,27 @@ const trustedMissingAttestationImport = {
   ]
 };
 
+const trustedPlaceholderAttestationImport = {
+  importId: 'import-trusted-placeholder-attestation',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-30T08:22:00Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted',
+    signedAttestation: 'sha256:pending'
+  },
+  blocks: [
+    {
+      id: 'blk-trusted-placeholder-attestation',
+      type: 'paragraph',
+      sectionId: 'results',
+      anchor: 'trusted-placeholder-attestation',
+      content: 'Trusted export supplied a corrected result summary.'
+    }
+  ]
+};
+
 const unsupportedChannelImport = {
   importId: 'import-unsupported-channel',
   workspaceId: 'workspace-paper-7',
@@ -99,7 +124,7 @@ const unsupportedChannelImport = {
     channel: 'side-loaded-cache',
     origin: 'trusted-docx-export',
     trustLevel: 'trusted',
-    signedAttestation: 'sha256:trusted-export'
+    signedAttestation: TRUSTED_EXPORT_ATTESTATION
   },
   blocks: [
     {
@@ -120,7 +145,7 @@ const cleanTrustedImport = {
     channel: 'file-import',
     origin: 'institutional-review-export',
     trustLevel: 'trusted',
-    signedAttestation: 'sha256:partner-signed-export'
+    signedAttestation: PARTNER_SIGNED_ATTESTATION
   },
   blocks: [
     {
@@ -141,7 +166,7 @@ const privateSourceOriginImport = {
     channel: 'file-import',
     origin: 'file:///Users/sam/private-lab/patient-export.docx',
     trustLevel: 'trusted',
-    signedAttestation: 'sha256:private-origin-export'
+    signedAttestation: PRIVATE_ORIGIN_ATTESTATION
   },
   blocks: [
     {
@@ -158,6 +183,7 @@ module.exports = {
   unsafeClipboardImport,
   partnerForwardImport,
   trustedMissingAttestationImport,
+  trustedPlaceholderAttestationImport,
   unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport

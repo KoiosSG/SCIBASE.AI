@@ -16,6 +16,7 @@ Expected evidence:
 - `reports/unsafe-packet.json` quarantines an untrusted clipboard payload.
 - `reports/partner-review-packet.json` stages a partner import missing a signed source attestation.
 - `reports/trusted-attestation-packet.json` stages a trusted import missing a signed source attestation.
+- `reports/placeholder-attestation-packet.json` stages a trusted import with placeholder or malformed attestation evidence.
 - `reports/source-origin-packet.json` quarantines and redacts local/private source-origin metadata.
 - Blank signed source attestation values are treated as missing and stage trusted or partner imports for curator review.
 - `reports/clean-packet.json` allows a trusted, attested import.

@@ -70,6 +70,15 @@ function assessSource(batch) {
     }));
   }
 
+  if (hasSignedAttestation(source) && !hasValidSignedAttestation(source)) {
+    findings.push(finding({
+      code: 'INVALID_SOURCE_ATTESTATION',
+      severity: 'warning',
+      blockId: null,
+      message: `${formatTrustLevel(source.trustLevel)} import has a placeholder or malformed source attestation.`
+    }));
+  }
+
   if (containsLocalPrivatePath(source.origin)) {
     findings.push(finding({
       code: 'LOCAL_PRIVATE_SOURCE',
@@ -284,6 +293,7 @@ function buildActions(batch, findings) {
     if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_IMPORT_CHANNEL') actions.add(`require_curator_channel_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
+    if (item.code === 'INVALID_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
   }
 
   return [...actions].sort();
@@ -303,7 +313,7 @@ function sanitizeSource(source) {
     channel: source.channel || 'unknown',
     origin: containsLocalPrivatePath(origin) ? redactLocalPrivatePaths(origin) : origin,
     trustLevel: source.trustLevel || 'unknown',
-    attested: hasSignedAttestation(source)
+    attested: hasValidSignedAttestation(source)
   };
 }
 
@@ -313,6 +323,10 @@ function isRecognizedImportChannel(channel) {
 
 function hasSignedAttestation(source) {
   return typeof source.signedAttestation === 'string' && source.signedAttestation.trim().length > 0;
+}
+
+function hasValidSignedAttestation(source) {
+  return hasSignedAttestation(source) && /^sha256:[a-f0-9]{64}$/i.test(source.signedAttestation.trim());
 }
 
 function formatTrustLevel(trustLevel) {

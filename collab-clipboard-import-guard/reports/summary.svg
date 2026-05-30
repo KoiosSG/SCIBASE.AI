@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="606" viewBox="0 0 1200 606">
-  <rect width="1200" height="606" fill="#eef2f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
+  <rect width="1200" height="680" fill="#eef2f7"/>
   <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Clipboard Import Provenance Guard</text>
   <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Pasted and imported research-editor blocks are gated before collaborative insertion.</text>
 
@@ -24,16 +24,22 @@
       <g transform="translate(48 330)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b45309"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-trusted-placeholder-attestation</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">stage_for_curator_review | findings 1 | digest a56510b069c495c8</text>
+      </g>
+      <g transform="translate(48 404)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b45309"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-unsupported-channel</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">stage_for_curator_review | findings 1 | digest 0f58494d8118cca9</text>
       </g>
-      <g transform="translate(48 404)">
+      <g transform="translate(48 478)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-private-source-origin</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">quarantine_import | findings 1 | digest a7f7271b903c5ec7</text>
       </g>
-      <g transform="translate(48 478)">
+      <g transform="translate(48 552)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#15803d"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-clean-zotero-note</text>

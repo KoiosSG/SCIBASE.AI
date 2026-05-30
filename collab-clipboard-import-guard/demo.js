@@ -6,6 +6,7 @@ const {
   unsafeClipboardImport,
   partnerForwardImport,
   trustedMissingAttestationImport,
+  trustedPlaceholderAttestationImport,
   unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport
@@ -18,6 +19,7 @@ const packets = [
   ['unsafe-packet.json', assessImportBatch(unsafeClipboardImport)],
   ['partner-review-packet.json', assessImportBatch(partnerForwardImport)],
   ['trusted-attestation-packet.json', assessImportBatch(trustedMissingAttestationImport)],
+  ['placeholder-attestation-packet.json', assessImportBatch(trustedPlaceholderAttestationImport)],
   ['unsupported-channel-packet.json', assessImportBatch(unsupportedChannelImport)],
   ['source-origin-packet.json', assessImportBatch(privateSourceOriginImport)],
   ['clean-packet.json', assessImportBatch(cleanTrustedImport)]

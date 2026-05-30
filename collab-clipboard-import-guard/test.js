@@ -2,6 +2,13 @@ const assert = require('assert');
 
 const { assessImportBatch } = require('./index');
 
+const TRUSTED_EXPORT_ATTESTATION = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const NOTEBOOK_OUTPUT_ATTESTATION = 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+const SPREADSHEET_EXPORT_ATTESTATION = 'sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+const PRIVATE_ORIGIN_ATTESTATION = 'sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+const REVIEW_EXPORT_ATTESTATION = 'sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+const PARTNER_SIGNED_ATTESTATION = 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
 function findingCodes(packet) {
   return packet.findings.map((finding) => finding.code).sort();
 }
@@ -176,6 +183,34 @@ function testStagesTrustedImportMissingSignedAttestationForCuratorReview() {
   assert.equal(packet.source.attested, false);
 }
 
+function testStagesTrustedImportWithPlaceholderAttestationForCuratorReview() {
+  const packet = assessImportBatch({
+    importId: 'import-trusted-placeholder-attestation',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-30T08:22:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:pending'
+    },
+    blocks: [
+      {
+        id: 'blk-trusted-placeholder-attestation',
+        type: 'paragraph',
+        sectionId: 'results',
+        anchor: 'trusted-placeholder-attestation',
+        content: 'Trusted export supplied a corrected result summary.'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.deepEqual(findingCodes(packet), ['INVALID_SOURCE_ATTESTATION']);
+  assert.deepEqual(packet.actions, ['request_signed_source_attestation:import-trusted-placeholder-attestation']);
+  assert.equal(packet.source.attested, false);
+}
+
 function testStagesImportMissingSourceTrustMetadataForCuratorReview() {
   const packet = assessImportBatch({
     importId: 'import-missing-source-trust',
@@ -212,7 +247,7 @@ function testStagesImportWithUnsupportedSourceChannelForCuratorReview() {
       channel: 'side-loaded-cache',
       origin: 'trusted-docx-export',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:trusted-export'
+      signedAttestation: TRUSTED_EXPORT_ATTESTATION
     },
     blocks: [
       {
@@ -239,7 +274,7 @@ function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
       channel: 'file-import',
       origin: 'trusted-docx-export',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:trusted-export'
+      signedAttestation: TRUSTED_EXPORT_ATTESTATION
     },
     blocks: [
       {
@@ -281,7 +316,7 @@ function testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated() {
       channel: 'file-import',
       origin: 'trusted-docx-export',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:trusted-export'
+      signedAttestation: TRUSTED_EXPORT_ATTESTATION
     },
     existingAnchors: ['methods-overview'],
     blocks: [
@@ -313,7 +348,7 @@ function testPrivateReferenceMarkersAreRedactedWithoutFilePaths() {
       channel: 'clipboard',
       origin: 'trusted-notebook-output',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:notebook-output'
+      signedAttestation: NOTEBOOK_OUTPUT_ATTESTATION
     },
     blocks: [
       {
@@ -345,7 +380,7 @@ function testTableCellsWithPrivatePathsAreQuarantinedAndRedacted() {
       channel: 'clipboard',
       origin: 'trusted-spreadsheet',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:spreadsheet-export'
+      signedAttestation: SPREADSHEET_EXPORT_ATTESTATION
     },
     blocks: [
       {
@@ -383,7 +418,7 @@ function testSourceOriginWithPrivatePathIsQuarantinedAndRedacted() {
       channel: 'file-import',
       origin: 'file:///Users/sam/private-lab/patient-export.docx',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:private-origin-export'
+      signedAttestation: PRIVATE_ORIGIN_ATTESTATION
     },
     blocks: [
       {
@@ -414,7 +449,7 @@ function testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion() {
       channel: 'file-import',
       origin: 'trusted-review-export',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:review-export'
+      signedAttestation: REVIEW_EXPORT_ATTESTATION
     },
     currentSectionVersions: {
       discussion: 'sec-discussion-current'
@@ -453,7 +488,7 @@ function testAllowsTrustedAttestedImportWithStableDigest() {
       channel: 'file-import',
       origin: 'institutional-review-export',
       trustLevel: 'trusted',
-      signedAttestation: 'sha256:partner-signed-export'
+      signedAttestation: PARTNER_SIGNED_ATTESTATION
     },
     blocks: [
       {
@@ -487,6 +522,7 @@ const tests = [
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
   testStagesPartnerImportWithBlankSignedAttestationForCuratorReview,
   testStagesTrustedImportMissingSignedAttestationForCuratorReview,
+  testStagesTrustedImportWithPlaceholderAttestationForCuratorReview,
   testStagesImportMissingSourceTrustMetadataForCuratorReview,
   testStagesImportWithUnsupportedSourceChannelForCuratorReview,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
