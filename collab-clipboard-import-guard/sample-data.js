@@ -157,6 +157,21 @@ const malformedBlockListImport = {
   }
 };
 
+const malformedBlockEntryImport = {
+  importId: 'import-malformed-block-entry',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-30T16:05:00Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted',
+    signedAttestation: TRUSTED_EXPORT_ATTESTATION
+  },
+  blocks: [
+    null
+  ]
+};
+
 const cleanTrustedImport = {
   importId: 'import-clean-zotero-note',
   workspaceId: 'workspace-paper-7',
@@ -248,6 +263,7 @@ module.exports = {
   trustedPlaceholderAttestationImport,
   unsupportedChannelImport,
   malformedBlockListImport,
+  malformedBlockEntryImport,
   cleanTrustedImport,
   privateSourceOriginImport,
   lowercaseWindowsPathImport,

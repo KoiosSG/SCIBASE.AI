@@ -8,6 +8,7 @@
 | placeholder-attestation-packet.json | stage_for_curator_review | curator_review | watermarked | staged | INVALID_SOURCE_ATTESTATION |
 | unsupported-channel-packet.json | stage_for_curator_review | curator_review | watermarked | staged | UNKNOWN_IMPORT_CHANNEL |
 | malformed-block-list-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_IMPORT_BLOCKS |
+| malformed-block-entry-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_IMPORT_BLOCK |
 | source-origin-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_SOURCE |
 | lowercase-windows-path-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_PATH |
 | forward-slash-windows-path-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_PATH |

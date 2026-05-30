@@ -3,18 +3,20 @@ const crypto = require('crypto');
 function assessImportBatch(batch) {
   const blocks = blockListFor(batch);
   const batchFindings = assessBatchShape(batch);
+  const blockShapeFindings = assessBlockShapes(blocks);
   const sourceFindings = assessSource(batch);
-  const duplicateAnchorBlocks = findAnchorCollisionBlocks(blocks, batch.existingAnchors || []);
+  const validBlocks = blocks.filter(isImportBlockObject);
+  const duplicateAnchorBlocks = findAnchorCollisionBlocks(validBlocks, batch.existingAnchors || []);
   const sanitizedBlocks = [];
   const blockFindings = [];
 
-  for (const block of blocks) {
+  for (const block of validBlocks) {
     const { sanitizedBlock, findings } = assessBlock(block, batch, duplicateAnchorBlocks);
     sanitizedBlocks.push(sanitizedBlock);
     blockFindings.push(...findings);
   }
 
-  const findings = [...batchFindings, ...sourceFindings, ...blockFindings].sort(compareFindings);
+  const findings = [...batchFindings, ...blockShapeFindings, ...sourceFindings, ...blockFindings].sort(compareFindings);
   const status = chooseStatus(findings);
   const packet = {
     importId: batch.importId,
@@ -36,6 +38,10 @@ function blockListFor(batch) {
   return Array.isArray(batch.blocks) ? batch.blocks : [];
 }
 
+function isImportBlockObject(block) {
+  return Boolean(block && typeof block === 'object' && !Array.isArray(block));
+}
+
 function assessBatchShape(batch) {
   if (Array.isArray(batch.blocks)) {
     return [];
@@ -49,6 +55,17 @@ function assessBatchShape(batch) {
       message: 'Import payload is missing a valid block list for collaborative insertion.'
     })
   ];
+}
+
+function assessBlockShapes(blocks) {
+  return blocks
+    .filter((block) => !isImportBlockObject(block))
+    .map(() => finding({
+      code: 'MALFORMED_IMPORT_BLOCK',
+      severity: 'warning',
+      blockId: null,
+      message: 'Import payload contains a malformed block entry that cannot enter collaborative state.'
+    }));
 }
 
 function assessSource(batch) {
@@ -314,6 +331,7 @@ function buildActions(batch, findings) {
     if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_IMPORT_CHANNEL') actions.add(`require_curator_channel_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCKS') actions.add(`require_curator_payload_review:${batch.importId}`);
+    if (item.code === 'MALFORMED_IMPORT_BLOCK') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
     if (item.code === 'INVALID_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
   }

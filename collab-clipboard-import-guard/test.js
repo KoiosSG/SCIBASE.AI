@@ -291,6 +291,28 @@ function testMalformedImportBlockListIsStagedWithoutCrashing() {
   assert.deepEqual(packet.actions, ['require_curator_payload_review:import-malformed-block-list']);
 }
 
+function testMalformedImportBlockEntryIsStagedWithoutCrashing() {
+  const packet = assessImportBatch({
+    importId: 'import-malformed-block-entry',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-30T16:05:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: TRUSTED_EXPORT_ATTESTATION
+    },
+    blocks: [
+      null
+    ]
+  });
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_IMPORT_BLOCK']);
+  assert.deepEqual(packet.sanitizedBlocks, []);
+  assert.deepEqual(packet.actions, ['require_curator_payload_review:import-malformed-block-entry']);
+}
+
 function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   const packet = assessImportBatch({
     importId: 'import-anchor-collision',
@@ -616,6 +638,7 @@ const tests = [
   testStagesImportMissingSourceTrustMetadataForCuratorReview,
   testStagesImportWithUnsupportedSourceChannelForCuratorReview,
   testMalformedImportBlockListIsStagedWithoutCrashing,
+  testMalformedImportBlockEntryIsStagedWithoutCrashing,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
