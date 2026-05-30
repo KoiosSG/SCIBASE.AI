@@ -46,6 +46,30 @@ const revisionManuscript = {
   limitations: ['single-institution pilot']
 };
 
+const negatedDesignManuscript = {
+  manuscriptId: 'ms-abstract-negated-methods-design',
+  assessedAt: '2026-05-30T13:40:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated 96 manuscripts, but this was not a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+    conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: false
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const resultCertaintyOverclaimManuscript = {
   manuscriptId: 'ms-abstract-result-certainty-overclaim',
   assessedAt: '2026-05-30T02:55:00Z',
@@ -289,6 +313,7 @@ const cleanManuscript = {
 module.exports = {
   blockedManuscript,
   revisionManuscript,
+  negatedDesignManuscript,
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,

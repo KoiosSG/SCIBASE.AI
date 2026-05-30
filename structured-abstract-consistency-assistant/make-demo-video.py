@@ -65,9 +65,9 @@ def main():
             "#ef4444",
             [
                 "Sample size and study design differ from the methods packet",
+                "Negated design wording cannot satisfy method alignment",
                 "Hyphenated measurements cannot masquerade as sample-size counts",
                 "Result text implies improvement despite no clear effect",
-                "Result or conclusion text overstates uncertain evidence",
             ],
         ),
         (

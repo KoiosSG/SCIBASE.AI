@@ -53,7 +53,7 @@ function assessMethodsAlignment(manuscript) {
   }
 
   const design = normalize(manuscript.methods?.design);
-  if (design && !abstractMethods.includes(design)) {
+  if (design && (!abstractMethods.includes(design) || phraseIsNegated(abstractMethods, design))) {
     findings.push(finding({
       code: 'METHODS_DESIGN_MISMATCH',
       severity: 'blocker',
@@ -224,6 +224,15 @@ function dedupeFindings(findings) {
 
 function normalize(value = '') {
   return String(value).toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function phraseIsNegated(text, phrase) {
+  const phrasePattern = escapeRegExp(normalize(phrase)).replace(/\\ /g, '\\s+');
+  return new RegExp(`\\b(?:not|no|without)\\s+(?:a\\s+|an\\s+|the\\s+)?${phrasePattern}\\b`, 'i').test(text);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function mentionsSampleSize(text, sampleSize) {

@@ -5,6 +5,7 @@ const { assessStructuredAbstract } = require('./index');
 const {
   blockedManuscript,
   revisionManuscript,
+  negatedDesignManuscript,
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,
@@ -23,6 +24,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 const packets = [
   ['blocked-packet.json', assessStructuredAbstract(blockedManuscript)],
   ['revision-packet.json', assessStructuredAbstract(revisionManuscript)],
+  ['negated-design-packet.json', assessStructuredAbstract(negatedDesignManuscript)],
   ['result-certainty-packet.json', assessStructuredAbstract(resultCertaintyOverclaimManuscript)],
   ['mixed-certainty-packet.json', assessStructuredAbstract(mixedCertaintyOverclaimManuscript)],
   ['conclusion-certainty-packet.json', assessStructuredAbstract(conclusionCertaintyOverclaimManuscript)],

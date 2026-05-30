@@ -126,6 +126,37 @@ function testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint() {
   assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-generic-endpoint'));
 }
 
+function testBlocksNegatedMethodsDesignStatement() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-negated-methods-design',
+    assessedAt: '2026-05-30T13:40:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts, but this was not a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['METHODS_DESIGN_MISMATCH']);
+  assert.ok(packet.actions.includes('revise_methods_summary:ms-abstract-negated-methods-design'));
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+}
+
 function testBlocksImprovementClaimWhenResultsShowWorseDirection() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-direction',
@@ -832,6 +863,7 @@ const tests = [
   testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence,
   testPreservesSameCodeFindingsForDifferentEvidenceTargets,
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
+  testBlocksNegatedMethodsDesignStatement,
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
   testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,
