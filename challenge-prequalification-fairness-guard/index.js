@@ -86,6 +86,22 @@ function reviewerIdFor(review) {
   return typeof review.reviewerId === 'string' ? review.reviewerId.trim() : '';
 }
 
+function applicantIdFor(applicant) {
+  return typeof applicant.id === 'string' ? applicant.id.trim() : '';
+}
+
+function applicantIdentityIsMissing(applicant) {
+  return !applicantIdFor(applicant);
+}
+
+function reviewApplicantIdFor(review) {
+  return typeof review.applicantId === 'string' ? review.applicantId.trim() : review.applicantId;
+}
+
+function outputApplicantIdFor(applicant) {
+  return applicantIdFor(applicant) || 'unidentified-applicant';
+}
+
 function duplicateNonConflictedReviewerIds(reviews) {
   const counts = reviews
     .filter((review) => !review.conflict)
@@ -248,6 +264,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-reviewer-identity');
   }
 
+  if (applicantIdentityIsMissing(applicant)) {
+    reasons.push('missing-applicant-identity');
+  }
+
   if (criteriaWeightTotal(round) !== 100) {
     reasons.push('criteria-weight-total-invalid');
   }
@@ -383,6 +403,10 @@ function remediationAction(applicant, reasons) {
     return 'complete-prequalification-evidence';
   }
 
+  if (reasons.includes('missing-applicant-identity')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('inconsistent-threshold-decision')) {
     return 'reconcile-score-threshold-decision';
   }
@@ -391,10 +415,11 @@ function remediationAction(applicant, reasons) {
 }
 
 function evaluatePrequalificationRound(round) {
-  const reviewsByApplicant = groupBy(round.reviews, (review) => review.applicantId);
+  const reviewsByApplicant = groupBy(round.reviews, reviewApplicantIdFor);
 
   const decisions = round.applicants.map((applicant) => {
-    const reviews = reviewsByApplicant[applicant.id] || [];
+    const reviews = reviewsByApplicant[applicantIdFor(applicant)] || [];
+    const applicantId = outputApplicantIdFor(applicant);
     const nonConflictedReviews = countableNonConflictedReviews(reviews);
     const reasons = reasonsForApplicant(applicant, reviews, round);
     const score = weightedScore(round.criteria, nonConflictedReviews);
@@ -406,8 +431,8 @@ function evaluatePrequalificationRound(round) {
         : 'reject-with-audit';
 
     return {
-      id: applicant.id,
-      applicantId: applicant.id,
+      id: applicantId,
+      applicantId,
       challengeId: round.challengeId,
       decision,
       sponsorDecision: applicant.sponsorDecision,
@@ -419,7 +444,7 @@ function evaluatePrequalificationRound(round) {
       rejectionReasons: applicantRejectionReasons(applicant),
       appealStatus: appealStatus(applicant, round),
       auditDigest: digest({
-        applicantId: applicant.id,
+        applicantId,
         challengeId: round.challengeId,
         score,
         reasons,
@@ -446,6 +471,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('missing-published-criterion-id') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
+        decision.reasons.includes('missing-applicant-identity') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||
         decision.reasons.includes('criteria-weight-value-invalid') ||

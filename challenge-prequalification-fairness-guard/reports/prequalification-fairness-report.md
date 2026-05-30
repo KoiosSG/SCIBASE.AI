@@ -65,6 +65,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: publish-valid-sponsor-decision
 - Audit digest: sha256:030c1d99cb355c21fb3d67e9876997fd4a8bb2042a76d205fe3c3b79beaeccc3
 
+## Missing Applicant Identity Packet
+
+- Applicant: "unidentified-applicant"
+- Decision: hold-for-fairness-review
+- Reasons: missing-applicant-identity
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:85aa774922f5707139444c13c705a88af31757014d98a8767b0cbe1725c4cf7c
+
 ## Blank Rejection Reason Packet
 
 - Applicant: applicant-blank-rejection-reason

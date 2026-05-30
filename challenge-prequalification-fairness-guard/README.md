@@ -2,7 +2,7 @@
 
 This module adds a focused Scientific Bounty System slice for SCIBASE issue #18. It evaluates sponsor-side prequalification rounds before solver teams are accepted or rejected from a challenge.
 
-The guard checks published screening criteria, complete and unique criterion identifiers after trimming, valid criterion weight values and totals, valid pass thresholds, valid reviewer quorum requirements, valid sponsor accept/reject decisions, complete reviewer score evidence, valid finite 0-100 reviewer score values, weighted threshold consistency, anonymous-screening requirements, reviewer conflicts, distinct reviewer quorum, missing reviewer identity evidence, duplicate reviewer score evidence, missing, empty, or blank rejection reason evidence, parseable appeal windows, and audit evidence. Conflicted reviewer scores are excluded from threshold scoring while the conflict remains auditable, repeated reviewer identities are deduplicated before quorum or threshold scoring, and missing reviewer identities, invalid sponsor decisions, or invalid score values are excluded from taking effect until the evidence is completed. Unfair or incomplete screening decisions are held for remediation before challenge access changes.
+The guard checks published screening criteria, complete and unique criterion identifiers after trimming, valid criterion weight values and totals, valid pass thresholds, valid reviewer quorum requirements, valid sponsor accept/reject decisions, complete applicant identity evidence, complete reviewer score evidence, valid finite 0-100 reviewer score values, weighted threshold consistency, anonymous-screening requirements, reviewer conflicts, distinct reviewer quorum, missing reviewer identity evidence, duplicate reviewer score evidence, missing, empty, or blank rejection reason evidence, parseable appeal windows, and audit evidence. Conflicted reviewer scores are excluded from threshold scoring while the conflict remains auditable, repeated reviewer identities are deduplicated before quorum or threshold scoring, and missing applicant identities, missing reviewer identities, invalid sponsor decisions, or invalid score values are excluded from taking effect until the evidence is completed. Unfair or incomplete screening decisions are held for remediation before challenge access changes.
 
 ## Run
 
@@ -21,6 +21,7 @@ npm run check
 - `reports/invalid-reviewer-score-packet.json`
 - `reports/invalid-reviewer-quorum-packet.json`
 - `reports/invalid-sponsor-decision-packet.json`
+- `reports/missing-applicant-identity-packet.json`
 - `reports/blank-rejection-reason-packet.json`
 - `reports/prequalification-fairness-report.md`
 - `reports/summary.svg`
