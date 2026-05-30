@@ -39,6 +39,13 @@ function assessVisualAndOperableComponents(dashboard) {
         'blocker',
         'Critical component color contrast evidence must include foreground and background hex values before dashboard release.'
       ));
+    } else if (requiresContrastEvidence(component) && (!component.foreground || !component.background)) {
+      findings.push(finding(
+        component,
+        'INVALID_CONTRAST_EVIDENCE',
+        'warning',
+        'Noncritical dashboard component contrast evidence should include foreground and background hex values before public release.'
+      ));
     } else if (component.foreground && component.background) {
       const contrast = contrastRatio(component.foreground, component.background);
       if (contrast === null) {
@@ -88,6 +95,10 @@ function assessVisualAndOperableComponents(dashboard) {
 
   findings.push(...assessHeadingOrder(components));
   return findings;
+}
+
+function requiresContrastEvidence(component) {
+  return Boolean(component.type || component.title || component.foreground || component.background);
 }
 
 function assessHeadingOrder(components) {

@@ -177,9 +177,33 @@ const missingContrastDashboard = {
   }
 };
 
+const missingNoncriticalContrastDashboard = {
+  dashboardId: 'enterprise-admin-missing-secondary-contrast',
+  institutionId: 'institution-redacted',
+  assessedAt: '2026-05-30T15:25:00Z',
+  widgets: [
+    {
+      id: 'secondary-usage-trend-without-colors',
+      type: 'metric',
+      title: 'Storage usage trend',
+      critical: false,
+      keyboardReachable: true,
+      screenReaderLabel: 'Storage usage trend across departments',
+      headingLevel: 2
+    }
+  ],
+  alerts: [],
+  exports: [],
+  motion: {
+    animatedCharts: [],
+    reducedMotionFallback: true
+  }
+};
+
 module.exports = {
   blockedDashboard,
   cleanDashboard,
   warningDashboard,
-  missingContrastDashboard
+  missingContrastDashboard,
+  missingNoncriticalContrastDashboard
 };

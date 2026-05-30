@@ -6,7 +6,8 @@ const {
   blockedDashboard,
   cleanDashboard,
   warningDashboard,
-  missingContrastDashboard
+  missingContrastDashboard,
+  missingNoncriticalContrastDashboard
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -15,6 +16,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 const packets = [
   ['blocked-packet.json', assessDashboardRelease(blockedDashboard)],
   ['missing-contrast-packet.json', assessDashboardRelease(missingContrastDashboard)],
+  ['missing-noncritical-contrast-packet.json', assessDashboardRelease(missingNoncriticalContrastDashboard)],
   ['clean-packet.json', assessDashboardRelease(cleanDashboard)],
   ['warning-packet.json', assessDashboardRelease(warningDashboard)]
 ];
@@ -55,6 +57,7 @@ function renderMarkdown(packetRows) {
 }
 
 function renderSvg(packetRows) {
+  const height = 108 + packetRows.length * 72 + 36;
   const rows = packetRows.map(([, packet], index) => {
     const y = 105 + index * 72;
     const color = packet.status === 'hold_accessibility_release' ? '#dc2626' : packet.status === 'remediate_before_public_release' ? '#d97706' : '#16a34a';
@@ -68,8 +71,8 @@ function renderSvg(packetRows) {
   }).join('');
 
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="432" viewBox="0 0 1200 432">',
-    '  <rect width="1200" height="432" fill="#e2e8f0"/>',
+    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${height}" viewBox="0 0 1200 ${height}">`,
+    `  <rect width="1200" height="${height}" fill="#e2e8f0"/>`,
     '  <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#0f172a">Enterprise Dashboard Accessibility Guard</text>',
     '  <text x="48" y="80" font-size="16" font-family="Arial" fill="#334155">Institutional dashboards, exports, and webhook notices are gated before release.</text>',
     rows,

@@ -181,6 +181,39 @@ function testMissingCriticalContrastEvidenceBlocksRelease() {
   assert.ok(packet.actions.includes('provide_valid_contrast_evidence:contract-risk-without-colors'));
 }
 
+function testMissingNoncriticalContrastEvidenceRequiresRemediation() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-missing-secondary-contrast',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-30T15:25:00Z',
+    widgets: [
+      {
+        id: 'secondary-usage-trend-without-colors',
+        type: 'metric',
+        title: 'Storage usage trend',
+        critical: false,
+        keyboardReachable: true,
+        screenReaderLabel: 'Storage usage trend across departments',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'remediate_before_public_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'internal_only');
+  assert.equal(packet.releaseLanes.scheduledExport, 'blocked');
+  assert.equal(packet.releaseLanes.webhookNotice, 'internal_only');
+  assert.deepEqual(codes(packet), ['INVALID_CONTRAST_EVIDENCE']);
+  assert.equal(packet.wcagSignals.perceivable, false);
+  assert.ok(packet.actions.includes('provide_valid_contrast_evidence:secondary-usage-trend-without-colors'));
+}
+
 function testShorthandHexContrastEvidenceRemainsValid() {
   const packet = assessDashboardRelease({
     dashboardId: 'enterprise-admin-shorthand-contrast',
@@ -254,6 +287,7 @@ const tests = [
   testPrivateDataInTableSummaryBlocksRelease,
   testInvalidContrastEvidenceBlocksRelease,
   testMissingCriticalContrastEvidenceBlocksRelease,
+  testMissingNoncriticalContrastEvidenceRequiresRemediation,
   testShorthandHexContrastEvidenceRemainsValid,
   testMissingVisibleFocusIndicatorBlocksKeyboardRelease
 ];

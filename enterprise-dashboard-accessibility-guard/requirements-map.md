@@ -5,7 +5,7 @@ Issue #19 asks for enterprise tooling around admin dashboards, API and webhook i
 | Issue Area | This Slice |
 | --- | --- |
 | Admin dashboards | Gates institutional dashboard widgets before release to admins. |
-| Contributor and usage analytics | Checks that critical and noncritical metrics are perceivable, include required contrast evidence, use valid contrast evidence, are labeled, keyboard reachable with visible focus indicators, and safe for nonvisual users. |
+| Contributor and usage analytics | Checks that critical and noncritical metrics are perceivable, include required contrast evidence, use valid contrast evidence, are labeled, keyboard reachable with visible focus indicators, and safe for nonvisual users. Missing noncritical contrast evidence now keeps public release in remediation instead of passing clean. |
 | Compliance tracking | Produces WCAG-oriented readiness signals and deterministic audit evidence for institutional governance. |
 | Export pipelines | Blocks scheduled exports when tables lack summaries or dashboard views are not accessible enough for release. |
 | Webhook support | Keeps webhook notices internal-only when the dashboard state has nonblocking accessibility warnings. |
