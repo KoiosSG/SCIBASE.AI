@@ -93,8 +93,15 @@ const warningRepository = {
   ]
 };
 
+const malformedRepository = {
+  repositoryId: 'repo-reference-malformed-entry',
+  assessedAt: '2026-05-28T12:00:00Z',
+  references: [null]
+};
+
 module.exports = {
   riskyRepository,
   cleanRepository,
-  warningRepository
+  warningRepository,
+  malformedRepository
 };

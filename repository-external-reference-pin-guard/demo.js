@@ -2,13 +2,19 @@ const fs = require('fs');
 const path = require('path');
 
 const { assessExternalReferences } = require('./index');
-const { riskyRepository, cleanRepository, warningRepository } = require('./sample-data');
+const {
+  riskyRepository,
+  cleanRepository,
+  warningRepository,
+  malformedRepository
+} = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
 fs.mkdirSync(reportsDir, { recursive: true });
 
 const packets = [
   ['blocked-packet.json', assessExternalReferences(riskyRepository)],
+  ['malformed-packet.json', assessExternalReferences(malformedRepository)],
   ['clean-packet.json', assessExternalReferences(cleanRepository)],
   ['warning-packet.json', assessExternalReferences(warningRepository)]
 ];

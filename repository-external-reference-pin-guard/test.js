@@ -412,6 +412,29 @@ function testMalformedOptionalEvidenceBlocksEvenWhenAnotherIdentifierIsValid() {
   assert.equal(packet.referenceSignals.exportable, false);
 }
 
+function testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-malformed-entry',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [null]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_REFERENCE_ENTRY']);
+  assert.equal(packet.findings[0].referenceId, 'malformed-reference-entry-1');
+  assert.ok(packet.actions.includes('repair_reference_entry:malformed-reference-entry-1'));
+  assert.equal(packet.referenceSignals.immutablePins, false);
+  assert.equal(packet.referenceSignals.exportable, false);
+  assert.equal(packet.referenceSignals.attributionComplete, false);
+  assert.equal(packet.referenceSignals.verificationFresh, false);
+  assert.deepEqual(packet.referenceSummary, {
+    total: 1,
+    byKind: {
+      unknown: 1
+    }
+  });
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
@@ -425,7 +448,8 @@ const tests = [
   testTruncatedApiSnapshotChecksumDoesNotCountAsPinnedEvidence,
   testNullGitCommitShaDoesNotCountAsImmutablePin,
   testMissingVerificationEvidenceBlocksOtherwisePinnedReference,
-  testMalformedOptionalEvidenceBlocksEvenWhenAnotherIdentifierIsValid
+  testMalformedOptionalEvidenceBlocksEvenWhenAnotherIdentifierIsValid,
+  testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing
 ];
 
 for (const test of tests) {

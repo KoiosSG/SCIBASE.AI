@@ -9,6 +9,7 @@ This module checks whether a scientific repository can safely publish a DOI, cit
 - Git submodules and external code are pinned to immutable commit SHAs, rejecting null all-zero placeholders.
 - Linked datasets and model weights have full-length SHA checksum, parseable DOI, or immutable version evidence; placeholders such as `pending` and floating aliases such as `latest` do not count.
 - Supplied checksum and DOI metadata must be valid even when another durable identifier is present, so malformed evidence cannot slip into export or citation packets.
+- Malformed external-reference entries create release-blocking repair actions instead of crashing assessment or disappearing from reviewer packets.
 - API sources use parseable, non-future dated snapshots with full-length SHA checksum evidence instead of floating "latest" endpoints.
 - Export bundles do not require authenticated external references.
 - License and attribution metadata are present before DOI publication.

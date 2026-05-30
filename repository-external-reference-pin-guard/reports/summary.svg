@@ -11,11 +11,17 @@
       </g>
       <g transform="translate(48 162)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-malformed-entry</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">malformed-packet.json | findings 1 | digest 5712c8d01b35d778</text>
+      </g>
+      <g transform="translate(48 230)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#047857"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-clean</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">clean-packet.json | findings 0 | digest 5b1ede709bdfe56b</text>
       </g>
-      <g transform="translate(48 230)">
+      <g transform="translate(48 298)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#a16207"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-warning</text>
