@@ -5,21 +5,23 @@ Generated: 2026-05-28T06:00:00Z
 
 ## Summary
 
-- Total reviews evaluated: 4
-- Stale reviews requiring recertification: 2
+- Total reviews evaluated: 5
+- Stale reviews requiring recertification: 3
 - Stale inline comments requiring anchor review: 1
-- Frozen reputation delta: 29
+- Frozen reputation delta: 41
 - Recommended action: block-reputation-update
-- Timeline audit digest: sha256:05d6bfae8c13031699429ce8eed05abc4046a732fb44f34746fca82415bb7f9f
+- Timeline audit digest: sha256:ca8b5b6b76b387794fe73c846c2fb4e558f0cc7dcf195fd4a09560a6a11d1d7b
 
 ## Stale Review Evidence
 
 - review-dataset-methods: artifact-digest-changed, artifact-updated-after-review
+- review-missing-public-reviewer: reviewer-identity-missing
 - review-blind-data: artifact-digest-changed, artifact-updated-after-review
 
 ## Recertification Tasks
 
 - recertify-review-dataset-methods (peer-review, high): confirm-review-still-applies-to-current-artifact
+- recertify-review-missing-public-reviewer (peer-review, normal): confirm-review-still-applies-to-current-artifact
 - recertify-review-blind-data (peer-review, normal): confirm-review-still-applies-to-current-artifact
 - recertify-comment-code-line-41 (inline-comment, normal): confirm-comment-anchor-still-matches-current-artifact
 

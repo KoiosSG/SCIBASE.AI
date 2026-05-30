@@ -25,7 +25,7 @@ function testStaleReviewsFreezeReputationUntilRecertified() {
   assert.equal(action.effectiveDelta, 0);
   assert.equal(action.appliesTo, 'reviewer:orcid:0000-0002-reviewer-a');
 
-  assert.equal(result.summary.staleReviews, 2);
+  assert.equal(result.summary.staleReviews, 3);
   assert.equal(result.summary.recommendedAction, 'block-reputation-update');
 }
 
@@ -437,6 +437,43 @@ function testMissingReviewTimestampRequiresRecertification() {
   assert.equal(action.effectiveDelta, 0);
 }
 
+function testPublicReviewWithoutReviewerIdentityFreezesReputation() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-10T10:00:00Z',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-missing-public-reviewer',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      reputationDelta: 12
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-missing-public-reviewer');
+  const task = byId(result.recertificationTasks, 'recertify-review-missing-public-reviewer');
+  const action = byId(result.reputationActions, 'review-missing-public-reviewer');
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['reviewer-identity-missing']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+  assert.notEqual(action.appliesTo, 'reviewer:undefined');
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['reviewer-identity-missing']);
+}
+
 function testInvalidArtifactTimestampRequiresReviewRecertification() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -558,7 +595,7 @@ function testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles() {
   const result = evaluateRecertification(project);
 
   assert.equal(result.timelinePacket.projectId, 'project-alpha-replication');
-  assert.equal(result.timelinePacket.events.length, 5);
+  assert.equal(result.timelinePacket.events.length, 6);
   assert.ok(result.timelinePacket.auditDigest.startsWith('sha256:'));
   assert.ok(!JSON.stringify(result.timelinePacket).includes('private@'));
 }
@@ -578,6 +615,7 @@ const tests = [
   testStaleInlineCommentsBlockReputationUpdateWithoutStaleReviews,
   testInvalidReviewTimestampRequiresRecertification,
   testMissingReviewTimestampRequiresRecertification,
+  testPublicReviewWithoutReviewerIdentityFreezesReputation,
   testInvalidArtifactTimestampRequiresReviewRecertification,
   testMissingArtifactTimestampRequiresReviewRecertification,
   testInvalidArtifactTimestampRequiresCommentRecertification,

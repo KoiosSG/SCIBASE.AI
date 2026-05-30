@@ -12,6 +12,7 @@ Validation targets:
 - recertified code review keeps its 14 point reputation delta
 - double-blind reviewer identity is not leaked in tasks or timeline events
 - space-separated blind and fully anonymous mode labels do not leak raw reviewer IDs
+- public or semi-private reviews without reviewer identity are frozen for recertification instead of applying credit to an undefined profile
 - stale inline comment anchors generate comment-specific recertification tasks
 - artifact digest changes mark inline comment anchors stale even when the selector line is unchanged
 - missing or malformed inline comment timestamps require recertification before comment evidence is treated as current

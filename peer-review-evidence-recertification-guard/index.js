@@ -31,6 +31,10 @@ function hasValidTime(value) {
   return Number.isFinite(isoTime(value));
 }
 
+function hasText(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
 function normalizeReviewMode(mode) {
   return String(mode || '')
     .trim()
@@ -45,10 +49,10 @@ function isBlindOrAnonymous(mode) {
 
 function reviewerDisplay(item) {
   if (isBlindOrAnonymous(item.mode)) {
-    return item.anonymousLabel || 'anonymous-reviewer';
+    return hasText(item.anonymousLabel) ? item.anonymousLabel.trim() : 'anonymous-reviewer';
   }
 
-  return `reviewer:${item.reviewerId}`;
+  return hasText(item.reviewerId) ? `reviewer:${item.reviewerId.trim()}` : 'reviewer:unverified';
 }
 
 function findArtifact(project, artifactId) {
@@ -64,6 +68,10 @@ function evaluateReview(project, review) {
 
   if (!reviewTimeIsValid) {
     reasons.push('invalid-review-timestamp');
+  }
+
+  if (!isBlindOrAnonymous(review.mode) && !hasText(review.reviewerId)) {
+    reasons.push('reviewer-identity-missing');
   }
 
   if (!artifact) {
@@ -337,6 +345,14 @@ function buildSampleProject() {
         evidenceDigest: 'sha256:notebook-v1',
         submittedAt: '2026-05-12T10:00:00Z',
         reputationDelta: 9
+      },
+      {
+        id: 'review-missing-public-reviewer',
+        mode: 'public',
+        artifactId: 'notebook-methods',
+        evidenceDigest: 'sha256:notebook-v1',
+        submittedAt: '2026-05-12T10:30:00Z',
+        reputationDelta: 12
       },
       {
         id: 'review-code-recertified',
