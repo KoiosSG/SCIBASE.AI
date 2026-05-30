@@ -6,6 +6,7 @@ const {
   blockedManuscript,
   revisionManuscript,
   resultCertaintyOverclaimManuscript,
+  mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,
   cleanManuscript
 } = require('./sample-data');
@@ -17,6 +18,7 @@ const packets = [
   ['blocked-packet.json', assessStructuredAbstract(blockedManuscript)],
   ['revision-packet.json', assessStructuredAbstract(revisionManuscript)],
   ['result-certainty-packet.json', assessStructuredAbstract(resultCertaintyOverclaimManuscript)],
+  ['mixed-certainty-packet.json', assessStructuredAbstract(mixedCertaintyOverclaimManuscript)],
   ['conclusion-certainty-packet.json', assessStructuredAbstract(conclusionCertaintyOverclaimManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];

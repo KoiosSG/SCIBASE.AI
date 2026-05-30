@@ -297,8 +297,16 @@ function hasUncertainEvidence(manuscript) {
 }
 
 function overstatesResultCertainty(value) {
-  if (/\b(not|non[- ]?|no)\s+(statistically\s+)?significant\b/i.test(value)) return false;
-  return /\b(statistically significant|clinically meaningful|robust|definitive|conclusive|confirmed|proven)\b/i.test(value);
+  return /\b(statistically significant|clinically meaningful|robust|definitive|conclusive|confirmed|proven)\b/i.test(
+    removeNegatedCertainty(value)
+  );
+}
+
+function removeNegatedCertainty(value) {
+  const certaintyPhrase = '(?:statistically\\s+significant|clinically\\s+meaningful|robust|definitive|conclusive|confirmed|proven)';
+  return String(value)
+    .replace(new RegExp(`\\b(?:not|no)\\s+${certaintyPhrase}(?:\\s+(?:or|and)\\s+${certaintyPhrase})*\\b`, 'gi'), ' ')
+    .replace(/\bnon[- ]?significant\b/gi, ' ');
 }
 
 function isNegativeOrNoEffectDirection(direction) {

@@ -346,6 +346,37 @@ function testBlocksResultCertaintyClaimWhenEvidenceCrossesNull() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksMixedNegatedAndPositiveCertaintyClaimWhenEvidenceCrossesNull() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-mixed-certainty-overclaim',
+    assessedAt: '2026-05-30T07:40:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, was not statistically significant but clinically meaningful in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings but requires validation.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: true
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['confidence interval crosses null']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['RESULT_OVERSTATES_EVIDENCE']);
+  assert.ok(packet.actions.includes('revise_results_certainty:ms-abstract-mixed-certainty-overclaim'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testBlocksConclusionCertaintyClaimWhenEvidenceCrossesNull() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-conclusion-certainty-overclaim',
@@ -586,6 +617,7 @@ const tests = [
   testBlocksSafetyBenefitConclusionWhenAdverseResultsWorsen,
   testBlocksNegatedSafetyConcernConclusionWhenAdverseResultsWorsen,
   testBlocksResultCertaintyClaimWhenEvidenceCrossesNull,
+  testBlocksMixedNegatedAndPositiveCertaintyClaimWhenEvidenceCrossesNull,
   testBlocksConclusionCertaintyClaimWhenEvidenceCrossesNull,
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
