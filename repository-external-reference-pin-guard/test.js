@@ -38,7 +38,7 @@ function testBlocksFloatingAndNonExportableExternalReferences() {
         kind: 'api_source',
         target: 'https://api.example.invalid/weather/latest',
         snapshotDate: '',
-        checksum: 'sha256:abcdef',
+        checksum: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         authRequired: true,
         license: 'CC0-1.0',
         attribution: 'Example Weather API'
@@ -80,7 +80,7 @@ function testAllowsPinnedExportableReferences() {
         id: 'dataset-lab-export',
         kind: 'linked_dataset',
         target: 'https://doi.org/10.5281/zenodo.1234567',
-        checksum: 'sha256:1234567890abcdef',
+        checksum: 'sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         doi: '10.5281/zenodo.1234567',
         license: 'CC-BY-4.0',
         attribution: 'Example Lab',
@@ -91,7 +91,7 @@ function testAllowsPinnedExportableReferences() {
         kind: 'api_source',
         target: 'https://api.example.invalid/weather/snapshots/2026-05-01.json',
         snapshotDate: '2026-05-01',
-        checksum: 'sha256:abcdef',
+        checksum: 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
         authRequired: false,
         license: 'CC0-1.0',
         attribution: 'Example Weather API',
@@ -118,7 +118,7 @@ function testStagesReferencesMissingLicenseAttributionOnly() {
         id: 'model-weights',
         kind: 'model_weights',
         target: 'https://models.example.invalid/model-v3.bin',
-        checksum: 'sha256:feedface',
+        checksum: 'sha256:feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface',
         version: 'v3.0.1',
         license: '',
         attribution: '',
@@ -196,7 +196,7 @@ function testFutureDatedVerificationEvidenceIsNotFresh() {
         id: 'dataset-future-verified',
         kind: 'linked_dataset',
         target: 'https://doi.org/10.5281/zenodo.7654321',
-        checksum: 'sha256:feedface',
+        checksum: 'sha256:feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface',
         doi: '10.5281/zenodo.7654321',
         license: 'CC-BY-4.0',
         attribution: 'Example Lab',
@@ -221,7 +221,7 @@ function testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence() {
         kind: 'api_source',
         target: 'https://api.example.invalid/weather/snapshots/2026-06-01.json',
         snapshotDate: '2026-06-01',
-        checksum: 'sha256:abcdef',
+        checksum: 'sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
         authRequired: false,
         license: 'CC0-1.0',
         attribution: 'Example Weather API',
@@ -261,6 +261,31 @@ function testInvalidApiSnapshotChecksumDoesNotCountAsPinnedEvidence() {
   assert.equal(packet.referenceSignals.immutablePins, false);
 }
 
+function testTruncatedApiSnapshotChecksumDoesNotCountAsPinnedEvidence() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-truncated-api-checksum',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'api-truncated-checksum',
+        kind: 'api_source',
+        target: 'https://api.example.invalid/weather/snapshots/2026-05-01.json',
+        snapshotDate: '2026-05-01',
+        checksum: 'sha256:abcdef',
+        authRequired: false,
+        license: 'CC0-1.0',
+        attribution: 'Example Weather API',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['FLOATING_API_REFERENCE']);
+  assert.ok(packet.actions.includes('pin_external_reference:api-truncated-checksum'));
+  assert.equal(packet.referenceSignals.immutablePins, false);
+}
+
 function testNullGitCommitShaDoesNotCountAsImmutablePin() {
   const packet = assessExternalReferences({
     repositoryId: 'repo-reference-null-git-pin',
@@ -293,7 +318,7 @@ function testMissingVerificationEvidenceBlocksOtherwisePinnedReference() {
         id: 'dataset-needs-verification',
         kind: 'linked_dataset',
         target: 'https://doi.org/10.5281/zenodo.2345678',
-        checksum: 'sha256:abcdef123456',
+        checksum: 'sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
         doi: '10.5281/zenodo.2345678',
         license: 'CC-BY-4.0',
         attribution: 'Example Lab'
@@ -316,6 +341,7 @@ const tests = [
   testFutureDatedVerificationEvidenceIsNotFresh,
   testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence,
   testInvalidApiSnapshotChecksumDoesNotCountAsPinnedEvidence,
+  testTruncatedApiSnapshotChecksumDoesNotCountAsPinnedEvidence,
   testNullGitCommitShaDoesNotCountAsImmutablePin,
   testMissingVerificationEvidenceBlocksOtherwisePinnedReference
 ];

@@ -4,6 +4,12 @@ const DEFAULT_POLICY = {
   maxReferenceAgeDays: 180
 };
 
+const CHECKSUM_HEX_LENGTHS = {
+  sha256: 64,
+  sha384: 96,
+  sha512: 128
+};
+
 function assessExternalReferences(repository) {
   const policy = { ...DEFAULT_POLICY, ...(repository.policy || {}) };
   const findings = repository.references
@@ -90,8 +96,12 @@ function hasDurableIdentifier(reference) {
 }
 
 function hasValidChecksum(checksum) {
-  return typeof checksum === 'string'
-    && /^(sha256|sha384|sha512):[a-f0-9]{6,}$/i.test(checksum.trim());
+  if (typeof checksum !== 'string') return false;
+  const match = checksum.trim().match(/^(sha256|sha384|sha512):([a-f0-9]+)$/i);
+  if (!match) return false;
+
+  const algorithm = match[1].toLowerCase();
+  return match[2].length === CHECKSUM_HEX_LENGTHS[algorithm];
 }
 
 function hasImmutableVersion(version) {
