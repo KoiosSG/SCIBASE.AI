@@ -114,6 +114,14 @@ function criteriaListIsMissing(round) {
   return !Array.isArray(round.criteria);
 }
 
+function applicantListFor(round) {
+  return Array.isArray(round.applicants) ? round.applicants : [];
+}
+
+function applicantListIsMissing(round) {
+  return !Array.isArray(round.applicants);
+}
+
 function outputApplicantIdFor(applicant) {
   return applicantIdFor(applicant) || 'unidentified-applicant';
 }
@@ -255,6 +263,10 @@ function reasonsForApplicant(applicant, reviews, round) {
   const duplicateReviewerIds = duplicateNonConflictedReviewerIds(reviews);
   const applicantAppealStatus = appealStatus(applicant, round);
   const reasons = [];
+
+  if (applicant.missingApplicantList) {
+    return ['missing-applicant-list'];
+  }
 
   if (round.anonymousScreeningRequired && reviews.some((review) => !review.anonymousScreeningObserved)) {
     reasons.push('anonymous-screening-leak');
@@ -435,6 +447,10 @@ function remediationAction(applicant, reasons) {
     return 'complete-prequalification-evidence';
   }
 
+  if (reasons.includes('missing-applicant-list')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('missing-applicant-identity')) {
     return 'complete-prequalification-evidence';
   }
@@ -448,8 +464,19 @@ function remediationAction(applicant, reasons) {
 
 function evaluatePrequalificationRound(round) {
   const reviewsByApplicant = groupBy(reviewListFor(round), reviewApplicantIdFor);
+  const applicants = applicantListIsMissing(round)
+    ? [
+        {
+          id: '',
+          sponsorDecision: null,
+          rejectionReasons: [],
+          appealDueAt: null,
+          missingApplicantList: true
+        }
+      ]
+    : applicantListFor(round);
 
-  const decisions = round.applicants.map((applicant) => {
+  const decisions = applicants.map((applicant) => {
     const reviews = reviewsByApplicant[applicantIdFor(applicant)] || [];
     const applicantId = outputApplicantIdFor(applicant);
     const nonConflictedReviews = countableNonConflictedReviews(reviews);
@@ -505,6 +532,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('missing-review-list') ||
+        decision.reasons.includes('missing-applicant-list') ||
         decision.reasons.includes('missing-applicant-identity') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||

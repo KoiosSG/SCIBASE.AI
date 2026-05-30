@@ -14,6 +14,7 @@ const invalidSponsorDecisionResult = evaluatePrequalificationRound(buildInvalidS
 const missingApplicantIdentityResult = evaluatePrequalificationRound(buildMissingApplicantIdentityRound());
 const missingReviewListResult = evaluatePrequalificationRound(buildMissingReviewListRound());
 const missingCriteriaListResult = evaluatePrequalificationRound(buildMissingCriteriaListRound());
+const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApplicantListRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
 
 const packetPath = path.join(reportsDir, 'prequalification-fairness-packet.json');
@@ -31,6 +32,7 @@ const missingApplicantIdentityPacketPath = path.join(
 );
 const missingReviewListPacketPath = path.join(reportsDir, 'missing-review-list-packet.json');
 const missingCriteriaListPacketPath = path.join(reportsDir, 'missing-criteria-list-packet.json');
+const missingApplicantListPacketPath = path.join(reportsDir, 'missing-applicant-list-packet.json');
 const blankRejectionReasonPacketPath = path.join(reportsDir, 'blank-rejection-reason-packet.json');
 const reportPath = path.join(reportsDir, 'prequalification-fairness-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
@@ -52,6 +54,10 @@ fs.writeFileSync(missingReviewListPacketPath, `${JSON.stringify(missingReviewLis
 fs.writeFileSync(
   missingCriteriaListPacketPath,
   `${JSON.stringify(missingCriteriaListResult, null, 2)}\n`
+);
+fs.writeFileSync(
+  missingApplicantListPacketPath,
+  `${JSON.stringify(missingApplicantListResult, null, 2)}\n`
 );
 fs.writeFileSync(blankRejectionReasonPacketPath, `${JSON.stringify(blankRejectionReasonResult, null, 2)}\n`);
 
@@ -154,6 +160,14 @@ ${actions}
 - Remediation: ${missingCriteriaListResult.remediationActions[0].action}
 - Audit digest: ${missingCriteriaListResult.auditDigest}
 
+## Missing Applicant List Packet
+
+- Applicant: ${missingApplicantListResult.decisions[0].applicantId}
+- Decision: ${missingApplicantListResult.decisions[0].decision}
+- Reasons: ${missingApplicantListResult.decisions[0].reasons.join(', ')}
+- Remediation: ${missingApplicantListResult.remediationActions[0].action}
+- Audit digest: ${missingApplicantListResult.auditDigest}
+
 ## Blank Rejection Reason Packet
 
 - Applicant: ${blankRejectionReasonResult.decisions[0].applicantId}
@@ -194,6 +208,7 @@ console.log(`Wrote ${path.relative(__dirname, invalidSponsorDecisionPacketPath)}
 console.log(`Wrote ${path.relative(__dirname, missingApplicantIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingReviewListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingCriteriaListPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
@@ -521,6 +536,12 @@ function buildMissingCriteriaListRound() {
     }
   ];
   delete round.criteria;
+  return round;
+}
+
+function buildMissingApplicantListRound() {
+  const round = buildSampleRound();
+  delete round.applicants;
   return round;
 }
 

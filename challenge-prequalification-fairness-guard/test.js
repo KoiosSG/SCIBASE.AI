@@ -885,6 +885,22 @@ function testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing() {
   assert.ok(result.criteriaDigest.startsWith('sha256:'));
 }
 
+function testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing() {
+  const round = buildSampleRound();
+  delete round.applicants;
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'unidentified-applicant');
+  const action = byId(result.remediationActions, 'remediate-unidentified-applicant');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('missing-applicant-list'), true);
+  assert.deepEqual(decision.rejectionReasons, []);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+  assert.equal(result.summary.held, 1);
+}
+
 function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
   const round = buildSampleRound();
   round.minReviewers = 2;
@@ -1022,6 +1038,7 @@ const tests = [
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testMissingReviewListHoldsPrequalificationRoundWithoutCrashing,
   testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing,
+  testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree

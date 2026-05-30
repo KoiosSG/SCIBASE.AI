@@ -89,6 +89,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: publish-complete-screening-criteria
 - Audit digest: sha256:c2d8b60e1ca8cc50e8b8c072ee2a22a9a832df09b59e63d60dd21b41b1f17fd3
 
+## Missing Applicant List Packet
+
+- Applicant: unidentified-applicant
+- Decision: hold-for-fairness-review
+- Reasons: missing-applicant-list
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:c77ccb7f1875504454711c406569be8b6b9b34789239e956635850890ecf1a90
+
 ## Blank Rejection Reason Packet
 
 - Applicant: applicant-blank-rejection-reason
