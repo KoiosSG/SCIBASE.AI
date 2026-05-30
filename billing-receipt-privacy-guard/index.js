@@ -137,17 +137,24 @@ function sanitizeMetadata(metadata = {}) {
   const safe = {};
   const removedKeys = [];
   const findings = [];
+  let redactedKeyCount = 0;
 
   for (const [key, value] of Object.entries(metadata)) {
+    const keyFindings = findingsForText(key);
+    const removedKey = keyFindings.length > 0
+      ? `metadata-key-redacted-${++redactedKeyCount}`
+      : key;
+
     if (!SAFE_METADATA_KEYS.has(key)) {
-      removedKeys.push(key);
+      removedKeys.push(removedKey);
       findings.push('unsafe-provider-metadata');
+      findings.push(...keyFindings);
       continue;
     }
 
     const textFindings = findingsForText(metadataValueText(value));
     if (textFindings.length > 0) {
-      removedKeys.push(key);
+      removedKeys.push(removedKey);
       findings.push(...textFindings);
       continue;
     }
@@ -320,7 +327,8 @@ function buildSampleBatch() {
           invoiceRef: 'inv-private-compute',
           plan: 'institution-compute',
           projectTitle: 'Alzheimer single-cell pilot',
-          collaboratorHandle: '@lab-private-reviewer'
+          collaboratorHandle: '@lab-private-reviewer',
+          'GSE-private-cohort': 'restricted metadata field name'
         },
         lineItems: [
           {

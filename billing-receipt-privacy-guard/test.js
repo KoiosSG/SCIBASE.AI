@@ -85,6 +85,44 @@ function testNestedAllowedMetadataStillScansPrivateContext() {
   assert.equal(Object.prototype.hasOwnProperty.call(receipt.providerMetadata, 'accountRef'), false);
 }
 
+function testUnsafeProviderMetadataKeyNamesAreRedacted() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-metadata-key-leak',
+      invoiceId: 'inv-metadata-key-leak',
+      customerId: 'customer-lab-011',
+      currency: 'USD',
+      totalCents: 18000,
+      providerMetadata: {
+        accountRef: 'acct-lab-011',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-metadata-key-leak',
+        plan: 'lab-pro',
+        'GSE-private-cohort': 'metadata field name carries restricted context'
+      },
+      lineItems: [
+        {
+          id: 'line-platform-subscription-f',
+          description: 'Lab Pro monthly subscription',
+          usageCategory: 'subscription',
+          quantity: 1,
+          unit: 'month',
+          amountCents: 18000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('restricted-dataset-reference'), true);
+  assert.equal(receipt.removedMetadataKeys.includes('metadata-key-redacted-1'), true);
+  assert.equal(JSON.stringify(result).includes('GSE-private'), false);
+}
+
 function testCustomerFacingLineItemFieldsAreRedacted() {
   const batch = buildSampleBatch();
   batch.receipts = [
@@ -367,6 +405,7 @@ const tests = [
   testPrivateResearchContextIsRedactedBeforeReceiptDelivery,
   testProviderMetadataAllowlistBlocksOverSpecificFields,
   testNestedAllowedMetadataStillScansPrivateContext,
+  testUnsafeProviderMetadataKeyNamesAreRedacted,
   testCustomerFacingLineItemFieldsAreRedacted,
   testCustomerFacingReceiptIdentifiersAreRedacted,
   testRedactedReceiptIdentifiersRemainDistinct,

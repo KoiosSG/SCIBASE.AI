@@ -9,12 +9,12 @@ Generated: 2026-05-28T09:00:00Z
 - Held receipts: 1
 - Remediation actions: 1
 - Total cents reviewed: 152400
-- Audit digest: sha256:20bea339360007ff72444466bdcc632050a108e5d9a63ded5838c5cd951d4d63
+- Audit digest: sha256:08e21ce3fc6915ed223f64220fdcc534986805530e3a1169f3d73ebe8860930f
 
 ## Receipt Decisions
 
 - receipt-safe-lab-plan: deliver-receipt, findings: none
-- receipt-private-compute: hold-for-finance-review, findings: private-research-context, restricted-dataset-reference, unsafe-provider-metadata
+- receipt-private-compute: hold-for-finance-review, findings: collaborator-identifier, private-research-context, restricted-dataset-reference, unsafe-provider-metadata
 
 ## Remediation Actions
 

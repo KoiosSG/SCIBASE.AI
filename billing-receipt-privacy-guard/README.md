@@ -2,7 +2,7 @@
 
 This module adds a focused Revenue Infrastructure slice for SCIBASE issue #20. It validates customer-facing invoices, receipts, and payment-provider metadata before billing artifacts leave SCIBASE.
 
-The guard detects private research project context, restricted dataset references, collaborator identifiers, grant-sensitive phrases, unsafe receipt identifiers, unsafe customer-facing envelope fields, unsafe monetary or quantity fields, unsafe line-item fields, and unsafe provider metadata, including nested provider metadata values. Missing provider metadata is treated as an empty provider packet rather than crashing receipt review. Safe receipts remain deliverable, while unsafe receipts are held for finance review with redacted replacement identifiers, safe currency labels, replacement line items, and deterministic audit evidence.
+The guard detects private research project context, restricted dataset references, collaborator identifiers, grant-sensitive phrases, unsafe receipt identifiers, unsafe customer-facing envelope fields, unsafe monetary or quantity fields, unsafe line-item fields, and unsafe provider metadata, including nested provider metadata values and provider metadata key names. Missing provider metadata is treated as an empty provider packet rather than crashing receipt review. Safe receipts remain deliverable, while unsafe receipts are held for finance review with redacted replacement identifiers, safe currency labels, replacement line items, metadata-key redaction handles, and deterministic audit evidence.
 
 ## Run
 
