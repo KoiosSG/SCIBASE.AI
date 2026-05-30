@@ -187,6 +187,31 @@ function testInvalidChecksumDoesNotCountAsDurableIdentifier() {
   assert.equal(packet.referenceSignals.exportable, false);
 }
 
+function testDoiPlaceholderDoesNotCountAsDurableIdentifier() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-invalid-doi',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'dataset-invalid-doi',
+        kind: 'linked_dataset',
+        target: 'https://data.example.invalid/lab-export.csv',
+        checksum: '',
+        doi: 'pending',
+        version: '',
+        license: 'CC-BY-4.0',
+        attribution: 'Example Lab',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['MISSING_DURABLE_IDENTIFIER']);
+  assert.ok(packet.actions.includes('add_checksum_or_doi:dataset-invalid-doi'));
+  assert.equal(packet.referenceSignals.exportable, false);
+}
+
 function testFutureDatedVerificationEvidenceIsNotFresh() {
   const packet = assessExternalReferences({
     repositoryId: 'repo-reference-future-verification',
@@ -338,6 +363,7 @@ const tests = [
   testStagesReferencesMissingLicenseAttributionOnly,
   testFloatingVersionAliasDoesNotCountAsDurableIdentifier,
   testInvalidChecksumDoesNotCountAsDurableIdentifier,
+  testDoiPlaceholderDoesNotCountAsDurableIdentifier,
   testFutureDatedVerificationEvidenceIsNotFresh,
   testFutureDatedApiSnapshotDoesNotCountAsPinnedEvidence,
   testInvalidApiSnapshotChecksumDoesNotCountAsPinnedEvidence,

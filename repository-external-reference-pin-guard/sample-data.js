@@ -20,7 +20,7 @@ const riskyRepository = {
       kind: 'linked_dataset',
       target: 'https://data.example.invalid/lab-export.csv',
       checksum: 'pending',
-      doi: '',
+      doi: 'pending',
       license: 'CC-BY-4.0',
       attribution: 'Example Lab',
       lastVerifiedAt: '2025-01-15T08:00:00Z'

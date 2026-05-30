@@ -92,7 +92,7 @@ function needsDurableIdentifier(reference) {
 }
 
 function hasDurableIdentifier(reference) {
-  return hasValidChecksum(reference.checksum) || hasText(reference.doi) || hasImmutableVersion(reference.version);
+  return hasValidChecksum(reference.checksum) || hasValidDoi(reference.doi) || hasImmutableVersion(reference.version);
 }
 
 function hasValidChecksum(checksum) {
@@ -102,6 +102,12 @@ function hasValidChecksum(checksum) {
 
   const algorithm = match[1].toLowerCase();
   return match[2].length === CHECKSUM_HEX_LENGTHS[algorithm];
+}
+
+function hasValidDoi(doi) {
+  if (!hasText(doi)) return false;
+  const normalized = doi.trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, '');
+  return /^10\.\d{4,9}\/\S+$/i.test(normalized);
 }
 
 function hasImmutableVersion(version) {

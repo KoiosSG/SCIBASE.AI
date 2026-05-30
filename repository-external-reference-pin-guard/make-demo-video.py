@@ -35,7 +35,7 @@ draw.text((48, 26), "Repository External Reference Pin Guard", fill="#ffffff", f
 cards = [
     ("hold_repository_release", "#991b1b", "Blocks floating git refs, auth-only APIs, stale dataset evidence"),
     ("stage_reference_metadata_revision", "#a16207", "Stages pinned references that still need license or attribution"),
-    ("release_repository_references", "#047857", "Allows DOI/export release only with immutable pins and checksums"),
+    ("release_repository_references", "#047857", "Allows DOI/export release only with immutable pins, parseable DOIs, and checksums"),
 ]
 
 for index, (status, color, description) in enumerate(cards):
