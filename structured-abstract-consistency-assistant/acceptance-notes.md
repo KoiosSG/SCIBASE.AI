@@ -19,6 +19,7 @@ Expected evidence:
 - Result-direction checks block abstracts that describe worse or harmful results as improvements.
 - Result-direction checks also block abstracts that describe improved results as worse, harmful, or no-effect.
 - Result-section certainty overclaims such as statistically significant or clinically meaningful are blocked when evidence is exploratory or confidence intervals cross null.
+- Conclusion-section certainty overclaims such as statistically significant or clinically meaningful are blocked when evidence is exploratory or confidence intervals cross null.
 - Conclusion-direction checks block reviewer-facing conclusion benefit claims when the result packet records no effect, worse outcomes, or harm.
 - Conclusion-direction checks block safety-benefit claims such as safe or well tolerated when adverse-outcome evidence worsens.
 - Conclusion-direction checks block negated safety-concern claims such as no safety concerns when adverse-outcome evidence worsens.
@@ -28,6 +29,7 @@ Expected evidence:
 - Accurate adverse-outcome wording such as increased adverse events is not mistaken for a benefit claim when the result packet also records a worse direction.
 - `reports/revision-packet.json` stages an incomplete but otherwise evidence-aligned abstract for author revision.
 - `reports/result-certainty-packet.json` holds an abstract whose results overstate uncertain or null-crossing evidence.
+- `reports/conclusion-certainty-packet.json` holds an abstract whose conclusion overstates uncertain or null-crossing evidence.
 - `reports/clean-packet.json` releases a consistent structured abstract with monitoring.
 - `reports/abstract-consistency-report.md` summarizes lanes and finding codes.
 - `reports/summary.svg` provides a visual review packet.

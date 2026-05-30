@@ -346,6 +346,37 @@ function testBlocksResultCertaintyClaimWhenEvidenceCrossesNull() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksConclusionCertaintyClaimWhenEvidenceCrossesNull() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-conclusion-certainty-overclaim',
+    assessedAt: '2026-05-30T03:35:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant provides a statistically significant and clinically meaningful improvement but requires validation.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: true
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['confidence interval crosses null']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['CONCLUSION_OVERSTATES_EVIDENCE']);
+  assert.ok(packet.actions.includes('tone_down_conclusion:ms-abstract-conclusion-certainty-overclaim'));
+  assert.equal(packet.abstractSignals.limitationsBalanced, false);
+}
+
 function testBlocksWorseOutcomeClaimWhenResultsShowImprovement() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-wording-drift',
@@ -555,6 +586,7 @@ const tests = [
   testBlocksSafetyBenefitConclusionWhenAdverseResultsWorsen,
   testBlocksNegatedSafetyConcernConclusionWhenAdverseResultsWorsen,
   testBlocksResultCertaintyClaimWhenEvidenceCrossesNull,
+  testBlocksConclusionCertaintyClaimWhenEvidenceCrossesNull,
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,

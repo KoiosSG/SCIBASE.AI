@@ -314,7 +314,10 @@ function formatDirection(direction) {
 }
 
 function overstatesConclusion(value) {
-  return /\b(definitively|proves|all|ready for clinical deployment|guarantees|always)\b/i.test(value);
+  return (
+    overstatesResultCertainty(value)
+    || /\b(definitively|proves|all|ready for clinical deployment|guarantees|always)\b/i.test(value)
+  );
 }
 
 function hasLimitations(manuscript, conclusion) {

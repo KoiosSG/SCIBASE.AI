@@ -70,6 +70,30 @@ const resultCertaintyOverclaimManuscript = {
   limitations: ['confidence interval crosses null']
 };
 
+const conclusionCertaintyOverclaimManuscript = {
+  manuscriptId: 'ms-abstract-conclusion-certainty-overclaim',
+  assessedAt: '2026-05-30T03:35:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+    conclusions: 'The assistant provides a statistically significant and clinically meaningful improvement but requires validation.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: true
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['confidence interval crosses null']
+};
+
 const cleanManuscript = {
   manuscriptId: 'ms-abstract-clean',
   assessedAt: '2026-05-28T10:20:00Z',
@@ -98,5 +122,6 @@ module.exports = {
   blockedManuscript,
   revisionManuscript,
   resultCertaintyOverclaimManuscript,
+  conclusionCertaintyOverclaimManuscript,
   cleanManuscript
 };
