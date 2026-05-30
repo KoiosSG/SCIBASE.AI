@@ -81,7 +81,10 @@ function assessResultsAlignment(manuscript) {
 
   if (
     results.primaryEndpoint
-    && !abstractResults.includes(normalize(results.primaryEndpoint))
+    && (
+      !abstractResults.includes(normalize(results.primaryEndpoint))
+      || phraseIsNegated(abstractResults, results.primaryEndpoint)
+    )
   ) {
     findings.push(finding({
       code: 'ENDPOINT_MISMATCH',

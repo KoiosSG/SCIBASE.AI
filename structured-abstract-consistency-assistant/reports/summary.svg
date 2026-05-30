@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1110" viewBox="0 0 1200 1110">
-  <rect width="1200" height="1110" fill="#eef2f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1184" viewBox="0 0 1200 1184">
+  <rect width="1200" height="1184" fill="#eef2f7"/>
   <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Structured Abstract Consistency Assistant</text>
   <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Abstracts are checked against counts, methods, results, and limitations before AI review release.</text>
 
@@ -24,58 +24,64 @@
       <g transform="translate(48 330)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-negated-primary-endpoint</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 1 | digest e4f5ec6d6a38ebb6</text>
+      </g>
+      <g transform="translate(48 404)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-result-certainty-overclaim</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 1 | digest 01c5f5aec02725ae</text>
       </g>
-      <g transform="translate(48 404)">
+      <g transform="translate(48 478)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-mixed-certainty-overclaim</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 1 | digest dd1c92bcd029b30b</text>
       </g>
-      <g transform="translate(48 478)">
+      <g transform="translate(48 552)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-conclusion-certainty-overclaim</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 1 | digest eaf994f1eca77f2d</text>
       </g>
-      <g transform="translate(48 552)">
+      <g transform="translate(48 626)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-weak-limitation-hedge</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 1 | digest 299309042661dd81</text>
       </g>
-      <g transform="translate(48 626)">
+      <g transform="translate(48 700)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-percentage-sample-size</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest 7bf44773bed09622</text>
       </g>
-      <g transform="translate(48 700)">
+      <g transform="translate(48 774)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-decimal-sample-size</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest ae11fb7f54d7cefc</text>
       </g>
-      <g transform="translate(48 774)">
+      <g transform="translate(48 848)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-duration-sample-size</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest d49d221615891315</text>
       </g>
-      <g transform="translate(48 848)">
+      <g transform="translate(48 922)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-hyphenated-measurement-sample-size</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest 41e20b22c8bcbc94</text>
       </g>
-      <g transform="translate(48 922)">
+      <g transform="translate(48 996)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-ordinal-sample-size</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 2 | digest ea3765bb4adaa5a7</text>
       </g>
-      <g transform="translate(48 996)">
+      <g transform="translate(48 1070)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#15803d"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-clean</text>

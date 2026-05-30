@@ -70,6 +70,30 @@ const negatedDesignManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const negatedPrimaryEndpointManuscript = {
+  manuscriptId: 'ms-abstract-negated-primary-endpoint',
+  assessedAt: '2026-05-30T15:05:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+    results: 'The primary endpoint was not comment triage time; reviewer load improved in 96 manuscripts.',
+    conclusions: 'The assistant may reduce reviewer load in similar retrospective settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: false
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const resultCertaintyOverclaimManuscript = {
   manuscriptId: 'ms-abstract-result-certainty-overclaim',
   assessedAt: '2026-05-30T02:55:00Z',
@@ -314,6 +338,7 @@ module.exports = {
   blockedManuscript,
   revisionManuscript,
   negatedDesignManuscript,
+  negatedPrimaryEndpointManuscript,
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,

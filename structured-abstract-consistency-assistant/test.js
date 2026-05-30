@@ -126,6 +126,37 @@ function testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint() {
   assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-generic-endpoint'));
 }
 
+function testBlocksNegatedPrimaryEndpointStatement() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-negated-primary-endpoint',
+    assessedAt: '2026-05-30T15:05:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint was not comment triage time; reviewer load improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce reviewer load in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['ENDPOINT_MISMATCH']);
+  assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-negated-primary-endpoint'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testBlocksNegatedMethodsDesignStatement() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-negated-methods-design',
@@ -863,6 +894,7 @@ const tests = [
   testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence,
   testPreservesSameCodeFindingsForDifferentEvidenceTargets,
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
+  testBlocksNegatedPrimaryEndpointStatement,
   testBlocksNegatedMethodsDesignStatement,
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
