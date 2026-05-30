@@ -71,6 +71,12 @@ function duplicatePublishedCriterionIds(round) {
   );
 }
 
+function hasMissingPublishedCriterionIds(round) {
+  return round.criteria.some(
+    (criterion) => typeof criterion.id !== 'string' || criterion.id.trim().length === 0
+  );
+}
+
 function reviewerIdFor(review) {
   return typeof review.reviewerId === 'string' ? review.reviewerId.trim() : '';
 }
@@ -197,6 +203,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('duplicate-published-criterion');
   }
 
+  if (hasMissingPublishedCriterionIds(round)) {
+    reasons.push('missing-published-criterion-id');
+  }
+
   if (duplicateReviewerIds.length > 0) {
     reasons.push('duplicate-reviewer-score-evidence');
   }
@@ -273,6 +283,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('duplicate-published-criterion')) {
     return 'publish-unique-screening-criteria';
+  }
+
+  if (reasons.includes('missing-published-criterion-id')) {
+    return 'publish-complete-screening-criteria';
   }
 
   if (reasons.includes('criteria-weight-total-invalid')) {
@@ -372,6 +386,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('anonymous-screening-leak') ||
         decision.reasons.includes('reviewer-conflict') ||
         decision.reasons.includes('duplicate-published-criterion') ||
+        decision.reasons.includes('missing-published-criterion-id') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('unpublished-screening-criterion') ||

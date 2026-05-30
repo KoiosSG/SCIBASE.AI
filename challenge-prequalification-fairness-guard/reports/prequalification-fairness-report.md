@@ -25,6 +25,14 @@ Generated: 2026-05-28T08:00:00Z
 - remediate-applicant-sponsor-alumni: replace-conflicted-reviewer (high)
 - remediate-applicant-missing-reviewer-identity: complete-prequalification-evidence (high)
 
+## Missing Criterion Identifier Packet
+
+- Applicant: applicant-missing-criterion-id
+- Decision: hold-for-fairness-review
+- Reasons: missing-published-criterion-id
+- Remediation: publish-complete-screening-criteria
+- Audit digest: sha256:b9df8bf4b4cf0ab259501a17673e27b1537153778f87a19190f026759151b27e
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, identity providers, private workspaces, sponsor systems, or external APIs.
