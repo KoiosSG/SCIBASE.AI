@@ -44,6 +44,10 @@ function findingsForText(text) {
   return PRIVATE_PATTERNS.filter((item) => item.pattern.test(text)).map((item) => item.id);
 }
 
+function evidenceList(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 function privacyText(value) {
   if (value === undefined || value === null) {
     return '';
@@ -178,7 +182,7 @@ function metadataValueText(value) {
 }
 
 function evaluateReceipt(receipt, index) {
-  const redactedLineItems = receipt.lineItems.map((lineItem, index) => sanitizeLineItem(lineItem, index));
+  const redactedLineItems = evidenceList(receipt.lineItems).map((lineItem, index) => sanitizeLineItem(lineItem, index));
   const lineFindings = redactedLineItems.flatMap((lineItem) => lineItem.findings);
   const identifierFindings = receiptIdentifierFindings(receipt);
   const envelopeFindings = receiptEnvelopeFindings(receipt);
@@ -245,7 +249,7 @@ function remediationAction(receipt) {
 }
 
 function evaluateReceiptPrivacy(batch) {
-  const receipts = batch.receipts.map((receipt, index) => evaluateReceipt(receipt, index));
+  const receipts = evidenceList(batch.receipts).map((receipt, index) => evaluateReceipt(receipt, index));
   const remediationActions = receipts
     .filter((receipt) => receipt.decision === 'hold-for-finance-review')
     .map((receipt) => ({

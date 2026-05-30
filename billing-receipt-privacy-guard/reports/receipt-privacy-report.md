@@ -20,6 +20,10 @@ Generated: 2026-05-28T09:00:00Z
 
 - remediate-receipt-private-compute: replace-private-billing-fields-before-delivery (high)
 
+## Sparse Billing Batch Guard
+
+Empty or partially populated provider batches that omit receipt or line-item collections produce deterministic empty review evidence instead of runtime failures. The empty batch fixture reviewed 0 receipts and generated 0 remediation actions.
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, customer systems, private workspaces, institutional finance tools, or external APIs.

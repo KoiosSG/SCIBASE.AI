@@ -299,6 +299,52 @@ function testMissingProviderMetadataIsTreatedAsEmptyMetadata() {
   assert.equal(receipt.findings.length, 0);
 }
 
+function testMissingReceiptListProducesEmptyReviewPacket() {
+  const batch = {
+    batchId: 'billing-empty-review-20',
+    generatedAt: '2026-05-30T12:00:00Z'
+  };
+
+  const result = evaluateReceiptPrivacy(batch);
+
+  assert.deepEqual(result.receipts, []);
+  assert.deepEqual(result.remediationActions, []);
+  assert.equal(result.summary.deliverableReceipts, 0);
+  assert.equal(result.summary.heldReceipts, 0);
+  assert.equal(result.summary.remediationActions, 0);
+  assert.equal(result.summary.totalCentsReviewed, 0);
+  assert.ok(result.auditDigest.startsWith('sha256:'));
+}
+
+function testMissingLineItemsAreTreatedAsEmptyReceiptLines() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-missing-line-items',
+      invoiceId: 'inv-missing-line-items',
+      customerId: 'customer-lab-012',
+      currency: 'USD',
+      totalCents: 9900,
+      providerMetadata: {
+        accountRef: 'acct-lab-012',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-missing-line-items',
+        plan: 'lab-pro'
+      }
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+
+  assert.equal(receipt.decision, 'deliver-receipt');
+  assert.deepEqual(receipt.customerCopy.lineItems, []);
+  assert.deepEqual(receipt.redactedLineItems, []);
+  assert.equal(result.summary.deliverableReceipts, 1);
+  assert.equal(result.summary.heldReceipts, 0);
+  assert.equal(result.summary.totalCentsReviewed, 9900);
+}
+
 function testCustomerFacingCurrencyLabelsAreRedacted() {
   const batch = buildSampleBatch();
   batch.receipts = [
@@ -410,6 +456,8 @@ const tests = [
   testCustomerFacingReceiptIdentifiersAreRedacted,
   testRedactedReceiptIdentifiersRemainDistinct,
   testMissingProviderMetadataIsTreatedAsEmptyMetadata,
+  testMissingReceiptListProducesEmptyReviewPacket,
+  testMissingLineItemsAreTreatedAsEmptyReceiptLines,
   testCustomerFacingCurrencyLabelsAreRedacted,
   testCustomerFacingMoneyAndQuantityFieldsAreRedacted,
   testCustomerCopyRemainsUsefulAfterRedaction,

@@ -11,6 +11,7 @@
 - Redacts unsafe customer-facing currency labels when they carry restricted dataset context.
 - Redacts unsafe customer-facing totals, quantities, and line-item amounts when they carry restricted dataset context.
 - Redacts customer-facing line-item identifiers and units when they carry restricted dataset context.
+- Treats omitted receipt and line-item collections as empty billing evidence instead of crashing receipt review.
 - Preserves customer-useful totals, billing period, plan, and invoice references after redaction.
 
 ## AI Compute Billing

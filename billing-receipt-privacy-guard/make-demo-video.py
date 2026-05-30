@@ -29,7 +29,8 @@ def draw_frame_with_pillow():
   draw.text((96, 190), "Safe receipts keep only allowed provider metadata", fill="#dff5d5", font=body_font)
   draw.text((96, 248), "Private project and dataset details are redacted", fill="#dff5d5", font=body_font)
   draw.text((96, 306), "Unsafe receipts are held for finance review", fill="#dff5d5", font=body_font)
-  draw.text((96, 402), "Synthetic data only. No payment, customer, or workspace systems are called.", fill="#ffd37a", font=note_font)
+  draw.text((96, 364), "Sparse provider batches produce deterministic empty evidence", fill="#dff5d5", font=body_font)
+  draw.text((96, 456), "Synthetic data only. No payment, customer, or workspace systems are called.", fill="#ffd37a", font=note_font)
 
   image.save(FRAME)
 

@@ -22,6 +22,7 @@ Validation coverage:
 - customer-facing totals, quantities, and line-item amounts are replaced with `null` when they carry restricted dataset context
 - customer-facing line-item identifiers and units are redacted when they contain restricted dataset context
 - missing provider metadata is treated as an empty provider packet instead of crashing receipt review
+- missing receipt and line-item collections are treated as empty billing evidence instead of crashing receipt review
 - unsafe provider metadata keys are removed before delivery
 - unsafe provider metadata key names are redacted when the key itself carries restricted dataset context
 - allowlisted provider metadata keys are still scanned when values are structured or nested
