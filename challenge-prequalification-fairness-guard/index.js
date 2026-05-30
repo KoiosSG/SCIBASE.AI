@@ -94,6 +94,23 @@ function applicantIdentityIsMissing(applicant) {
   return !applicantIdFor(applicant);
 }
 
+function duplicateApplicantIds(round) {
+  const applicantCounts = applicantListFor(round).reduce((counts, applicant) => {
+    const applicantId = applicantIdFor(applicant);
+    if (!applicantId) {
+      return counts;
+    }
+    counts[applicantId] = (counts[applicantId] || 0) + 1;
+    return counts;
+  }, Object.create(null));
+
+  return uniqueSorted(
+    Object.entries(applicantCounts)
+      .filter(([, count]) => count > 1)
+      .map(([applicantId]) => applicantId)
+  );
+}
+
 function reviewApplicantIdFor(review) {
   return typeof review.applicantId === 'string' ? review.applicantId.trim() : review.applicantId;
 }
@@ -259,6 +276,7 @@ function appealStatus(applicant, round) {
 function reasonsForApplicant(applicant, reviews, round) {
   const criteriaIds = publicCriteriaIds(round);
   const duplicateCriterionIds = duplicatePublishedCriterionIds(round);
+  const duplicateApplicantIdentities = duplicateApplicantIds(round);
   const nonConflictedReviews = countableNonConflictedReviews(reviews);
   const duplicateReviewerIds = duplicateNonConflictedReviewerIds(reviews);
   const applicantAppealStatus = appealStatus(applicant, round);
@@ -302,6 +320,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (applicantIdentityIsMissing(applicant)) {
     reasons.push('missing-applicant-identity');
+  }
+
+  if (duplicateApplicantIdentities.includes(applicantIdFor(applicant))) {
+    reasons.push('duplicate-applicant-identity');
   }
 
   if (criteriaWeightTotal(round) !== 100) {
@@ -455,6 +477,10 @@ function remediationAction(applicant, reasons) {
     return 'complete-prequalification-evidence';
   }
 
+  if (reasons.includes('duplicate-applicant-identity')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('inconsistent-threshold-decision')) {
     return 'reconcile-score-threshold-decision';
   }
@@ -534,6 +560,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('missing-review-list') ||
         decision.reasons.includes('missing-applicant-list') ||
         decision.reasons.includes('missing-applicant-identity') ||
+        decision.reasons.includes('duplicate-applicant-identity') ||
         decision.reasons.includes('unpublished-screening-criterion') ||
         decision.reasons.includes('criteria-weight-total-invalid') ||
         decision.reasons.includes('criteria-weight-value-invalid') ||

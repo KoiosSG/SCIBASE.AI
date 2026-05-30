@@ -73,6 +73,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-prequalification-evidence
 - Audit digest: sha256:85aa774922f5707139444c13c705a88af31757014d98a8767b0cbe1725c4cf7c
 
+## Duplicate Applicant Identity Packet
+
+- Applicant: applicant-duplicate
+- Decision: hold-for-fairness-review
+- Reasons: duplicate-applicant-identity
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:3f23ed40ab5aa7c06e33ca3dc3b149bae1d550f3764425c6955cedf04beb01e0
+
 ## Missing Review List Packet
 
 - Applicant: applicant-missing-review-list

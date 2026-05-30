@@ -670,6 +670,64 @@ function testMissingApplicantIdentityHoldsPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testDuplicateApplicantIdentitiesHoldPrequalificationRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: ' applicant-duplicate ',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    },
+    {
+      id: 'applicant-duplicate',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['duplicate entry should be resolved before screening'],
+      appealDueAt: '2026-06-04T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-duplicate',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 94
+      }
+    },
+    {
+      applicantId: 'applicant-duplicate',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 93
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decisions = result.decisions.filter(
+    (decision) => decision.applicantId === 'applicant-duplicate'
+  );
+  const action = byId(result.remediationActions, 'remediate-applicant-duplicate');
+
+  assert.equal(decisions.length, 2);
+  assert.equal(decisions.every((decision) => decision.decision === 'hold-for-fairness-review'), true);
+  assert.equal(decisions.every((decision) => decision.reasons.includes('duplicate-applicant-identity')), true);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testMissingRejectionReasonListHoldsWithoutCrashing() {
   const round = buildSampleRound();
   round.applicants = [
@@ -1033,6 +1091,7 @@ const tests = [
   testInvalidReviewerScoreValuesHoldPrequalificationRound,
   testInvalidSponsorDecisionHoldsPrequalificationRound,
   testMissingApplicantIdentityHoldsPrequalificationRound,
+  testDuplicateApplicantIdentitiesHoldPrequalificationRound,
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testBlankRejectionReasonTextHoldsRejectedApplicant,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,

@@ -12,6 +12,7 @@ const invalidScoreResult = evaluatePrequalificationRound(buildInvalidReviewerSco
 const invalidQuorumResult = evaluatePrequalificationRound(buildInvalidReviewerQuorumRound());
 const invalidSponsorDecisionResult = evaluatePrequalificationRound(buildInvalidSponsorDecisionRound());
 const missingApplicantIdentityResult = evaluatePrequalificationRound(buildMissingApplicantIdentityRound());
+const duplicateApplicantIdentityResult = evaluatePrequalificationRound(buildDuplicateApplicantIdentityRound());
 const missingReviewListResult = evaluatePrequalificationRound(buildMissingReviewListRound());
 const missingCriteriaListResult = evaluatePrequalificationRound(buildMissingCriteriaListRound());
 const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApplicantListRound());
@@ -29,6 +30,10 @@ const invalidSponsorDecisionPacketPath = path.join(
 const missingApplicantIdentityPacketPath = path.join(
   reportsDir,
   'missing-applicant-identity-packet.json'
+);
+const duplicateApplicantIdentityPacketPath = path.join(
+  reportsDir,
+  'duplicate-applicant-identity-packet.json'
 );
 const missingReviewListPacketPath = path.join(reportsDir, 'missing-review-list-packet.json');
 const missingCriteriaListPacketPath = path.join(reportsDir, 'missing-criteria-list-packet.json');
@@ -49,6 +54,10 @@ fs.writeFileSync(
 fs.writeFileSync(
   missingApplicantIdentityPacketPath,
   `${JSON.stringify(missingApplicantIdentityResult, null, 2)}\n`
+);
+fs.writeFileSync(
+  duplicateApplicantIdentityPacketPath,
+  `${JSON.stringify(duplicateApplicantIdentityResult, null, 2)}\n`
 );
 fs.writeFileSync(missingReviewListPacketPath, `${JSON.stringify(missingReviewListResult, null, 2)}\n`);
 fs.writeFileSync(
@@ -144,6 +153,14 @@ ${actions}
 - Remediation: ${missingApplicantIdentityResult.remediationActions[0].action}
 - Audit digest: ${missingApplicantIdentityResult.auditDigest}
 
+## Duplicate Applicant Identity Packet
+
+- Applicant: ${duplicateApplicantIdentityResult.decisions[0].applicantId}
+- Decision: ${duplicateApplicantIdentityResult.decisions[0].decision}
+- Reasons: ${duplicateApplicantIdentityResult.decisions[0].reasons.join(', ')}
+- Remediation: ${duplicateApplicantIdentityResult.remediationActions[0].action}
+- Audit digest: ${duplicateApplicantIdentityResult.auditDigest}
+
 ## Missing Review List Packet
 
 - Applicant: ${missingReviewListResult.decisions[0].applicantId}
@@ -206,6 +223,7 @@ console.log(`Wrote ${path.relative(__dirname, invalidScorePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidQuorumPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidSponsorDecisionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingApplicantIdentityPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, duplicateApplicantIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingReviewListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingCriteriaListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`);
@@ -468,6 +486,53 @@ function buildMissingApplicantIdentityRound() {
     },
     {
       applicantId: '   ',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 93
+      }
+    }
+  ];
+  return round;
+}
+
+function buildDuplicateApplicantIdentityRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: ' applicant-duplicate ',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    },
+    {
+      id: 'applicant-duplicate',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['duplicate entry should be resolved before screening'],
+      appealDueAt: '2026-06-04T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-duplicate',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 94
+      }
+    },
+    {
+      applicantId: 'applicant-duplicate',
       reviewerId: 'reviewer-independent-b',
       anonymousScreeningObserved: true,
       conflict: false,
