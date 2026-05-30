@@ -236,8 +236,10 @@ function mentionsSampleSize(text, sampleSize) {
   while ((match = countPattern.exec(comparableText)) !== null) {
     const countStart = match.index + match[1].length;
     const countEnd = countStart + expected.length;
+    const previousCharacter = comparableText[countStart - 1] || '';
     const nextCharacter = comparableText[countEnd] || '';
     const nextMeaningfulCharacter = comparableText.slice(countEnd).trimStart()[0] || '';
+    if (previousCharacter === '.') continue;
     if (nextMeaningfulCharacter === '%') continue;
     if (nextCharacter === '.' && /\d/.test(comparableText[countEnd + 1] || '')) continue;
     return true;

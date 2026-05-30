@@ -166,6 +166,30 @@ const percentageSampleSizeManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const decimalSampleSizeManuscript = {
+  manuscriptId: 'ms-abstract-decimal-sample-size',
+  assessedAt: '2026-05-30T10:10:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated manuscripts in a retrospective cohort; the baseline ratio was 0.96.',
+    results: 'The primary endpoint, comment triage time, had an effect estimate of 0.96.',
+    conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: false
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const cleanManuscript = {
   manuscriptId: 'ms-abstract-clean',
   assessedAt: '2026-05-28T10:20:00Z',
@@ -198,5 +222,6 @@ module.exports = {
   conclusionCertaintyOverclaimManuscript,
   weakLimitationHedgeManuscript,
   percentageSampleSizeManuscript,
+  decimalSampleSizeManuscript,
   cleanManuscript
 };

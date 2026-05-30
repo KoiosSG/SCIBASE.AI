@@ -575,6 +575,44 @@ function testRejectsPercentagesAsSampleSizeEvidence() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testRejectsDecimalValuesAsSampleSizeEvidence() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-decimal-sample-size',
+    assessedAt: '2026-05-30T10:10:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated manuscripts in a retrospective cohort; the baseline ratio was 0.96.',
+      results: 'The primary endpoint, comment triage time, had an effect estimate of 0.96.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), [
+    'SAMPLE_SIZE_MISMATCH',
+    'SAMPLE_SIZE_MISMATCH'
+  ]);
+  assert.deepEqual(findingTargets(packet, 'SAMPLE_SIZE_MISMATCH'), [
+    'methods.sampleSize',
+    'results.sampleSize'
+  ]);
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testRequiresLimitationLanguageInStructuredAbstractConclusion() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-limitation-outside-abstract',
@@ -694,6 +732,7 @@ const tests = [
   testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,
   testRejectsPercentagesAsSampleSizeEvidence,
+  testRejectsDecimalValuesAsSampleSizeEvidence,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,
   testAllowsConsistentStructuredAbstractWithStableDigest

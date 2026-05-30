@@ -17,6 +17,7 @@ Expected evidence:
 - Same-code findings are preserved when methods and results disagree on different evidence targets.
 - Comma-formatted manuscript counts such as `1,200` are accepted as matching numeric sample-size evidence.
 - Percentages such as `96%` are rejected as sample-size evidence unless the actual manuscript/participant count is also stated.
+- Decimal values such as `0.96` are rejected as sample-size evidence unless the actual manuscript/participant count is also stated.
 - Result-direction checks block abstracts that describe worse or harmful results as improvements.
 - Result-direction checks also block abstracts that describe improved results as worse, harmful, or no-effect.
 - Result-section certainty overclaims such as statistically significant or clinically meaningful are blocked when evidence is exploratory or confidence intervals cross null.
@@ -36,6 +37,7 @@ Expected evidence:
 - `reports/conclusion-certainty-packet.json` holds an abstract whose conclusion overstates uncertain or null-crossing evidence.
 - `reports/weak-limitation-packet.json` holds an abstract whose conclusion only weakly hedges uncertain evidence.
 - `reports/percentage-sample-size-packet.json` holds an abstract that uses percentage wording where required sample-size counts should appear.
+- `reports/decimal-sample-size-packet.json` holds an abstract that uses decimal effect-size wording where required sample-size counts should appear.
 - `reports/clean-packet.json` releases a consistent structured abstract with monitoring.
 - `reports/abstract-consistency-report.md` summarizes lanes and finding codes.
 - `reports/summary.svg` provides a visual review packet.
