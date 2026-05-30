@@ -150,6 +150,37 @@ function testInvalidContrastEvidenceBlocksRelease() {
   assert.ok(packet.actions.includes('provide_valid_contrast_evidence:contract-risk-score'));
 }
 
+function testMissingCriticalContrastEvidenceBlocksRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-missing-contrast-evidence',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:17:00Z',
+    widgets: [
+      {
+        id: 'contract-risk-without-colors',
+        type: 'metric',
+        title: 'Contract risk score',
+        critical: true,
+        keyboardReachable: true,
+        screenReaderLabel: 'Contract risk score across departments',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'blocked');
+  assert.deepEqual(codes(packet), ['INVALID_CONTRAST_EVIDENCE']);
+  assert.equal(packet.wcagSignals.perceivable, false);
+  assert.ok(packet.actions.includes('provide_valid_contrast_evidence:contract-risk-without-colors'));
+}
+
 function testShorthandHexContrastEvidenceRemainsValid() {
   const packet = assessDashboardRelease({
     dashboardId: 'enterprise-admin-shorthand-contrast',
@@ -222,6 +253,7 @@ const tests = [
   testNonCriticalLowContrastRequiresRemediationBeforeRelease,
   testPrivateDataInTableSummaryBlocksRelease,
   testInvalidContrastEvidenceBlocksRelease,
+  testMissingCriticalContrastEvidenceBlocksRelease,
   testShorthandHexContrastEvidenceRemainsValid,
   testMissingVisibleFocusIndicatorBlocksKeyboardRelease
 ];

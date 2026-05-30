@@ -154,8 +154,32 @@ const warningDashboard = {
   }
 };
 
+const missingContrastDashboard = {
+  dashboardId: 'enterprise-admin-missing-contrast-evidence',
+  institutionId: 'institution-redacted',
+  assessedAt: '2026-05-27T13:17:00Z',
+  widgets: [
+    {
+      id: 'contract-risk-without-colors',
+      type: 'metric',
+      title: 'Contract risk score',
+      critical: true,
+      keyboardReachable: true,
+      screenReaderLabel: 'Contract risk score across departments',
+      headingLevel: 2
+    }
+  ],
+  alerts: [],
+  exports: [],
+  motion: {
+    animatedCharts: [],
+    reducedMotionFallback: true
+  }
+};
+
 module.exports = {
   blockedDashboard,
   cleanDashboard,
-  warningDashboard
+  warningDashboard,
+  missingContrastDashboard
 };

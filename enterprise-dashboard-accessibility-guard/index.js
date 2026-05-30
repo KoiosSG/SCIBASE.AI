@@ -32,7 +32,14 @@ function assessVisualAndOperableComponents(dashboard) {
   const findings = [];
 
   for (const component of components) {
-    if (component.foreground && component.background) {
+    if (component.critical && (!component.foreground || !component.background)) {
+      findings.push(finding(
+        component,
+        'INVALID_CONTRAST_EVIDENCE',
+        'blocker',
+        'Critical component color contrast evidence must include foreground and background hex values before dashboard release.'
+      ));
+    } else if (component.foreground && component.background) {
       const contrast = contrastRatio(component.foreground, component.background);
       if (contrast === null) {
         findings.push(finding(

@@ -2,13 +2,19 @@ const fs = require('fs');
 const path = require('path');
 
 const { assessDashboardRelease } = require('./index');
-const { blockedDashboard, cleanDashboard, warningDashboard } = require('./sample-data');
+const {
+  blockedDashboard,
+  cleanDashboard,
+  warningDashboard,
+  missingContrastDashboard
+} = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
 fs.mkdirSync(reportsDir, { recursive: true });
 
 const packets = [
   ['blocked-packet.json', assessDashboardRelease(blockedDashboard)],
+  ['missing-contrast-packet.json', assessDashboardRelease(missingContrastDashboard)],
   ['clean-packet.json', assessDashboardRelease(cleanDashboard)],
   ['warning-packet.json', assessDashboardRelease(warningDashboard)]
 ];
@@ -62,8 +68,8 @@ function renderSvg(packetRows) {
   }).join('');
 
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360">',
-    '  <rect width="1200" height="360" fill="#e2e8f0"/>',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="432" viewBox="0 0 1200 432">',
+    '  <rect width="1200" height="432" fill="#e2e8f0"/>',
     '  <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#0f172a">Enterprise Dashboard Accessibility Guard</text>',
     '  <text x="48" y="80" font-size="16" font-family="Arial" fill="#334155">Institutional dashboards, exports, and webhook notices are gated before release.</text>',
     rows,
