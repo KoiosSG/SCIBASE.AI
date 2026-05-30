@@ -265,6 +265,32 @@ function testStagesImportWithUnsupportedSourceChannelForCuratorReview() {
   assert.deepEqual(packet.actions, ['require_curator_channel_review:import-unsupported-channel']);
 }
 
+function testMalformedImportBlockListIsStagedWithoutCrashing() {
+  const packet = assessImportBatch({
+    importId: 'import-malformed-block-list',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-30T12:10:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: TRUSTED_EXPORT_ATTESTATION
+    },
+    blocks: {
+      id: 'blk-not-an-array',
+      type: 'paragraph',
+      sectionId: 'methods',
+      anchor: 'malformed-block-list',
+      content: 'This malformed payload should not enter collaborative state directly.'
+    }
+  });
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_IMPORT_BLOCKS']);
+  assert.deepEqual(packet.sanitizedBlocks, []);
+  assert.deepEqual(packet.actions, ['require_curator_payload_review:import-malformed-block-list']);
+}
+
 function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   const packet = assessImportBatch({
     importId: 'import-anchor-collision',
@@ -589,6 +615,7 @@ const tests = [
   testStagesTrustedImportWithPlaceholderAttestationForCuratorReview,
   testStagesImportMissingSourceTrustMetadataForCuratorReview,
   testStagesImportWithUnsupportedSourceChannelForCuratorReview,
+  testMalformedImportBlockListIsStagedWithoutCrashing,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,

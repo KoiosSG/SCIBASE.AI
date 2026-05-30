@@ -1,18 +1,20 @@
 const crypto = require('crypto');
 
 function assessImportBatch(batch) {
+  const blocks = blockListFor(batch);
+  const batchFindings = assessBatchShape(batch);
   const sourceFindings = assessSource(batch);
-  const duplicateAnchorBlocks = findAnchorCollisionBlocks(batch.blocks || [], batch.existingAnchors || []);
+  const duplicateAnchorBlocks = findAnchorCollisionBlocks(blocks, batch.existingAnchors || []);
   const sanitizedBlocks = [];
   const blockFindings = [];
 
-  for (const block of batch.blocks || []) {
+  for (const block of blocks) {
     const { sanitizedBlock, findings } = assessBlock(block, batch, duplicateAnchorBlocks);
     sanitizedBlocks.push(sanitizedBlock);
     blockFindings.push(...findings);
   }
 
-  const findings = [...sourceFindings, ...blockFindings].sort(compareFindings);
+  const findings = [...batchFindings, ...sourceFindings, ...blockFindings].sort(compareFindings);
   const status = chooseStatus(findings);
   const packet = {
     importId: batch.importId,
@@ -28,6 +30,25 @@ function assessImportBatch(batch) {
 
   packet.auditDigest = digestPacket(packet);
   return packet;
+}
+
+function blockListFor(batch) {
+  return Array.isArray(batch.blocks) ? batch.blocks : [];
+}
+
+function assessBatchShape(batch) {
+  if (Array.isArray(batch.blocks)) {
+    return [];
+  }
+
+  return [
+    finding({
+      code: 'MALFORMED_IMPORT_BLOCKS',
+      severity: 'warning',
+      blockId: null,
+      message: 'Import payload is missing a valid block list for collaborative insertion.'
+    })
+  ];
 }
 
 function assessSource(batch) {
@@ -292,6 +313,7 @@ function buildActions(batch, findings) {
     if (item.code === 'UNTRUSTED_SOURCE') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_IMPORT_CHANNEL') actions.add(`require_curator_channel_review:${batch.importId}`);
+    if (item.code === 'MALFORMED_IMPORT_BLOCKS') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
     if (item.code === 'INVALID_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
   }

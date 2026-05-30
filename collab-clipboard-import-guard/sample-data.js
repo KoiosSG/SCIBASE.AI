@@ -138,6 +138,25 @@ const unsupportedChannelImport = {
   ]
 };
 
+const malformedBlockListImport = {
+  importId: 'import-malformed-block-list',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-30T12:10:00Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted',
+    signedAttestation: TRUSTED_EXPORT_ATTESTATION
+  },
+  blocks: {
+    id: 'blk-not-an-array',
+    type: 'paragraph',
+    sectionId: 'methods',
+    anchor: 'malformed-block-list',
+    content: 'This malformed payload should not enter collaborative state directly.'
+  }
+};
+
 const cleanTrustedImport = {
   importId: 'import-clean-zotero-note',
   workspaceId: 'workspace-paper-7',
@@ -228,6 +247,7 @@ module.exports = {
   trustedMissingAttestationImport,
   trustedPlaceholderAttestationImport,
   unsupportedChannelImport,
+  malformedBlockListImport,
   cleanTrustedImport,
   privateSourceOriginImport,
   lowercaseWindowsPathImport,

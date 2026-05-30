@@ -76,6 +76,7 @@ def main():
             [
                 "Stages partner-supplied documents for curator review",
                 "Stages trusted claims from unsupported import channels",
+                "Stages malformed payload shapes before any shared insertion",
                 "Watermarks reviewer preview instead of treating it as clean content",
             ],
         ),
