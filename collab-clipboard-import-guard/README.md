@@ -5,6 +5,7 @@ This module adds a focused issue #12 slice for the real-time collaborative resea
 It evaluates synthetic import batches for:
 
 - untrusted clipboard or file sources
+- missing or unsupported import channel metadata
 - missing or unrecognized source trust metadata
 - missing or blank signed source attestations from partner imports
 - hidden instruction-like text that is not visible to collaborators
@@ -27,7 +28,7 @@ npm run check
 
 The demo writes JSON, Markdown, SVG, and MP4 evidence to `reports/`.
 
-Generated packets include unsafe clipboard, partner-review, private source-origin, and clean trusted import examples.
+Generated packets include unsafe clipboard, partner-review, unsupported-channel, private source-origin, and clean trusted import examples.
 
 ## Scope
 

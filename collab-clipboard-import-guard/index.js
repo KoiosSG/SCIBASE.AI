@@ -34,6 +34,15 @@ function assessSource(batch) {
   const source = batch.source || {};
   const findings = [];
 
+  if (!isRecognizedImportChannel(source.channel)) {
+    findings.push(finding({
+      code: 'UNKNOWN_IMPORT_CHANNEL',
+      severity: 'warning',
+      blockId: null,
+      message: `Import channel ${source.channel || 'unknown'} is not recognized for direct collaborative insertion.`
+    }));
+  }
+
   if (source.trustLevel === 'untrusted') {
     findings.push(finding({
       code: 'UNTRUSTED_SOURCE',
@@ -273,6 +282,7 @@ function buildActions(batch, findings) {
     if (item.code === 'LOCAL_PRIVATE_SOURCE') actions.add(`redact_source_origin:${batch.importId}`);
     if (item.code === 'UNTRUSTED_SOURCE') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
+    if (item.code === 'UNKNOWN_IMPORT_CHANNEL') actions.add(`require_curator_channel_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
   }
 
@@ -295,6 +305,10 @@ function sanitizeSource(source) {
     trustLevel: source.trustLevel || 'unknown',
     attested: hasSignedAttestation(source)
   };
+}
+
+function isRecognizedImportChannel(channel) {
+  return ['clipboard', 'file-import'].includes(channel);
 }
 
 function hasSignedAttestation(source) {

@@ -71,6 +71,27 @@ const partnerForwardImport = {
   ]
 };
 
+const unsupportedChannelImport = {
+  importId: 'import-unsupported-channel',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-28T08:36:30Z',
+  source: {
+    channel: 'side-loaded-cache',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted',
+    signedAttestation: 'sha256:trusted-export'
+  },
+  blocks: [
+    {
+      id: 'blk-unsupported-channel',
+      type: 'paragraph',
+      sectionId: 'discussion',
+      anchor: 'unsupported-channel-clean',
+      content: 'Clean text imported through an unsupported channel.'
+    }
+  ]
+};
+
 const cleanTrustedImport = {
   importId: 'import-clean-zotero-note',
   workspaceId: 'workspace-paper-7',
@@ -116,6 +137,7 @@ const privateSourceOriginImport = {
 module.exports = {
   unsafeClipboardImport,
   partnerForwardImport,
+  unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport
 };

@@ -176,6 +176,33 @@ function testStagesImportMissingSourceTrustMetadataForCuratorReview() {
   assert.deepEqual(packet.actions, ['require_curator_source_review:import-missing-source-trust']);
 }
 
+function testStagesImportWithUnsupportedSourceChannelForCuratorReview() {
+  const packet = assessImportBatch({
+    importId: 'import-unsupported-channel',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:36:30Z',
+    source: {
+      channel: 'side-loaded-cache',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: 'sha256:trusted-export'
+    },
+    blocks: [
+      {
+        id: 'blk-unsupported-channel',
+        type: 'paragraph',
+        sectionId: 'discussion',
+        anchor: 'unsupported-channel-clean',
+        content: 'Clean text imported through an unsupported channel.'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.deepEqual(findingCodes(packet), ['UNKNOWN_IMPORT_CHANNEL']);
+  assert.deepEqual(packet.actions, ['require_curator_channel_review:import-unsupported-channel']);
+}
+
 function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   const packet = assessImportBatch({
     importId: 'import-anchor-collision',
@@ -433,6 +460,7 @@ const tests = [
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
   testStagesPartnerImportWithBlankSignedAttestationForCuratorReview,
   testStagesImportMissingSourceTrustMetadataForCuratorReview,
+  testStagesImportWithUnsupportedSourceChannelForCuratorReview,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,

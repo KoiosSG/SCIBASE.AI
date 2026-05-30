@@ -19,6 +19,7 @@ Expected evidence:
 - Blank signed source attestation values are treated as missing and stage partner imports for curator review.
 - `reports/clean-packet.json` allows a trusted, attested import.
 - Missing or unrecognized source trust metadata stages otherwise clean imports for curator review.
+- Unsupported import channels stage otherwise clean, trusted, attested imports for curator review.
 - Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion, including collisions with anchors that already exist in shared manuscript state.
 - Table-cell local/private paths are quarantined, redacted, and still formula-escaped when needed.
 - Source-origin local/private paths are quarantined and redacted before reviewer packets are emitted.

@@ -75,8 +75,8 @@ def main():
             "#f59e0b",
             [
                 "Stages partner-supplied documents for curator review",
+                "Stages trusted claims from unsupported import channels",
                 "Watermarks reviewer preview instead of treating it as clean content",
-                "Requests a signed source attestation before direct insertion",
             ],
         ),
         (

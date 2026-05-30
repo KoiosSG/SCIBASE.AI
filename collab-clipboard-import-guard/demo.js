@@ -5,6 +5,7 @@ const { assessImportBatch } = require('./index');
 const {
   unsafeClipboardImport,
   partnerForwardImport,
+  unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport
 } = require('./sample-data');
@@ -15,6 +16,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 const packets = [
   ['unsafe-packet.json', assessImportBatch(unsafeClipboardImport)],
   ['partner-review-packet.json', assessImportBatch(partnerForwardImport)],
+  ['unsupported-channel-packet.json', assessImportBatch(unsupportedChannelImport)],
   ['source-origin-packet.json', assessImportBatch(privateSourceOriginImport)],
   ['clean-packet.json', assessImportBatch(cleanTrustedImport)]
 ];
