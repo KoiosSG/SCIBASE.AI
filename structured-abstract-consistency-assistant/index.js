@@ -250,7 +250,7 @@ function mentionsSampleSize(text, sampleSize) {
 }
 
 function isMeasurementValueNotSampleSize(followingText) {
-  return /^(milliseconds?|seconds?|secs?|minutes?|mins?|hours?|days?|weeks?|months?|years?|ms|fold|points?|scores?|ratio|odds|hazard|confidence|ci)\b/i.test(followingText);
+  return /^(?:-\s*)?(milliseconds?|seconds?|secs?|minutes?|mins?|hours?|days?|weeks?|months?|years?|ms|fold|points?|scores?|ratio|odds|hazard|confidence|ci)\b/i.test(followingText);
 }
 
 function hasText(value) {

@@ -5,7 +5,7 @@ This module adds a focused issue #16 slice for the AI-Powered Research Assistant
 It evaluates synthetic manuscript packets for:
 
 - missing structured abstract sections
-- target-specific sample-size mismatches between abstract, methods, and results, while accepting normal comma-formatted counts such as `1,200` and rejecting percentages, decimal values, and duration/effect measurements as count evidence
+- target-specific sample-size mismatches between abstract, methods, and results, while accepting normal comma-formatted counts such as `1,200` and rejecting percentages, decimal values, duration/effect measurements, and hyphenated measurement wording as count evidence
 - methods design mismatches
 - primary endpoint and bidirectional result-direction drift, including negative/no-effect results described as improvements and improved results described as worsened or harmful
 - result-section certainty overclaims, such as statistically significant or clinically meaningful, when evidence is exploratory or confidence intervals cross null, including mixed phrasing like not statistically significant but clinically meaningful
