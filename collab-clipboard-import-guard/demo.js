@@ -5,6 +5,7 @@ const { assessImportBatch } = require('./index');
 const {
   unsafeClipboardImport,
   partnerForwardImport,
+  trustedMissingAttestationImport,
   unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport
@@ -16,6 +17,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 const packets = [
   ['unsafe-packet.json', assessImportBatch(unsafeClipboardImport)],
   ['partner-review-packet.json', assessImportBatch(partnerForwardImport)],
+  ['trusted-attestation-packet.json', assessImportBatch(trustedMissingAttestationImport)],
   ['unsupported-channel-packet.json', assessImportBatch(unsupportedChannelImport)],
   ['source-origin-packet.json', assessImportBatch(privateSourceOriginImport)],
   ['clean-packet.json', assessImportBatch(cleanTrustedImport)]

@@ -71,6 +71,26 @@ const partnerForwardImport = {
   ]
 };
 
+const trustedMissingAttestationImport = {
+  importId: 'import-trusted-missing-attestation',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-28T08:35:45Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted'
+  },
+  blocks: [
+    {
+      id: 'blk-trusted-missing-attestation',
+      type: 'paragraph',
+      sectionId: 'results',
+      anchor: 'trusted-missing-attestation',
+      content: 'Trusted export supplied a corrected result summary.'
+    }
+  ]
+};
+
 const unsupportedChannelImport = {
   importId: 'import-unsupported-channel',
   workspaceId: 'workspace-paper-7',
@@ -137,6 +157,7 @@ const privateSourceOriginImport = {
 module.exports = {
   unsafeClipboardImport,
   partnerForwardImport,
+  trustedMissingAttestationImport,
   unsupportedChannelImport,
   cleanTrustedImport,
   privateSourceOriginImport

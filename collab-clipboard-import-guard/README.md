@@ -7,7 +7,7 @@ It evaluates synthetic import batches for:
 - untrusted clipboard or file sources
 - missing or unsupported import channel metadata
 - missing or unrecognized source trust metadata
-- missing or blank signed source attestations from partner imports
+- missing or blank signed source attestations from trusted and partner imports
 - hidden instruction-like text that is not visible to collaborators
 - spreadsheet formula cells that could execute after import
 - notebook output snippets and table cells containing local or private filesystem paths
@@ -28,7 +28,7 @@ npm run check
 
 The demo writes JSON, Markdown, SVG, and MP4 evidence to `reports/`.
 
-Generated packets include unsafe clipboard, partner-review, unsupported-channel, private source-origin, and clean trusted import examples.
+Generated packets include unsafe clipboard, partner-review, trusted-attestation, unsupported-channel, private source-origin, and clean trusted import examples.
 
 ## Scope
 

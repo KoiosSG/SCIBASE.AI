@@ -61,12 +61,12 @@ function assessSource(batch) {
     }));
   }
 
-  if (source.trustLevel === 'partner' && !hasSignedAttestation(source)) {
+  if (['trusted', 'partner'].includes(source.trustLevel) && !hasSignedAttestation(source)) {
     findings.push(finding({
       code: 'MISSING_SOURCE_ATTESTATION',
       severity: 'warning',
       blockId: null,
-      message: 'Partner import needs a signed source attestation before direct insertion.'
+      message: `${formatTrustLevel(source.trustLevel)} import needs a signed source attestation before direct insertion.`
     }));
   }
 
@@ -313,6 +313,12 @@ function isRecognizedImportChannel(channel) {
 
 function hasSignedAttestation(source) {
   return typeof source.signedAttestation === 'string' && source.signedAttestation.trim().length > 0;
+}
+
+function formatTrustLevel(trustLevel) {
+  return String(trustLevel || 'source')
+    .replace(/[-_]+/g, ' ')
+    .replace(/^\w/, (letter) => letter.toUpperCase());
 }
 
 function clone(value) {
