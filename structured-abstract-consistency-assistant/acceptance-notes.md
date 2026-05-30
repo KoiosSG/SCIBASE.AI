@@ -15,6 +15,7 @@ Expected evidence:
 
 - `reports/blocked-packet.json` holds AI peer-review release when abstract claims conflict with methods and results.
 - Same-code findings are preserved when methods and results disagree on different evidence targets.
+- Missing source methods/results evidence packets hold release instead of treating a complete abstract as verified.
 - Negated methods design statements such as "not a retrospective cohort" are blocked instead of satisfying the expected design by substring.
 - Negated primary endpoint statements such as "not comment triage time" are blocked instead of satisfying the expected endpoint by substring.
 - Comma-formatted manuscript counts such as `1,200` are accepted as matching numeric sample-size evidence.
@@ -39,6 +40,7 @@ Expected evidence:
 - `reports/revision-packet.json` stages an incomplete but otherwise evidence-aligned abstract for author revision.
 - `reports/negated-design-packet.json` holds an abstract that mentions the expected methods design only to deny it.
 - `reports/negated-primary-endpoint-packet.json` holds an abstract that mentions the expected primary endpoint only to deny it.
+- `reports/missing-source-evidence-packet.json` holds an otherwise polished abstract until source methods/results evidence is attached.
 - `reports/result-certainty-packet.json` holds an abstract whose results overstate uncertain or null-crossing evidence.
 - `reports/mixed-certainty-packet.json` holds an abstract whose results mix negated statistical significance with an asserted clinical-meaningfulness overclaim.
 - `reports/conclusion-certainty-packet.json` holds an abstract whose conclusion overstates uncertain or null-crossing evidence.

@@ -5,6 +5,7 @@ This module adds a focused issue #16 slice for the AI-Powered Research Assistant
 It evaluates synthetic manuscript packets for:
 
 - missing structured abstract sections
+- missing source methods/results evidence packets, so a polished abstract cannot be released without authoritative comparison data
 - target-specific sample-size mismatches between abstract, methods, and results, while accepting normal comma-formatted counts such as `1,200` and rejecting percentages, decimal values, duration/effect measurements, hyphenated measurement wording, and ordinal measurements as count evidence
 - methods design mismatches, including negated design statements that mention the expected design only to deny it
 - primary endpoint mismatches, including negated endpoint statements that mention the expected endpoint only to deny it

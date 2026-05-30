@@ -94,6 +94,18 @@ const negatedPrimaryEndpointManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const missingSourceEvidenceManuscript = {
+  manuscriptId: 'ms-abstract-missing-source-evidence',
+  assessedAt: '2026-05-30T15:40:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+    conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const resultCertaintyOverclaimManuscript = {
   manuscriptId: 'ms-abstract-result-certainty-overclaim',
   assessedAt: '2026-05-30T02:55:00Z',
@@ -339,6 +351,7 @@ module.exports = {
   revisionManuscript,
   negatedDesignManuscript,
   negatedPrimaryEndpointManuscript,
+  missingSourceEvidenceManuscript,
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,

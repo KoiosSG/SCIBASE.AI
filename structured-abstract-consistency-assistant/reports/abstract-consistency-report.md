@@ -6,6 +6,7 @@
 | revision-packet.json | stage_for_author_revision | revision_queue | draft_only | withhold | MISSING_ABSTRACT_SECTION |
 | negated-design-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | METHODS_DESIGN_MISMATCH |
 | negated-primary-endpoint-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | ENDPOINT_MISMATCH |
+| missing-source-evidence-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | MISSING_METHODS_EVIDENCE, MISSING_RESULTS_EVIDENCE |
 | result-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | RESULT_OVERSTATES_EVIDENCE |
 | mixed-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | RESULT_OVERSTATES_EVIDENCE |
 | conclusion-certainty-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | CONCLUSION_OVERSTATES_EVIDENCE |

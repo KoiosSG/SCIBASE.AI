@@ -4,6 +4,7 @@ const REQUIRED_SECTIONS = ['background', 'methods', 'results', 'conclusions'];
 
 function assessStructuredAbstract(manuscript) {
   const findings = dedupeFindings([
+    ...assessSourceEvidence(manuscript),
     ...assessRequiredSections(manuscript),
     ...assessMethodsAlignment(manuscript),
     ...assessResultsAlignment(manuscript),
@@ -25,6 +26,30 @@ function assessStructuredAbstract(manuscript) {
 
   packet.auditDigest = digestPacket(packet);
   return packet;
+}
+
+function assessSourceEvidence(manuscript) {
+  const findings = [];
+
+  if (!isEvidenceObject(manuscript.methods)) {
+    findings.push(finding({
+      code: 'MISSING_METHODS_EVIDENCE',
+      severity: 'blocker',
+      target: 'methods',
+      message: 'Structured abstract release requires a source methods evidence packet.'
+    }));
+  }
+
+  if (!isEvidenceObject(manuscript.results)) {
+    findings.push(finding({
+      code: 'MISSING_RESULTS_EVIDENCE',
+      severity: 'blocker',
+      target: 'results',
+      message: 'Structured abstract release requires a source results evidence packet.'
+    }));
+  }
+
+  return findings;
 }
 
 function assessRequiredSections(manuscript) {
@@ -183,6 +208,7 @@ function buildActions(manuscript, findings) {
 
   const actions = new Set();
   const codes = new Set(findings.map((finding) => finding.code));
+  if (codes.has('MISSING_METHODS_EVIDENCE') || codes.has('MISSING_RESULTS_EVIDENCE')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_ABSTRACT_SECTION')) actions.add(`add_missing_sections:${manuscript.manuscriptId}`);
   if (codes.has('METHODS_DESIGN_MISMATCH') || codes.has('SAMPLE_SIZE_MISMATCH')) actions.add(`revise_methods_summary:${manuscript.manuscriptId}`);
   if (codes.has('ENDPOINT_MISMATCH') || codes.has('RESULT_DIRECTION_MISMATCH')) actions.add(`align_results_with_primary_endpoint:${manuscript.manuscriptId}`);
@@ -199,8 +225,8 @@ function buildSignals(findings) {
   );
   return {
     sectionsComplete: !codes.has('MISSING_ABSTRACT_SECTION'),
-    methodsAligned: !codes.has('METHODS_DESIGN_MISMATCH') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'methods.'),
-    resultsAligned: !hasFinding('SAMPLE_SIZE_MISMATCH', 'results.') && !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
+    methodsAligned: !codes.has('MISSING_METHODS_EVIDENCE') && !codes.has('METHODS_DESIGN_MISMATCH') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'methods.'),
+    resultsAligned: !codes.has('MISSING_RESULTS_EVIDENCE') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'results.') && !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
     limitationsBalanced: !codes.has('MISSING_LIMITATION_LANGUAGE') && !codes.has('CONCLUSION_OVERSTATES_EVIDENCE')
   };
 }
@@ -227,6 +253,10 @@ function dedupeFindings(findings) {
 
 function normalize(value = '') {
   return String(value).toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function isEvidenceObject(value) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
 function phraseIsNegated(text, phrase) {

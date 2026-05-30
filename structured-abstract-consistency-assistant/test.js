@@ -188,6 +188,29 @@ function testBlocksNegatedMethodsDesignStatement() {
   assert.equal(packet.abstractSignals.methodsAligned, false);
 }
 
+function testHoldsAbstractWhenSourceEvidencePacketsAreMissing() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-missing-source-evidence',
+    assessedAt: '2026-05-30T15:40:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), [
+    'MISSING_METHODS_EVIDENCE',
+    'MISSING_RESULTS_EVIDENCE'
+  ]);
+  assert.ok(packet.actions.includes('attach_source_evidence:ms-abstract-missing-source-evidence'));
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testBlocksImprovementClaimWhenResultsShowWorseDirection() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-direction',
@@ -896,6 +919,7 @@ const tests = [
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
   testBlocksNegatedPrimaryEndpointStatement,
   testBlocksNegatedMethodsDesignStatement,
+  testHoldsAbstractWhenSourceEvidencePacketsAreMissing,
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
   testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,
