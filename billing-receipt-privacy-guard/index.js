@@ -60,6 +60,10 @@ function hasPrivateContext(value) {
   return findingsForText(privacyText(value)).length > 0;
 }
 
+function isRecord(value) {
+  return value && typeof value === 'object' && !Array.isArray(value);
+}
+
 function lineItemPrivacyFindings(lineItem) {
   return Array.from(new Set([
     ...findingsForText(
@@ -95,6 +99,18 @@ function categoryDescription(lineItem) {
 }
 
 function sanitizeLineItem(lineItem, index) {
+  if (!isRecord(lineItem)) {
+    return {
+      id: `line-malformed-${index + 1}`,
+      usageCategory: 'billing-line-repair',
+      quantity: null,
+      unit: 'usage-unit',
+      amountCents: null,
+      description: 'Malformed billing line item requires finance repair',
+      findings: ['malformed-line-item']
+    };
+  }
+
   const findings = lineItemPrivacyFindings(lineItem);
   const description = findings.length > 0 ? categoryDescription(lineItem) : lineItem.description;
   const id = hasPrivateContext(lineItem.id) ? `line-redacted-${index + 1}` : lineItem.id;
@@ -266,7 +282,8 @@ function remediationAction(receipt) {
 
   if (
     receipt.findings.includes('invalid-billing-amount') ||
-    receipt.findings.includes('invalid-billing-quantity')
+    receipt.findings.includes('invalid-billing-quantity') ||
+    receipt.findings.includes('malformed-line-item')
   ) {
     return 'repair-malformed-billing-fields-before-delivery';
   }

@@ -28,6 +28,10 @@ Empty or partially populated provider batches that omit receipt or line-item col
 
 Receipts with non-numeric totals, quantities, or line-item amounts are held before delivery. The malformed fixture decision is hold-for-finance-review, and customer-facing numeric fields are redacted to null.
 
+## Malformed Line Item Guard
+
+Malformed line-item entries are held before delivery instead of crashing receipt review. The malformed line-item fixture decision is hold-for-finance-review, and the customer-facing line item id is line-malformed-1.
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, customer systems, private workspaces, institutional finance tools, or external APIs.

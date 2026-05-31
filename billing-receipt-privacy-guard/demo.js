@@ -39,16 +39,38 @@ const malformedResult = evaluateReceiptPrivacy({
     }
   ]
 });
+const malformedLineItemResult = evaluateReceiptPrivacy({
+  batchId: 'billing-malformed-line-item-review-20',
+  generatedAt: '2026-05-31T08:45:00Z',
+  receipts: [
+    {
+      id: 'receipt-malformed-line-item',
+      invoiceId: 'inv-malformed-line-item',
+      customerId: 'customer-lab-014',
+      currency: 'USD',
+      totalCents: 19900,
+      providerMetadata: {
+        accountRef: 'acct-lab-014',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-malformed-line-item',
+        plan: 'lab-pro'
+      },
+      lineItems: [null]
+    }
+  ]
+});
 
 const packetPath = path.join(reportsDir, 'receipt-privacy-packet.json');
 const emptyPacketPath = path.join(reportsDir, 'empty-receipt-privacy-packet.json');
 const malformedPacketPath = path.join(reportsDir, 'malformed-receipt-privacy-packet.json');
+const malformedLineItemPacketPath = path.join(reportsDir, 'malformed-line-item-privacy-packet.json');
 const reportPath = path.join(reportsDir, 'receipt-privacy-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
 fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(emptyPacketPath, `${JSON.stringify(emptyResult, null, 2)}\n`);
 fs.writeFileSync(malformedPacketPath, `${JSON.stringify(malformedResult, null, 2)}\n`);
+fs.writeFileSync(malformedLineItemPacketPath, `${JSON.stringify(malformedLineItemResult, null, 2)}\n`);
 
 const receipts = result.receipts
   .map(
@@ -92,6 +114,10 @@ Empty or partially populated provider batches that omit receipt or line-item col
 
 Receipts with non-numeric totals, quantities, or line-item amounts are held before delivery. The malformed fixture decision is ${malformedResult.receipts[0].decision}, and customer-facing numeric fields are redacted to ${malformedResult.receipts[0].customerCopy.totalCents}.
 
+## Malformed Line Item Guard
+
+Malformed line-item entries are held before delivery instead of crashing receipt review. The malformed line-item fixture decision is ${malformedLineItemResult.receipts[0].decision}, and the customer-facing line item id is ${malformedLineItemResult.receipts[0].customerCopy.lineItems[0].id}.
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, customer systems, private workspaces, institutional finance tools, or external APIs.
@@ -117,6 +143,7 @@ fs.writeFileSync(svgPath, svg);
 console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, emptyPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedLineItemPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Deliverable receipts: ${result.summary.deliverableReceipts}`);

@@ -468,6 +468,40 @@ function testMalformedCustomerFacingMoneyAndQuantityFieldsAreHeld() {
   assert.equal(action.priority, 'normal');
 }
 
+function testMalformedLineItemEntriesAreHeldInsteadOfCrashing() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-malformed-line-item',
+      invoiceId: 'inv-malformed-line-item',
+      customerId: 'customer-lab-014',
+      currency: 'USD',
+      totalCents: 19900,
+      providerMetadata: {
+        accountRef: 'acct-lab-014',
+        billingPeriod: '2026-05',
+        invoiceRef: 'inv-malformed-line-item',
+        plan: 'lab-pro'
+      },
+      lineItems: [null]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+  const lineItem = receipt.customerCopy.lineItems[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('malformed-line-item'), true);
+  assert.equal(lineItem.id, 'line-malformed-1');
+  assert.equal(lineItem.quantity, null);
+  assert.equal(lineItem.amountCents, null);
+
+  const action = result.remediationActions[0];
+  assert.equal(action.action, 'repair-malformed-billing-fields-before-delivery');
+  assert.equal(action.priority, 'normal');
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -506,6 +540,7 @@ const tests = [
   testCustomerFacingCurrencyLabelsAreRedacted,
   testCustomerFacingMoneyAndQuantityFieldsAreRedacted,
   testMalformedCustomerFacingMoneyAndQuantityFieldsAreHeld,
+  testMalformedLineItemEntriesAreHeldInsteadOfCrashing,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
