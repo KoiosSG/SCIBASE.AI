@@ -705,6 +705,89 @@ function testMissingReviewAndCommentListsEvaluateAsEmptyEvidence() {
   assert.equal(result.timelinePacket.events.length, 0);
 }
 
+function testMalformedReviewListRequiresRecertificationInsteadOfAllowingUpdate() {
+  const project = {
+    projectId: 'project-malformed-review-list',
+    asOf: '2026-05-30T12:05:00Z',
+    artifacts: [
+      {
+        id: 'analysis-code',
+        type: 'code',
+        currentDigest: 'sha256:code-v3',
+        changedAt: '2026-05-10T10:00:00Z',
+        currentAnchors: {}
+      }
+    ],
+    reviews: {
+      id: 'review-object-instead-of-array',
+      artifactId: 'analysis-code',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      submittedAt: '2026-05-16T11:00:00Z',
+      evidenceDigest: 'sha256:code-v3',
+      reputationDelta: 14
+    },
+    inlineComments: []
+  };
+
+  const result = evaluateRecertification(project);
+  const review = byId(result.reviewDecisions, 'malformed-review-list');
+  const task = byId(result.recertificationTasks, 'recertify-malformed-review-list');
+  const action = byId(result.reputationActions, 'malformed-review-list');
+
+  assert.ok(review, 'expected malformed review collection to create a review decision');
+  assert.ok(task, 'expected malformed review collection to create a recertification task');
+  assert.ok(action, 'expected malformed review collection to freeze reputation updates');
+  assert.equal(review.status, 'recertification-required');
+  assert.deepEqual(review.reasons, ['malformed-review-list']);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['malformed-review-list']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(result.summary.staleReviews, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
+function testMalformedInlineCommentListRequiresRecertificationInsteadOfAllowingUpdate() {
+  const project = {
+    projectId: 'project-malformed-inline-comment-list',
+    asOf: '2026-05-30T12:08:00Z',
+    artifacts: [
+      {
+        id: 'analysis-code',
+        type: 'code',
+        currentDigest: 'sha256:code-v3',
+        changedAt: '2026-05-10T10:00:00Z',
+        currentAnchors: {}
+      }
+    ],
+    reviews: [],
+    inlineComments: {
+      id: 'comment-object-instead-of-array',
+      artifactId: 'analysis-code',
+      reviewerId: 'orcid:0000-0002-reviewer-b',
+      anchorDigest: 'sha256:code-v3',
+      anchor: {
+        selector: 'src/analyze.py#L41',
+        line: 41
+      },
+      submittedAt: '2026-05-18T14:30:00Z'
+    }
+  };
+
+  const result = evaluateRecertification(project);
+  const comment = byId(result.commentDecisions, 'malformed-inline-comment-list');
+  const task = byId(result.recertificationTasks, 'recertify-malformed-inline-comment-list');
+
+  assert.ok(comment, 'expected malformed inline comment collection to create a comment decision');
+  assert.ok(task, 'expected malformed inline comment collection to create a recertification task');
+  assert.equal(comment.status, 'recertification-required');
+  assert.equal(comment.anchorStatus, 'missing');
+  assert.deepEqual(comment.reasons, ['malformed-inline-comment-list']);
+  assert.equal(task.kind, 'inline-comment');
+  assert.deepEqual(task.reasons, ['malformed-inline-comment-list']);
+  assert.equal(result.summary.staleComments, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 function testMissingArtifactListRequiresRecertificationInsteadOfCrashing() {
   const project = {
     projectId: 'project-missing-artifact-list',
@@ -823,6 +906,8 @@ const tests = [
   testInvalidArtifactTimestampRequiresCommentRecertification,
   testTimelinePacketPreservesAuditEvidenceWithoutRawPrivateProfiles,
   testMissingReviewAndCommentListsEvaluateAsEmptyEvidence,
+  testMalformedReviewListRequiresRecertificationInsteadOfAllowingUpdate,
+  testMalformedInlineCommentListRequiresRecertificationInsteadOfAllowingUpdate,
   testMissingArtifactListRequiresRecertificationInsteadOfCrashing,
   testMalformedReviewEntriesRequireRecertificationInsteadOfCrashing,
   testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashing

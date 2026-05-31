@@ -15,6 +15,7 @@ Validation targets:
 - public or semi-private reviews without reviewer identity are frozen for recertification instead of applying credit to an undefined profile
 - malformed reputation-delta evidence is frozen for recertification instead of applying non-numeric profile credit
 - malformed review and inline-comment entries inside otherwise valid evidence arrays create recertification holds instead of crashing or being silently ignored
+- malformed non-array review and inline-comment collections create recertification holds instead of being treated like omitted evidence
 - stale inline comment anchors generate comment-specific recertification tasks
 - artifact digest changes mark inline comment anchors stale even when the selector line is unchanged
 - artifact updates after inline comments require recertification even when digest and selector evidence still match

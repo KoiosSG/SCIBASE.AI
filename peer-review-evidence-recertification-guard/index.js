@@ -76,7 +76,22 @@ function evidenceRecords(value) {
 }
 
 function normalizeReviewEntries(value) {
-  return evidenceList(value).map((review, index) => {
+  const reviews = Array.isArray(value)
+    ? value
+    : value == null
+      ? []
+      : [
+        {
+          id: 'malformed-review-list',
+          artifactId: null,
+          mode: null,
+          reputationDelta: null,
+          malformedReason: 'malformed-review-list',
+          __malformedReviewEntry: true
+        }
+      ];
+
+  return reviews.map((review, index) => {
     if (isRecord(review)) {
       return review;
     }
@@ -86,13 +101,28 @@ function normalizeReviewEntries(value) {
       artifactId: null,
       mode: null,
       reputationDelta: null,
+      malformedReason: 'malformed-review-entry',
       __malformedReviewEntry: true
     };
   });
 }
 
 function normalizeInlineCommentEntries(value) {
-  return evidenceList(value).map((comment, index) => {
+  const comments = Array.isArray(value)
+    ? value
+    : value == null
+      ? []
+      : [
+        {
+          id: 'malformed-inline-comment-list',
+          artifactId: null,
+          mode: null,
+          malformedReason: 'malformed-inline-comment-list',
+          __malformedInlineCommentEntry: true
+        }
+      ];
+
+  return comments.map((comment, index) => {
     if (isRecord(comment)) {
       return comment;
     }
@@ -101,6 +131,7 @@ function normalizeInlineCommentEntries(value) {
       id: `malformed-inline-comment-entry-${index + 1}`,
       artifactId: null,
       mode: null,
+      malformedReason: 'malformed-inline-comment-entry',
       __malformedInlineCommentEntry: true
     };
   });
@@ -118,7 +149,7 @@ function evaluateReview(project, review) {
       mode: null,
       reviewer: reviewerDisplay(review),
       status: 'recertification-required',
-      reasons: ['malformed-review-entry'],
+      reasons: [review.malformedReason || 'malformed-review-entry'],
       submittedAt: null,
       recertifiedAt: null,
       evidenceDigest: null,
@@ -231,7 +262,7 @@ function evaluateComment(project, comment) {
       status: 'recertification-required',
       anchorStatus: 'missing',
       reviewer: reviewerDisplay(comment),
-      reasons: ['malformed-inline-comment-entry'],
+      reasons: [comment.malformedReason || 'malformed-inline-comment-entry'],
       anchor: null
     };
   }
