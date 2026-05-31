@@ -3,10 +3,11 @@ const crypto = require('crypto');
 function assessImportBatch(batch) {
   const blocks = blockListFor(batch);
   const batchFindings = assessBatchShape(batch);
+  const existingAnchorFindings = assessExistingAnchorShape(batch);
   const blockShapeFindings = assessBlockShapes(blocks);
   const sourceFindings = assessSource(batch);
   const validBlocks = blocks.filter(isImportBlockObject);
-  const duplicateAnchorBlocks = findAnchorCollisionBlocks(validBlocks, batch.existingAnchors || []);
+  const duplicateAnchorBlocks = findAnchorCollisionBlocks(validBlocks, existingAnchorListFor(batch));
   const sanitizedBlocks = [];
   const blockFindings = [];
 
@@ -16,7 +17,13 @@ function assessImportBatch(batch) {
     blockFindings.push(...findings);
   }
 
-  const findings = [...batchFindings, ...blockShapeFindings, ...sourceFindings, ...blockFindings].sort(compareFindings);
+  const findings = [
+    ...batchFindings,
+    ...existingAnchorFindings,
+    ...blockShapeFindings,
+    ...sourceFindings,
+    ...blockFindings
+  ].sort(compareFindings);
   const status = chooseStatus(findings);
   const packet = {
     importId: batch.importId,
@@ -38,6 +45,10 @@ function blockListFor(batch) {
   return Array.isArray(batch.blocks) ? batch.blocks : [];
 }
 
+function existingAnchorListFor(batch) {
+  return Array.isArray(batch.existingAnchors) ? batch.existingAnchors : [];
+}
+
 function isImportBlockObject(block) {
   return Boolean(block && typeof block === 'object' && !Array.isArray(block));
 }
@@ -53,6 +64,21 @@ function assessBatchShape(batch) {
       severity: 'warning',
       blockId: null,
       message: 'Import payload is missing a valid block list for collaborative insertion.'
+    })
+  ];
+}
+
+function assessExistingAnchorShape(batch) {
+  if (batch.existingAnchors === undefined || Array.isArray(batch.existingAnchors)) {
+    return [];
+  }
+
+  return [
+    finding({
+      code: 'MALFORMED_EXISTING_ANCHORS',
+      severity: 'warning',
+      blockId: null,
+      message: 'Existing shared-document anchors are malformed, so imported anchors need curator review before insertion.'
     })
   ];
 }
@@ -350,6 +376,7 @@ function buildActions(batch, findings) {
     if (item.code === 'UNTRUSTED_SOURCE') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_IMPORT_CHANNEL') actions.add(`require_curator_channel_review:${batch.importId}`);
+    if (item.code === 'MALFORMED_EXISTING_ANCHORS') actions.add(`require_curator_anchor_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCKS') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCK') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MALFORMED_TABLE_ROW') actions.add(`require_curator_payload_review:${batch.importId}`);

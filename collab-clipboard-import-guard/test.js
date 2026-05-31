@@ -349,6 +349,39 @@ function testMalformedTableRowsAreStagedBeforeCollaborativeInsertion() {
   assert.deepEqual(packet.actions, ['require_curator_payload_review:import-malformed-table-row']);
 }
 
+function testMalformedExistingAnchorsAreStagedBeforeCollisionChecks() {
+  const packet = assessImportBatch({
+    importId: 'import-malformed-existing-anchors',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-31T20:55:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: TRUSTED_EXPORT_ATTESTATION
+    },
+    existingAnchors: {
+      methods: 'methods-overview'
+    },
+    blocks: [
+      {
+        id: 'blk-malformed-existing-anchors',
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'methods-overview',
+        content: 'Imported paragraph with unchecked existing anchor metadata.'
+      }
+    ]
+  });
+
+  const importedBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-malformed-existing-anchors');
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_EXISTING_ANCHORS']);
+  assert.equal(importedBlock.anchor, 'methods-overview');
+  assert.deepEqual(packet.actions, ['require_curator_anchor_review:import-malformed-existing-anchors']);
+}
+
 function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   const packet = assessImportBatch({
     importId: 'import-anchor-collision',
@@ -676,6 +709,7 @@ const tests = [
   testMalformedImportBlockListIsStagedWithoutCrashing,
   testMalformedImportBlockEntryIsStagedWithoutCrashing,
   testMalformedTableRowsAreStagedBeforeCollaborativeInsertion,
+  testMalformedExistingAnchorsAreStagedBeforeCollisionChecks,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,

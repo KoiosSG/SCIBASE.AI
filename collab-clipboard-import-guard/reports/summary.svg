@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050">
-  <rect width="1200" height="1050" fill="#eef2f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1124" viewBox="0 0 1200 1124">
+  <rect width="1200" height="1124" fill="#eef2f7"/>
   <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Clipboard Import Provenance Guard</text>
   <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Pasted and imported research-editor blocks are gated before collaborative insertion.</text>
 
@@ -53,23 +53,29 @@
       </g>
       <g transform="translate(48 700)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b45309"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-malformed-existing-anchors</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">stage_for_curator_review | findings 1 | digest 1edd8ecb020cf6d7</text>
+      </g>
+      <g transform="translate(48 774)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-private-source-origin</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">quarantine_import | findings 1 | digest a7f7271b903c5ec7</text>
       </g>
-      <g transform="translate(48 774)">
+      <g transform="translate(48 848)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-lowercase-windows-path</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">quarantine_import | findings 1 | digest e17275a00e2d2715</text>
       </g>
-      <g transform="translate(48 848)">
+      <g transform="translate(48 922)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-forward-slash-windows-path</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">quarantine_import | findings 1 | digest bcae99436e765559</text>
       </g>
-      <g transform="translate(48 922)">
+      <g transform="translate(48 996)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#15803d"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">import-clean-zotero-note</text>

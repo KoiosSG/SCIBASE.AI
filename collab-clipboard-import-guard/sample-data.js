@@ -196,6 +196,30 @@ const malformedTableRowImport = {
   ]
 };
 
+const malformedExistingAnchorsImport = {
+  importId: 'import-malformed-existing-anchors',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-05-31T20:55:00Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted',
+    signedAttestation: TRUSTED_EXPORT_ATTESTATION
+  },
+  existingAnchors: {
+    methods: 'methods-overview'
+  },
+  blocks: [
+    {
+      id: 'blk-malformed-existing-anchors',
+      type: 'paragraph',
+      sectionId: 'methods',
+      anchor: 'methods-overview',
+      content: 'Imported paragraph with unchecked existing anchor metadata.'
+    }
+  ]
+};
+
 const cleanTrustedImport = {
   importId: 'import-clean-zotero-note',
   workspaceId: 'workspace-paper-7',
@@ -289,6 +313,7 @@ module.exports = {
   malformedBlockListImport,
   malformedBlockEntryImport,
   malformedTableRowImport,
+  malformedExistingAnchorsImport,
   cleanTrustedImport,
   privateSourceOriginImport,
   lowercaseWindowsPathImport,

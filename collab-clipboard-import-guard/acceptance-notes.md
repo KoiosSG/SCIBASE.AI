@@ -20,6 +20,7 @@ Expected evidence:
 - `reports/malformed-block-list-packet.json` stages a malformed import payload instead of throwing or allowing collaborative insertion.
 - `reports/malformed-block-entry-packet.json` stages malformed block entries inside an otherwise valid block list without throwing or creating sanitized shared-manuscript blocks.
 - `reports/malformed-table-row-packet.json` stages malformed table rows before collaborative insertion and normalizes them in sanitized reviewer output.
+- `reports/malformed-existing-anchors-packet.json` stages malformed existing-anchor metadata before collision checks can trust it.
 - `reports/source-origin-packet.json` quarantines and redacts local/private source-origin metadata.
 - `reports/lowercase-windows-path-packet.json` quarantines and fully redacts lowercase-drive Windows user paths.
 - `reports/forward-slash-windows-path-packet.json` quarantines and fully redacts forward-slash Windows user paths.
@@ -30,6 +31,7 @@ Expected evidence:
 - Malformed block-list payloads stage for curator payload review without creating sanitized shared-manuscript blocks.
 - Malformed block entries stage for curator payload review without creating sanitized shared-manuscript blocks.
 - Malformed table rows stage for curator payload review and normalize to empty rows instead of entering collaborative state.
+- Malformed existing-anchor metadata stages for curator anchor review instead of crashing before packet generation or claiming collision safety.
 - Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion, including collisions with anchors that already exist in shared manuscript state.
 - Table-cell local/private paths are quarantined, redacted, and still formula-escaped when needed.
 - Lowercase Windows user paths are fully redacted from sanitized reviewer output after quarantine.
