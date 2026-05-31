@@ -9,6 +9,7 @@
       "ontology": "MeSH",
       "identifier": "D012345",
       "languages": [],
+      "aliasEvidenceIssues": [],
       "mentions": [],
       "localizedNames": {},
       "jsonLd": {
@@ -36,5 +37,5 @@
     "suppressedMentions": 0,
     "entityPackets": 1
   },
-  "auditDigest": "sha256:bdd2f1686738a2fdfd4ffc8eb062412cfe9c35daaef85041fec974b0475f9fdd"
+  "auditDigest": "sha256:a6c361911c2ddc87ab437444d96ffd4422b6b5e2295ed41b25a7f60d0009192a"
 }

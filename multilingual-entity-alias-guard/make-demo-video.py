@@ -17,7 +17,7 @@ vf = ",".join(
         f"drawtext=fontfile='{font}':text='Preserves language tags for entity pages and JSON-LD':x=92:y=266:fontsize=30:fontcolor=0xd8f6df",
         f"drawtext=fontfile='{font}':text='Holds homographs and false friends for curator review':x=92:y=326:fontsize=30:fontcolor=0xd8f6df",
         f"drawtext=fontfile='{font}':text='Suppresses weak aliases before recommendations are shown':x=92:y=386:fontsize=30:fontcolor=0xd8f6df",
-        f"drawtext=fontfile='{font}':text='Handles sparse ontology exports without runtime failures':x=92:y=446:fontsize=30:fontcolor=0xd8f6df",
+        f"drawtext=fontfile='{font}':text='Handles malformed alias evidence without runtime failures':x=92:y=446:fontsize=30:fontcolor=0xd8f6df",
         f"drawtext=fontfile='{font}':text='SCIBASE issue #17 multilingual KG integration slice':x=92:y=536:fontsize=28:fontcolor=0xffd37a",
     ]
 )

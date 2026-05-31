@@ -22,5 +22,7 @@ Validation coverage:
 - low-confidence French alias output is suppressed from recommendations
 - missing or non-numeric confidence evidence is suppressed before graph recommendations
 - sparse ontology/corpus exports with omitted localized names, mention lists, or homograph policies do not crash corpus review
+- malformed localized-name entries are omitted from alias lookup and JSON-LD alternate names, with alias evidence issues preserved for review
+- malformed mention text values are held for curator review instead of crashing alias normalization or reaching recommendation-safe IDs
 - localized names remain language-tagged on entity packets
 - audit output is deterministic and private-data free

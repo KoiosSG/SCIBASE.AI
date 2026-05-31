@@ -154,6 +154,7 @@
         "en",
         "es"
       ],
+      "aliasEvidenceIssues": [],
       "mentions": [
         {
           "id": "mention-crispr-en",
@@ -234,6 +235,7 @@
         "en",
         "es"
       ],
+      "aliasEvidenceIssues": [],
       "mentions": [
         {
           "id": "mention-diabetes-en",
@@ -310,6 +312,7 @@
       "ontology": "SCIBASE-STAT",
       "identifier": "control-group",
       "languages": [],
+      "aliasEvidenceIssues": [],
       "mentions": [],
       "localizedNames": {
         "en": [
@@ -412,5 +415,5 @@
     "suppressedMentions": 1,
     "entityPackets": 3
   },
-  "auditDigest": "sha256:48d59a0c5224f91e46bbcd93174e2ce12a6f0008946fbcea6f7608abd6798778"
+  "auditDigest": "sha256:f11c08d8634f046b8382a175239964b368830acc24fe0f8c2ff1b92cdd02ef8f"
 }

@@ -9,7 +9,7 @@ Generated: 2026-05-28T07:00:00Z
 - Held curator-review mentions: 3
 - Suppressed low-confidence mentions: 1
 - Entity packets emitted: 3
-- Audit digest: sha256:48d59a0c5224f91e46bbcd93174e2ce12a6f0008946fbcea6f7608abd6798778
+- Audit digest: sha256:f11c08d8634f046b8382a175239964b368830acc24fe0f8c2ff1b92cdd02ef8f
 
 ## Accepted Canonical Mappings
 
@@ -38,6 +38,14 @@ Sparse ontology or corpus exports that omit localized names, mention lists, or h
 ## Candidate Alias Conflict Guard
 
 Extractor candidates that disagree with trusted multilingual alias lookup are held for curator review instead of silently overriding the upstream candidate. The conflict fixture decision is hold-for-curator-review with reason candidate-alias-conflict.
+
+## Malformed Mention Text Guard
+
+Malformed mention text values are held for curator review instead of crashing alias normalization. The malformed fixture decision is hold-for-curator-review with reason malformed-mention-text, and it emits review-multilingual-malformed-mention.
+
+## Malformed Alias Evidence Guard
+
+Malformed localized-name evidence is omitted from alias lookup and JSON-LD alternate names instead of crashing ontology review. The malformed alias fixture records 1 alias evidence issue with reason malformed-localized-name.
 
 ## Safety
 

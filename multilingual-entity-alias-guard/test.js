@@ -306,6 +306,45 @@ function testMissingLocalizedNamesEmitEmptyEntityAliasPacket() {
   assert.ok(result.auditDigest.startsWith('sha256:'));
 }
 
+function testMalformedLocalizedNameTermsAreOmittedFromAliasEvidence() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.entities = [
+    {
+      id: 'entity:mesh:D003920',
+      canonicalName: 'Diabetes Mellitus',
+      ontology: 'MeSH',
+      identifier: 'D003920',
+      localizedNames: {
+        es: ['diabetes mellitus', { value: 'diabete mellitus' }]
+      }
+    }
+  ];
+  corpus.mentions = [
+    {
+      id: 'mention-diabetes-es',
+      documentId: 'paper-19',
+      text: 'diabetes mellitus',
+      language: 'es',
+      confidence: 0.94
+    }
+  ];
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-diabetes-es');
+  const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
+
+  assert.equal(event.decision, 'accept-canonical-entity');
+  assert.deepEqual(diabetes.localizedNames, { es: ['diabetes mellitus'] });
+  assert.deepEqual(diabetes.jsonLd.alternateName, ['diabetes mellitus']);
+  assert.deepEqual(diabetes.aliasEvidenceIssues, [
+    {
+      language: 'es',
+      reason: 'malformed-localized-name',
+      valueType: 'object'
+    }
+  ]);
+}
+
 function testMissingMentionListProducesEmptyAliasReview() {
   const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
   delete corpus.mentions;
@@ -341,6 +380,32 @@ function testMissingHomographPolicyDefaultsToEmptyPolicy() {
   assert.equal(event.reason, 'trusted-translated-alias');
   assert.equal(event.candidateEntityId, 'entity:mesh:D003920');
   assert.deepEqual(result.curatorActions, []);
+}
+
+function testMalformedMentionTextIsHeldForCuratorReview() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions = [
+    {
+      id: 'mention-malformed-text',
+      documentId: 'paper-18',
+      text: { value: 'diabetes mellitus' },
+      language: 'es',
+      confidence: 0.94,
+      candidateEntityId: 'entity:mesh:D003920'
+    }
+  ];
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-malformed-text');
+  const action = byId(result.curatorActions, 'curate-mention-malformed-text');
+
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'malformed-mention-text');
+  assert.equal(event.candidateEntityId, 'entity:mesh:D003920');
+  assert.deepEqual(event.candidateEntityIds, ['entity:mesh:D003920']);
+  assert.equal(action.priority, 'high');
+  assert.equal(action.action, 'review-multilingual-malformed-mention');
+  assert.equal(result.recommendationGuards.safeEntityIds.includes('entity:mesh:D003920'), false);
 }
 
 function testLanguageTaggedSynonymsArePreservedForEntityPages() {
@@ -380,8 +445,10 @@ const tests = [
   testLowConfidenceAliasesDoNotDriveRecommendations,
   testMissingConfidenceAliasesDoNotDriveRecommendations,
   testMissingLocalizedNamesEmitEmptyEntityAliasPacket,
+  testMalformedLocalizedNameTermsAreOmittedFromAliasEvidence,
   testMissingMentionListProducesEmptyAliasReview,
   testMissingHomographPolicyDefaultsToEmptyPolicy,
+  testMalformedMentionTextIsHeldForCuratorReview,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

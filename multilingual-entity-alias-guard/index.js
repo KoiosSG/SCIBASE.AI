@@ -23,10 +23,47 @@ function evidenceList(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function valueType(value) {
+  return value === null ? 'null' : Array.isArray(value) ? 'array' : typeof value;
+}
+
 function localizedNamesFor(entity) {
-  return entity.localizedNames && typeof entity.localizedNames === 'object'
-    ? entity.localizedNames
-    : {};
+  const localizedNames =
+    entity.localizedNames && typeof entity.localizedNames === 'object' ? entity.localizedNames : {};
+  return Object.fromEntries(
+    Object.entries(localizedNames)
+      .map(([language, terms]) => [language, evidenceList(terms).filter(isTextValue)])
+      .filter(([, terms]) => terms.length > 0)
+  );
+}
+
+function localizedNameIssuesFor(entity) {
+  const localizedNames =
+    entity.localizedNames && typeof entity.localizedNames === 'object' ? entity.localizedNames : {};
+  const issues = [];
+
+  for (const [language, terms] of Object.entries(localizedNames)) {
+    if (!Array.isArray(terms)) {
+      issues.push({
+        language,
+        reason: 'malformed-localized-name-list',
+        valueType: valueType(terms)
+      });
+      continue;
+    }
+
+    for (const term of terms) {
+      if (!isTextValue(term)) {
+        issues.push({
+          language,
+          reason: 'malformed-localized-name',
+          valueType: valueType(term)
+        });
+      }
+    }
+  }
+
+  return issues;
 }
 
 function evidenceObject(value) {
@@ -64,6 +101,10 @@ const GREEK_LATIN_CONFUSABLE_RE = /[\u0391\u0392\u0395\u0396\u0397\u0399\u039A\u
 
 function normalizeTerm(term) {
   return term.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+}
+
+function isTextValue(value) {
+  return typeof value === 'string';
 }
 
 function normalizeLanguageTag(language) {
@@ -143,6 +184,22 @@ function buildAliasIndex(entities) {
 
 function mentionDecision(mention, aliasIndex, homographs) {
   const languageKeys = languageLookupKeys(mention.language);
+  if (!isTextValue(mention.text)) {
+    const candidateEntityId = mention.candidateEntityId || null;
+    return {
+      id: mention.id,
+      language: mention.language,
+      text: mention.text,
+      documentId: mention.documentId,
+      decision: 'hold-for-curator-review',
+      reason: 'malformed-mention-text',
+      candidateEntityId,
+      candidateEntityIds: candidateEntityId ? [candidateEntityId] : [],
+      confidence: mention.confidence,
+      preservedLanguageTag: mention.language
+    };
+  }
+
   const termKey = normalizeTerm(mention.text);
   const aliasEntry = languageKeys
     .map((languageKey) => aliasIndex.get(`${languageKey}:${termKey}`))
@@ -258,6 +315,8 @@ function curatorActionForDecision(decision) {
         ? 'review-multilingual-candidate-alias-conflict'
         : decision.reason === 'script-confusable-alias'
         ? 'review-multilingual-script-confusable'
+        : decision.reason === 'malformed-mention-text'
+        ? 'review-multilingual-malformed-mention'
         : decision.reason === 'false-friend-or-homograph'
         ? 'review-multilingual-homograph'
         : 'verify-translated-alias-before-recommendation',
@@ -265,7 +324,8 @@ function curatorActionForDecision(decision) {
       decision.reason === 'false-friend-or-homograph' ||
       decision.reason === 'alias-collision' ||
       decision.reason === 'candidate-alias-conflict' ||
-      decision.reason === 'script-confusable-alias'
+      decision.reason === 'script-confusable-alias' ||
+      decision.reason === 'malformed-mention-text'
         ? 'high'
         : 'normal',
     language: decision.language,
@@ -279,6 +339,7 @@ function curatorActionForDecision(decision) {
 function buildEntityPackets(entities, decisions) {
   return evidenceList(entities).map((entity) => {
     const localizedNames = localizedNamesFor(entity);
+    const aliasEvidenceIssues = localizedNameIssuesFor(entity);
     const accepted = decisions.filter(
       (decision) =>
         decision.decision === 'accept-canonical-entity' && decision.candidateEntityId === entity.id
@@ -291,6 +352,7 @@ function buildEntityPackets(entities, decisions) {
       ontology: entity.ontology,
       identifier: entity.identifier,
       languages,
+      aliasEvidenceIssues,
       mentions: accepted.map((decision) => ({
         id: decision.id,
         text: decision.text,

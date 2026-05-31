@@ -7,6 +7,6 @@
   <text x="96" y="310" fill="#d8f6df" font-family="Arial, sans-serif" font-size="28">Suppressed low-confidence mentions: 1</text>
   <text x="96" y="380" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">Languages preserved: en, de, es, fr</text>
   <text x="96" y="430" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">JSON-LD entity packets ready for schema.org-style pages</text>
-  <text x="96" y="510" fill="#ffd37a" font-family="Arial, sans-serif" font-size="26">Unsafe aliases are held before graph recommendations are shown.</text>
-  <text x="96" y="574" fill="#a6d7c3" font-family="Arial, sans-serif" font-size="18">sha256:48d59a0c5224f91e46bbcd93174e2ce12a6f0008946fbcea6f7608abd6798778</text>
+  <text x="96" y="510" fill="#ffd37a" font-family="Arial, sans-serif" font-size="26">Unsafe or malformed aliases are held before recommendations are shown.</text>
+  <text x="96" y="574" fill="#a6d7c3" font-family="Arial, sans-serif" font-size="18">sha256:f11c08d8634f046b8382a175239964b368830acc24fe0f8c2ff1b92cdd02ef8f</text>
 </svg>

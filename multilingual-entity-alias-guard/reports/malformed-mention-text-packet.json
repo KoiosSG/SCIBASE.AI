@@ -1,20 +1,21 @@
 {
-  "corpusId": "kg-candidate-alias-conflict-17",
-  "generatedAt": "2026-05-30T12:30:00Z",
+  "corpusId": "kg-malformed-mention-text-17",
+  "generatedAt": "2026-05-31T10:45:00Z",
   "mentionDecisions": [
     {
-      "id": "mention-diabetes-conflicting-candidate",
+      "id": "mention-malformed-text",
       "language": "es",
-      "text": "diabetes mellitus",
-      "documentId": "paper-17",
+      "text": {
+        "value": "diabetes mellitus"
+      },
+      "documentId": "paper-18",
       "decision": "hold-for-curator-review",
-      "reason": "candidate-alias-conflict",
-      "candidateEntityId": null,
+      "reason": "malformed-mention-text",
+      "candidateEntityId": "entity:mesh:D003920",
       "candidateEntityIds": [
-        "entity:mesh:D003920",
-        "entity:stat:control-group"
+        "entity:mesh:D003920"
       ],
-      "confidence": 0.93,
+      "confidence": 0.94,
       "preservedLanguageTag": "es"
     }
   ],
@@ -130,23 +131,24 @@
   ],
   "curatorActions": [
     {
-      "id": "curate-mention-diabetes-conflicting-candidate",
-      "mentionId": "mention-diabetes-conflicting-candidate",
-      "action": "review-multilingual-candidate-alias-conflict",
+      "id": "curate-mention-malformed-text",
+      "mentionId": "mention-malformed-text",
+      "action": "review-multilingual-malformed-mention",
       "priority": "high",
       "language": "es",
-      "text": "diabetes mellitus",
-      "candidateEntityId": null,
+      "text": {
+        "value": "diabetes mellitus"
+      },
+      "candidateEntityId": "entity:mesh:D003920",
       "candidateEntityIds": [
-        "entity:mesh:D003920",
-        "entity:stat:control-group"
+        "entity:mesh:D003920"
       ],
-      "reason": "candidate-alias-conflict"
+      "reason": "malformed-mention-text"
     }
   ],
   "recommendationGuards": {
     "suppressedMentionIds": [
-      "mention-diabetes-conflicting-candidate"
+      "mention-malformed-text"
     ],
     "safeEntityIds": []
   },
@@ -156,5 +158,5 @@
     "suppressedMentions": 0,
     "entityPackets": 3
   },
-  "auditDigest": "sha256:9c5561ec683bbf63505c6a252c7cae3559dca84172940c59941bfab62e23485e"
+  "auditDigest": "sha256:6fe14f9c776e3beb44509a8d8197586bb86757ccf617e0faa31cb20664fcf8ee"
 }
