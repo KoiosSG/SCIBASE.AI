@@ -214,6 +214,27 @@ function testMissingNoncriticalContrastEvidenceRequiresRemediation() {
   assert.ok(packet.actions.includes('provide_valid_contrast_evidence:secondary-usage-trend-without-colors'));
 }
 
+function testMalformedDashboardComponentEntriesBlockRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-malformed-component',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-31T14:30:00Z',
+    widgets: [null],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'blocked');
+  assert.deepEqual(codes(packet), ['MALFORMED_DASHBOARD_COMPONENT_ENTRY']);
+  assert.equal(packet.wcagSignals.robust, false);
+  assert.ok(packet.actions.includes('repair_dashboard_component_evidence:widgets[0]'));
+}
+
 function testShorthandHexContrastEvidenceRemainsValid() {
   const packet = assessDashboardRelease({
     dashboardId: 'enterprise-admin-shorthand-contrast',
@@ -288,6 +309,7 @@ const tests = [
   testInvalidContrastEvidenceBlocksRelease,
   testMissingCriticalContrastEvidenceBlocksRelease,
   testMissingNoncriticalContrastEvidenceRequiresRemediation,
+  testMalformedDashboardComponentEntriesBlockRelease,
   testShorthandHexContrastEvidenceRemainsValid,
   testMissingVisibleFocusIndicatorBlocksKeyboardRelease
 ];

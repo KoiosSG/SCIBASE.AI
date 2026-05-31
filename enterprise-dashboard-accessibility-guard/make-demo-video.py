@@ -69,6 +69,16 @@ def main():
             ],
         ),
         (
+            "Malformed Evidence Hold",
+            "Reviewer packet instead of a crash",
+            "#f97316",
+            [
+                "Malformed dashboard component entries become explicit blocker findings",
+                "Release lanes stay blocked until component evidence is repaired",
+                "Audit packet keeps deterministic remediation actions for maintainers",
+            ],
+        ),
+        (
             "Warning Release",
             "Internal-only until remediated",
             "#f59e0b",

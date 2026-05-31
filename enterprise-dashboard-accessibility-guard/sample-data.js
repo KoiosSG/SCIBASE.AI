@@ -200,10 +200,24 @@ const missingNoncriticalContrastDashboard = {
   }
 };
 
+const malformedComponentDashboard = {
+  dashboardId: 'enterprise-admin-malformed-component',
+  institutionId: 'institution-redacted',
+  assessedAt: '2026-05-31T14:30:00Z',
+  widgets: [null],
+  alerts: [],
+  exports: [],
+  motion: {
+    animatedCharts: [],
+    reducedMotionFallback: true
+  }
+};
+
 module.exports = {
   blockedDashboard,
   cleanDashboard,
   warningDashboard,
   missingContrastDashboard,
-  missingNoncriticalContrastDashboard
+  missingNoncriticalContrastDashboard,
+  malformedComponentDashboard
 };

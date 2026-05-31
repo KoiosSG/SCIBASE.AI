@@ -24,12 +24,8 @@ function assessDashboardRelease(dashboard) {
 }
 
 function assessVisualAndOperableComponents(dashboard) {
-  const components = [
-    ...(dashboard.widgets || []),
-    ...(dashboard.alerts || []),
-    ...(dashboard.exports || [])
-  ];
   const findings = [];
+  const components = collectDashboardComponents(dashboard, findings);
 
   for (const component of components) {
     if (component.critical && (!component.foreground || !component.background)) {
@@ -95,6 +91,43 @@ function assessVisualAndOperableComponents(dashboard) {
 
   findings.push(...assessHeadingOrder(components));
   return findings;
+}
+
+function collectDashboardComponents(dashboard, findings) {
+  const groups = [
+    ['widgets', dashboard.widgets],
+    ['alerts', dashboard.alerts],
+    ['exports', dashboard.exports]
+  ];
+  const components = [];
+
+  for (const [groupName, group] of groups) {
+    if (group == null) continue;
+    if (!Array.isArray(group)) {
+      findings.push({
+        componentId: groupName,
+        code: 'MALFORMED_DASHBOARD_COMPONENT_ENTRY',
+        severity: 'blocker',
+        message: `Dashboard ${groupName} evidence must be an array of component objects before release.`
+      });
+      continue;
+    }
+
+    group.forEach((component, index) => {
+      if (!component || typeof component !== 'object' || Array.isArray(component)) {
+        findings.push({
+          componentId: `${groupName}[${index}]`,
+          code: 'MALFORMED_DASHBOARD_COMPONENT_ENTRY',
+          severity: 'blocker',
+          message: 'Dashboard component evidence must be an object before accessibility release.'
+        });
+        return;
+      }
+      components.push(component);
+    });
+  }
+
+  return components;
 }
 
 function requiresContrastEvidence(component) {
@@ -196,6 +229,9 @@ function buildActions(dashboard, findings) {
     if (item.code === 'PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') {
       actions.add(`redact_accessibility_text:${item.componentId}`);
     }
+    if (item.code === 'MALFORMED_DASHBOARD_COMPONENT_ENTRY') {
+      actions.add(`repair_dashboard_component_evidence:${item.componentId}`);
+    }
   }
 
   return [...actions].sort();
@@ -214,7 +250,7 @@ function buildWcagSignals(findings) {
       !codes.has('MISSING_REDUCED_MOTION_FALLBACK') &&
       !codes.has('MISSING_VISIBLE_FOCUS_INDICATOR'),
     understandable: !codes.has('PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') && !codes.has('HEADING_ORDER_SKIP'),
-    robust: !codes.has('MISSING_SCREEN_READER_LABEL')
+    robust: !codes.has('MISSING_SCREEN_READER_LABEL') && !codes.has('MALFORMED_DASHBOARD_COMPONENT_ENTRY')
   };
 }
 

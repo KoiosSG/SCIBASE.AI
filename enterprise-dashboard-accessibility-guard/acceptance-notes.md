@@ -8,11 +8,13 @@
 - Blocks release when critical dashboard contrast evidence is missing, invalid, or still expressed as unresolved CSS color tokens.
 - Treats missing noncritical dashboard contrast evidence as a remediation warning before public release.
 - Blocks release when keyboard-reachable dashboard controls suppress visible focus indicators.
+- Blocks malformed dashboard component evidence before it can crash release assessment.
 - Blocks release when private data appears in table or export accessibility summaries.
 - Generates reviewer artifacts:
   - `reports/blocked-packet.json`
   - `reports/missing-contrast-packet.json`
   - `reports/missing-noncritical-contrast-packet.json`
+  - `reports/malformed-component-packet.json`
   - `reports/clean-packet.json`
   - `reports/warning-packet.json`
   - `reports/accessibility-report.md`
