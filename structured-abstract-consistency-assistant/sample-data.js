@@ -346,6 +346,30 @@ const ordinalSampleSizeManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const noDifferenceOutcomeManuscript = {
+  manuscriptId: 'ms-abstract-no-difference-drift',
+  assessedAt: '2026-05-31T16:55:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, showed no meaningful difference in 96 manuscripts.',
+    conclusions: 'Comment triage outcomes were comparable in similar retrospective settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    primaryEndpoint: 'comment triage time',
+    confidenceIntervalCrossesNull: false
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const cleanManuscript = {
   manuscriptId: 'ms-abstract-clean',
   assessedAt: '2026-05-28T10:20:00Z',
@@ -386,5 +410,6 @@ module.exports = {
   abbreviatedUnitSampleSizeManuscript,
   hyphenatedMeasurementSampleSizeManuscript,
   ordinalSampleSizeManuscript,
+  noDifferenceOutcomeManuscript,
   cleanManuscript
 };

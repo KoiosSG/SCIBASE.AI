@@ -16,6 +16,7 @@ It evaluates synthetic manuscript packets for:
 - safety-benefit conclusions such as safe, well tolerated, or tolerable when adverse-outcome evidence worsens
 - negated safety-concern conclusions, such as no safety concerns or no adverse events, when adverse-outcome evidence worsens
 - results or conclusions that use negated benefit wording, such as did not improve, when the results packet records improvement
+- results or conclusions that claim no meaningful difference, no superiority, comparable outcomes, or equivalent outcomes when the results packet records improvement
 - conclusions that describe worse/no-effect outcomes when the results packet records improvement
 - accurate adverse-outcome wording, such as increased adverse events, without mistaking it for a benefit claim when the result packet also records a worse direction
 - conclusions that overstate exploratory or uncertain evidence

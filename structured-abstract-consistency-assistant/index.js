@@ -313,7 +313,17 @@ function impliesWorseOutcome(value) {
     /\b(worse|worsened|worsening|harm|harms|harmful|inferior|declined|negative|no clear effect|no effect|null effect|unchanged|not significant|non-significant)\b/i.test(value)
     || impliesNegatedBenefitClaim(value)
     || impliesNegativeSafetyClaim(value)
+    || impliesNoDifferenceOutcome(value)
     || (/\b(increase|increased|increases)\b/i.test(value) && mentionsAdverseOutcome(value))
+  );
+}
+
+function impliesNoDifferenceOutcome(value) {
+  return (
+    /\b(?:no|little|minimal)\s+(?:meaningful\s+|clinically\s+|statistically\s+)?differences?\b/i.test(value)
+    || /\b(?:comparable|equivalent)\s+(?:outcomes?|results?|effects?|rates?|responses?)\b/i.test(value)
+    || /\b(?:outcomes?|results?|effects?|rates?|responses?)\s+(?:were|was|are|remain|remained)\s+(?:comparable|equivalent)\b/i.test(value)
+    || /\bno\s+superiority\b/i.test(value)
   );
 }
 

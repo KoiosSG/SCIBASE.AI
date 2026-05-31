@@ -18,6 +18,7 @@ const {
   abbreviatedUnitSampleSizeManuscript,
   hyphenatedMeasurementSampleSizeManuscript,
   ordinalSampleSizeManuscript,
+  noDifferenceOutcomeManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -40,6 +41,7 @@ const packets = [
   ['abbreviated-unit-sample-size-packet.json', assessStructuredAbstract(abbreviatedUnitSampleSizeManuscript)],
   ['hyphenated-measurement-sample-size-packet.json', assessStructuredAbstract(hyphenatedMeasurementSampleSizeManuscript)],
   ['ordinal-sample-size-packet.json', assessStructuredAbstract(ordinalSampleSizeManuscript)],
+  ['no-difference-outcome-packet.json', assessStructuredAbstract(noDifferenceOutcomeManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 

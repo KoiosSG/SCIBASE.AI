@@ -590,6 +590,41 @@ function testBlocksNegatedBenefitClaimWhenResultsShowImprovement() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksNoDifferenceOutcomeWordingWhenResultsShowImprovement() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-no-difference-drift',
+    assessedAt: '2026-05-31T16:55:00Z',
+    abstract: {
+      background: 'Automated checks may reduce manual reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, showed no meaningful difference in 96 manuscripts.',
+      conclusions: 'Comment triage outcomes were comparable in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), [
+    'CONCLUSION_RESULT_DIRECTION_MISMATCH',
+    'RESULT_DIRECTION_MISMATCH'
+  ]);
+  assert.ok(packet.actions.includes('align_results_with_primary_endpoint:ms-abstract-no-difference-drift'));
+  assert.ok(packet.actions.includes('tone_down_conclusion:ms-abstract-no-difference-drift'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testAllowsFormattedSampleSizesInStructuredAbstract() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-formatted-sample-size',
@@ -970,6 +1005,7 @@ const tests = [
   testRequiresSpecificLimitationLanguageBeyondWeakHedging,
   testBlocksWorseOutcomeClaimWhenResultsShowImprovement,
   testBlocksNegatedBenefitClaimWhenResultsShowImprovement,
+  testBlocksNoDifferenceOutcomeWordingWhenResultsShowImprovement,
   testAllowsFormattedSampleSizesInStructuredAbstract,
   testRejectsPercentagesAsSampleSizeEvidence,
   testRejectsDecimalValuesAsSampleSizeEvidence,
