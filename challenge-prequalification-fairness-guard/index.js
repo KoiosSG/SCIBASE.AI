@@ -86,7 +86,29 @@ function reviewerIdFor(review) {
   return typeof review.reviewerId === 'string' ? review.reviewerId.trim() : '';
 }
 
+function applicantIsRecord(applicant) {
+  return Boolean(applicant && typeof applicant === 'object' && !Array.isArray(applicant));
+}
+
+function applicantRecordFor(applicant) {
+  if (applicantIsRecord(applicant)) {
+    return applicant;
+  }
+
+  return {
+    id: '',
+    sponsorDecision: null,
+    rejectionReasons: [],
+    appealDueAt: null,
+    malformedApplicantEntry: true
+  };
+}
+
 function applicantIdFor(applicant) {
+  if (!applicantIsRecord(applicant)) {
+    return '';
+  }
+
   return typeof applicant.id === 'string' ? applicant.id.trim() : '';
 }
 
@@ -286,6 +308,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     return ['missing-applicant-list'];
   }
 
+  if (applicant.malformedApplicantEntry) {
+    return ['malformed-applicant-entry'];
+  }
+
   if (round.anonymousScreeningRequired && reviews.some((review) => !review.anonymousScreeningObserved)) {
     reasons.push('anonymous-screening-leak');
   }
@@ -473,6 +499,10 @@ function remediationAction(applicant, reasons) {
     return 'complete-prequalification-evidence';
   }
 
+  if (reasons.includes('malformed-applicant-entry')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('missing-applicant-identity')) {
     return 'complete-prequalification-evidence';
   }
@@ -500,7 +530,7 @@ function evaluatePrequalificationRound(round) {
           missingApplicantList: true
         }
       ]
-    : applicantListFor(round);
+    : applicantListFor(round).map(applicantRecordFor);
 
   const decisions = applicants.map((applicant) => {
     const reviews = reviewsByApplicant[applicantIdFor(applicant)] || [];
@@ -559,6 +589,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('missing-review-list') ||
         decision.reasons.includes('missing-applicant-list') ||
+        decision.reasons.includes('malformed-applicant-entry') ||
         decision.reasons.includes('missing-applicant-identity') ||
         decision.reasons.includes('duplicate-applicant-identity') ||
         decision.reasons.includes('unpublished-screening-criterion') ||

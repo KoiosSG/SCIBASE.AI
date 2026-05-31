@@ -10,7 +10,7 @@
 
 - Protects anonymous or named participation settings during prequalification review.
 - Requires a valid positive reviewer quorum before a solver team is accepted or rejected, and excludes missing or blank reviewer identities from quorum until reviewer evidence is completed.
-- Holds missing, blank, or duplicate applicant identities before malformed applicant rows can change solver-team access.
+- Holds missing, blank, duplicate, or malformed applicant identity entries before malformed applicant rows can change solver-team access.
 - Holds missing round-level criteria lists and review lists before sparse prequalification packets can crash or change solver-team access.
 - Holds missing applicant lists before sparse prequalification packets can crash or change solver-team access.
 - Holds incomplete reviewer score packets and invalid finite 0-100 score values for evidence completion instead of letting malformed review records crash or drive decisions.
@@ -22,7 +22,7 @@
 - Holds invalid pass thresholds for fairness review before sponsor accept/reject decisions can take effect.
 - Holds invalid reviewer quorum requirements for fairness review before sponsor accept/reject decisions can take effect.
 - Holds invalid sponsor decision values for fairness review before malformed accept/reject evidence can change solver access.
-- Holds missing or duplicate applicant identity evidence for fairness review before anonymous or malformed applicant rows can change solver access.
+- Holds missing, duplicate, or malformed applicant identity evidence for fairness review before anonymous or malformed applicant rows can change solver access.
 - Holds missing applicant-list evidence for fairness review before malformed challenge rounds can change solver access.
 - Holds invalid reviewer score values for fairness review before malformed score evidence can drive sponsor decisions.
 - Holds duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.

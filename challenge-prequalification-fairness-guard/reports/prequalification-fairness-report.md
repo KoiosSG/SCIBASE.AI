@@ -105,6 +105,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-prequalification-evidence
 - Audit digest: sha256:c77ccb7f1875504454711c406569be8b6b9b34789239e956635850890ecf1a90
 
+## Malformed Applicant Entry Packet
+
+- Applicant: unidentified-applicant
+- Decision: hold-for-fairness-review
+- Reasons: malformed-applicant-entry
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:f186f54dec87f06c4cc6c61d8de82dfc74749a0ce103446d2084e1fb0f3b6de4
+
 ## Blank Rejection Reason Packet
 
 - Applicant: applicant-blank-rejection-reason

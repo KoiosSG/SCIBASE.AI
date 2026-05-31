@@ -728,6 +728,22 @@ function testDuplicateApplicantIdentitiesHoldPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testMalformedApplicantEntryHoldsPrequalificationRoundWithoutCrashing() {
+  const round = buildSampleRound();
+  round.applicants = [null];
+  round.reviews = [];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'unidentified-applicant');
+  const action = byId(result.remediationActions, 'remediate-unidentified-applicant');
+
+  assert.equal(decision.applicantId, 'unidentified-applicant');
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('malformed-applicant-entry'), true);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testMissingRejectionReasonListHoldsWithoutCrashing() {
   const round = buildSampleRound();
   round.applicants = [
@@ -1092,6 +1108,7 @@ const tests = [
   testInvalidSponsorDecisionHoldsPrequalificationRound,
   testMissingApplicantIdentityHoldsPrequalificationRound,
   testDuplicateApplicantIdentitiesHoldPrequalificationRound,
+  testMalformedApplicantEntryHoldsPrequalificationRoundWithoutCrashing,
   testMissingRejectionReasonListHoldsWithoutCrashing,
   testBlankRejectionReasonTextHoldsRejectedApplicant,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
