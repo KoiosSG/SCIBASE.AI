@@ -99,9 +99,22 @@ const malformedRepository = {
   references: [null]
 };
 
+const malformedManifestRepository = {
+  repositoryId: 'repo-reference-malformed-manifest',
+  assessedAt: '2026-05-28T12:00:00Z',
+  references: {
+    dataset: {
+      id: 'dataset-not-in-list',
+      kind: 'linked_dataset',
+      target: 'https://doi.org/10.5281/zenodo.4567890'
+    }
+  }
+};
+
 module.exports = {
   riskyRepository,
   cleanRepository,
   warningRepository,
-  malformedRepository
+  malformedRepository,
+  malformedManifestRepository
 };

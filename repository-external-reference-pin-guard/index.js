@@ -36,6 +36,12 @@ function assessExternalReferences(repository) {
 }
 
 function assessReference(reference, assessedAt, policy) {
+  if (reference.__malformedReferenceManifest) {
+    return [
+      finding(reference, 'MALFORMED_REFERENCE_MANIFEST', 'blocker', 'External reference manifest must be an array before release.')
+    ];
+  }
+
   if (reference.__malformedReferenceEntry) {
     return [
       finding(reference, 'MALFORMED_REFERENCE_ENTRY', 'blocker', 'External reference entry must be a structured object before release.')
@@ -107,7 +113,16 @@ function needsDurableIdentifier(reference) {
 }
 
 function normalizeReferenceEntries(value) {
-  if (!Array.isArray(value)) return [];
+  if (!Array.isArray(value)) {
+    return [
+      {
+        id: 'reference-manifest',
+        kind: 'unknown',
+        target: null,
+        __malformedReferenceManifest: true
+      }
+    ];
+  }
 
   return value.map((reference, index) => {
     if (isRecord(reference)) return reference;
@@ -213,6 +228,7 @@ function buildActions(repository, findings) {
 
   const actions = new Set();
   for (const [referenceId, codes] of byReference.entries()) {
+    if (codes.has('MALFORMED_REFERENCE_MANIFEST')) actions.add(`repair_reference_manifest:${referenceId}`);
     if (codes.has('MALFORMED_REFERENCE_ENTRY')) actions.add(`repair_reference_entry:${referenceId}`);
     if (codes.has('AUTH_REQUIRED_REFERENCE')) actions.add(`replace_or_snapshot_auth_reference:${referenceId}`);
     if (codes.has('FLOATING_GIT_REFERENCE') || codes.has('FLOATING_API_REFERENCE')) actions.add(`pin_external_reference:${referenceId}`);
@@ -228,18 +244,22 @@ function buildActions(repository, findings) {
 function buildSignals(findings) {
   const codes = new Set(findings.map((finding) => finding.code));
   return {
-    immutablePins: !codes.has('MALFORMED_REFERENCE_ENTRY')
+    immutablePins: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+      && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('FLOATING_GIT_REFERENCE')
       && !codes.has('FLOATING_API_REFERENCE'),
-    exportable: !codes.has('MALFORMED_REFERENCE_ENTRY')
+    exportable: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+      && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('AUTH_REQUIRED_REFERENCE')
       && !codes.has('MISSING_DURABLE_IDENTIFIER')
       && !codes.has('INVALID_CHECKSUM_EVIDENCE')
       && !codes.has('INVALID_DOI_EVIDENCE'),
-    attributionComplete: !codes.has('MALFORMED_REFERENCE_ENTRY')
+    attributionComplete: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+      && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('MISSING_LICENSE')
       && !codes.has('MISSING_ATTRIBUTION'),
-    verificationFresh: !codes.has('MALFORMED_REFERENCE_ENTRY')
+    verificationFresh: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+      && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('STALE_REFERENCE_EVIDENCE')
   };
 }

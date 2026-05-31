@@ -6,7 +6,8 @@ const {
   riskyRepository,
   cleanRepository,
   warningRepository,
-  malformedRepository
+  malformedRepository,
+  malformedManifestRepository
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -14,6 +15,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 
 const packets = [
   ['blocked-packet.json', assessExternalReferences(riskyRepository)],
+  ['malformed-manifest-packet.json', assessExternalReferences(malformedManifestRepository)],
   ['malformed-packet.json', assessExternalReferences(malformedRepository)],
   ['clean-packet.json', assessExternalReferences(cleanRepository)],
   ['warning-packet.json', assessExternalReferences(warningRepository)]
@@ -47,8 +49,9 @@ const rows = packets.map(([fileName, packet], index) => {
       </g>`;
 }).join('');
 
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340">
-  <rect width="1200" height="340" fill="#ffffff"/>
+const svgHeight = 408;
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${svgHeight}" viewBox="0 0 1200 ${svgHeight}">
+  <rect width="1200" height="${svgHeight}" fill="#ffffff"/>
   <text x="48" y="48" font-size="28" font-family="Arial" font-weight="700" fill="#111827">Repository External Reference Pin Guard</text>
   <text x="48" y="74" font-size="15" font-family="Arial" fill="#475569">Issue #10 release/export gate for submodules, linked datasets, API sources, and model references</text>
 ${rows}

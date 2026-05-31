@@ -435,6 +435,35 @@ function testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing() {
   });
 }
 
+function testMalformedReferenceManifestBlocksRelease() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-malformed-manifest',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: {
+      dataset: {
+        id: 'dataset-not-in-list',
+        kind: 'linked_dataset',
+        target: 'https://doi.org/10.5281/zenodo.4567890'
+      }
+    }
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_REFERENCE_MANIFEST']);
+  assert.equal(packet.findings[0].referenceId, 'reference-manifest');
+  assert.ok(packet.actions.includes('repair_reference_manifest:reference-manifest'));
+  assert.equal(packet.referenceSignals.immutablePins, false);
+  assert.equal(packet.referenceSignals.exportable, false);
+  assert.equal(packet.referenceSignals.attributionComplete, false);
+  assert.equal(packet.referenceSignals.verificationFresh, false);
+  assert.deepEqual(packet.referenceSummary, {
+    total: 1,
+    byKind: {
+      unknown: 1
+    }
+  });
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
@@ -449,7 +478,8 @@ const tests = [
   testNullGitCommitShaDoesNotCountAsImmutablePin,
   testMissingVerificationEvidenceBlocksOtherwisePinnedReference,
   testMalformedOptionalEvidenceBlocksEvenWhenAnotherIdentifierIsValid,
-  testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing
+  testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing,
+  testMalformedReferenceManifestBlocksRelease
 ];
 
 for (const test of tests) {
