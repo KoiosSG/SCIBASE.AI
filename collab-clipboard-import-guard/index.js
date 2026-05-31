@@ -178,6 +178,16 @@ function assessBlock(block, batch, duplicateAnchorBlocks) {
     sanitizedBlock.cells = sanitizeCells(block.cells);
   }
 
+  if (hasMalformedTableCells(block)) {
+    findings.push(finding({
+      code: 'MALFORMED_TABLE_CELLS',
+      severity: 'warning',
+      blockId: block.id,
+      message: 'Imported table contains malformed cell metadata that cannot enter collaborative state directly.'
+    }));
+    sanitizedBlock.cells = [];
+  }
+
   if (hasMalformedTableRows(block)) {
     findings.push(finding({
       code: 'MALFORMED_TABLE_ROW',
@@ -269,6 +279,10 @@ function hasFormulaCell(block) {
   return Array.isArray(block.cells) && block.cells.some((row) => (
     Array.isArray(row) && row.some((cell) => typeof cell === 'string' && /^[=+\-@]/.test(cell.trim()))
   ));
+}
+
+function hasMalformedTableCells(block) {
+  return block.type === 'table' && Object.hasOwn(block, 'cells') && !Array.isArray(block.cells);
 }
 
 function hasLocalPrivatePathCell(block) {
@@ -379,6 +393,7 @@ function buildActions(batch, findings) {
     if (item.code === 'MALFORMED_EXISTING_ANCHORS') actions.add(`require_curator_anchor_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCKS') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCK') actions.add(`require_curator_payload_review:${batch.importId}`);
+    if (item.code === 'MALFORMED_TABLE_CELLS') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MALFORMED_TABLE_ROW') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MISSING_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);
     if (item.code === 'INVALID_SOURCE_ATTESTATION') actions.add(`request_signed_source_attestation:${batch.importId}`);

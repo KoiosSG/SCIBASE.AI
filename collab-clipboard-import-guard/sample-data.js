@@ -196,6 +196,32 @@ const malformedTableRowImport = {
   ]
 };
 
+const malformedTableCellsImport = {
+  importId: 'import-malformed-table-cells',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-06-01T01:10:00Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-spreadsheet-export',
+    trustLevel: 'trusted',
+    signedAttestation: TRUSTED_EXPORT_ATTESTATION
+  },
+  blocks: [
+    {
+      id: 'blk-malformed-table-cells',
+      type: 'table',
+      sectionId: 'results',
+      anchor: 'malformed-table-cells',
+      cells: {
+        rows: [
+          ['metric', 'value'],
+          ['private note', '=HYPERLINK("file:///Users/sam/private-lab/raw.csv")']
+        ]
+      }
+    }
+  ]
+};
+
 const malformedExistingAnchorsImport = {
   importId: 'import-malformed-existing-anchors',
   workspaceId: 'workspace-paper-7',
@@ -313,6 +339,7 @@ module.exports = {
   malformedBlockListImport,
   malformedBlockEntryImport,
   malformedTableRowImport,
+  malformedTableCellsImport,
   malformedExistingAnchorsImport,
   cleanTrustedImport,
   privateSourceOriginImport,

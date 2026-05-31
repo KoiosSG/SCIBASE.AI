@@ -349,6 +349,41 @@ function testMalformedTableRowsAreStagedBeforeCollaborativeInsertion() {
   assert.deepEqual(packet.actions, ['require_curator_payload_review:import-malformed-table-row']);
 }
 
+function testMalformedTableCellsAreStagedBeforeCollaborativeInsertion() {
+  const packet = assessImportBatch({
+    importId: 'import-malformed-table-cells',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-06-01T01:10:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-spreadsheet-export',
+      trustLevel: 'trusted',
+      signedAttestation: SPREADSHEET_EXPORT_ATTESTATION
+    },
+    blocks: [
+      {
+        id: 'blk-malformed-table-cells',
+        type: 'table',
+        sectionId: 'results',
+        anchor: 'malformed-table-cells',
+        cells: {
+          rows: [
+            ['metric', 'value'],
+            ['private note', '=HYPERLINK("file:///Users/sam/private-lab/raw.csv")']
+          ]
+        }
+      }
+    ]
+  });
+
+  const tableBlock = packet.sanitizedBlocks.find((block) => block.id === 'blk-malformed-table-cells');
+
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_TABLE_CELLS']);
+  assert.deepEqual(tableBlock.cells, []);
+  assert.deepEqual(packet.actions, ['require_curator_payload_review:import-malformed-table-cells']);
+}
+
 function testMalformedExistingAnchorsAreStagedBeforeCollisionChecks() {
   const packet = assessImportBatch({
     importId: 'import-malformed-existing-anchors',
@@ -709,6 +744,7 @@ const tests = [
   testMalformedImportBlockListIsStagedWithoutCrashing,
   testMalformedImportBlockEntryIsStagedWithoutCrashing,
   testMalformedTableRowsAreStagedBeforeCollaborativeInsertion,
+  testMalformedTableCellsAreStagedBeforeCollaborativeInsertion,
   testMalformedExistingAnchorsAreStagedBeforeCollisionChecks,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,

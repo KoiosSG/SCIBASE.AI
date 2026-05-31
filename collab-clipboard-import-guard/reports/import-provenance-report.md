@@ -10,6 +10,7 @@
 | malformed-block-list-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_IMPORT_BLOCKS |
 | malformed-block-entry-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_IMPORT_BLOCK |
 | malformed-table-row-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_TABLE_ROW |
+| malformed-table-cells-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_TABLE_CELLS |
 | malformed-existing-anchors-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_EXISTING_ANCHORS |
 | source-origin-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_SOURCE |
 | lowercase-windows-path-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_PATH |
