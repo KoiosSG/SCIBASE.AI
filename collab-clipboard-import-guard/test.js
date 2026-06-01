@@ -291,6 +291,17 @@ function testMalformedImportBlockListIsStagedWithoutCrashing() {
   assert.deepEqual(packet.actions, ['require_curator_payload_review:import-malformed-block-list']);
 }
 
+function testMalformedTopLevelImportBatchIsStagedWithoutCrashing() {
+  const packet = assessImportBatch(null);
+
+  assert.equal(packet.importId, 'unknown-import');
+  assert.equal(packet.status, 'stage_for_curator_review');
+  assert.equal(packet.insertionLanes.collaborativeInsert, 'curator_review');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_IMPORT_BATCH']);
+  assert.deepEqual(packet.sanitizedBlocks, []);
+  assert.deepEqual(packet.actions, ['require_curator_payload_review:unknown-import']);
+}
+
 function testMalformedImportBlockEntryIsStagedWithoutCrashing() {
   const packet = assessImportBatch({
     importId: 'import-malformed-block-entry',
@@ -742,6 +753,7 @@ const tests = [
   testStagesImportMissingSourceTrustMetadataForCuratorReview,
   testStagesImportWithUnsupportedSourceChannelForCuratorReview,
   testMalformedImportBlockListIsStagedWithoutCrashing,
+  testMalformedTopLevelImportBatchIsStagedWithoutCrashing,
   testMalformedImportBlockEntryIsStagedWithoutCrashing,
   testMalformedTableRowsAreStagedBeforeCollaborativeInsertion,
   testMalformedTableCellsAreStagedBeforeCollaborativeInsertion,

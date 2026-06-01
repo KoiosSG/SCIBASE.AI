@@ -28,6 +28,7 @@ const packets = [
   ['trusted-attestation-packet.json', assessImportBatch(trustedMissingAttestationImport)],
   ['placeholder-attestation-packet.json', assessImportBatch(trustedPlaceholderAttestationImport)],
   ['unsupported-channel-packet.json', assessImportBatch(unsupportedChannelImport)],
+  ['malformed-import-batch-packet.json', assessImportBatch(null)],
   ['malformed-block-list-packet.json', assessImportBatch(malformedBlockListImport)],
   ['malformed-block-entry-packet.json', assessImportBatch(malformedBlockEntryImport)],
   ['malformed-table-row-packet.json', assessImportBatch(malformedTableRowImport)],

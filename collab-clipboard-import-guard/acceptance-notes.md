@@ -17,6 +17,7 @@ Expected evidence:
 - `reports/partner-review-packet.json` stages a partner import missing a signed source attestation.
 - `reports/trusted-attestation-packet.json` stages a trusted import missing a signed source attestation.
 - `reports/placeholder-attestation-packet.json` stages a trusted import with placeholder or malformed attestation evidence.
+- `reports/malformed-import-batch-packet.json` stages a malformed top-level import batch instead of crashing before curator review evidence exists.
 - `reports/malformed-block-list-packet.json` stages a malformed import payload instead of throwing or allowing collaborative insertion.
 - `reports/malformed-block-entry-packet.json` stages malformed block entries inside an otherwise valid block list without throwing or creating sanitized shared-manuscript blocks.
 - `reports/malformed-table-row-packet.json` stages malformed table rows before collaborative insertion and normalizes them in sanitized reviewer output.
@@ -29,6 +30,7 @@ Expected evidence:
 - `reports/clean-packet.json` allows a trusted, attested import.
 - Missing or unrecognized source trust metadata stages otherwise clean imports for curator review.
 - Unsupported import channels stage otherwise clean, trusted, attested imports for curator review.
+- Malformed top-level import batch payloads stage for curator payload review without throwing before packet generation.
 - Malformed block-list payloads stage for curator payload review without creating sanitized shared-manuscript blocks.
 - Malformed block entries stage for curator payload review without creating sanitized shared-manuscript blocks.
 - Malformed table rows stage for curator payload review and normalize to empty rows instead of entering collaborative state.

@@ -6,7 +6,7 @@ It evaluates synthetic import batches for:
 
 - untrusted clipboard or file sources
 - missing or unsupported import channel metadata
-- malformed import payloads that do not provide a valid block list, contain malformed block entries inside an otherwise valid list, contain malformed table cells or rows, or provide malformed existing-anchor metadata
+- malformed import payloads that do not provide a valid top-level import batch or block list, contain malformed block entries inside an otherwise valid list, contain malformed table cells or rows, or provide malformed existing-anchor metadata
 - missing or unrecognized source trust metadata
 - missing, blank, placeholder, or malformed signed source attestations from trusted and partner imports
 - hidden instruction-like text that is not visible to collaborators
@@ -29,7 +29,7 @@ npm run check
 
 The demo writes JSON, Markdown, SVG, and MP4 evidence to `reports/`.
 
-Generated packets include unsafe clipboard, partner-review, trusted-attestation, placeholder-attestation, unsupported-channel, malformed-block-list, malformed-block-entry, malformed-table-row, malformed-table-cells, malformed-existing-anchors, private source-origin, lowercase Windows path, forward-slash Windows path, and clean trusted import examples.
+Generated packets include unsafe clipboard, partner-review, trusted-attestation, placeholder-attestation, unsupported-channel, malformed-import-batch, malformed-block-list, malformed-block-entry, malformed-table-row, malformed-table-cells, malformed-existing-anchors, private source-origin, lowercase Windows path, forward-slash Windows path, and clean trusted import examples.
 
 ## Scope
 

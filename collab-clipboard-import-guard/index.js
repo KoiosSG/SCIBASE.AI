@@ -1,6 +1,10 @@
 const crypto = require('crypto');
 
 function assessImportBatch(batch) {
+  if (!isImportBatchObject(batch)) {
+    return malformedImportBatchPacket();
+  }
+
   const blocks = blockListFor(batch);
   const batchFindings = assessBatchShape(batch);
   const existingAnchorFindings = assessExistingAnchorShape(batch);
@@ -33,6 +37,41 @@ function assessImportBatch(batch) {
     source: sanitizeSource(batch.source || {}),
     findings,
     sanitizedBlocks,
+    actions: buildActions(batch, findings),
+    assessedAt: batch.receivedAt
+  };
+
+  packet.auditDigest = digestPacket(packet);
+  return packet;
+}
+
+function isImportBatchObject(batch) {
+  return Boolean(batch && typeof batch === 'object' && !Array.isArray(batch));
+}
+
+function malformedImportBatchPacket() {
+  const batch = {
+    importId: 'unknown-import',
+    workspaceId: null,
+    receivedAt: null,
+    source: {}
+  };
+  const findings = [
+    finding({
+      code: 'MALFORMED_IMPORT_BATCH',
+      severity: 'warning',
+      blockId: null,
+      message: 'Import payload is malformed and cannot enter collaborative state directly.'
+    })
+  ];
+  const packet = {
+    importId: batch.importId,
+    workspaceId: batch.workspaceId,
+    status: 'stage_for_curator_review',
+    insertionLanes: chooseInsertionLanes('stage_for_curator_review'),
+    source: sanitizeSource(batch.source),
+    findings,
+    sanitizedBlocks: [],
     actions: buildActions(batch, findings),
     assessedAt: batch.receivedAt
   };
@@ -390,6 +429,7 @@ function buildActions(batch, findings) {
     if (item.code === 'UNTRUSTED_SOURCE') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_SOURCE_TRUST') actions.add(`require_curator_source_review:${batch.importId}`);
     if (item.code === 'UNKNOWN_IMPORT_CHANNEL') actions.add(`require_curator_channel_review:${batch.importId}`);
+    if (item.code === 'MALFORMED_IMPORT_BATCH') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MALFORMED_EXISTING_ANCHORS') actions.add(`require_curator_anchor_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCKS') actions.add(`require_curator_payload_review:${batch.importId}`);
     if (item.code === 'MALFORMED_IMPORT_BLOCK') actions.add(`require_curator_payload_review:${batch.importId}`);
