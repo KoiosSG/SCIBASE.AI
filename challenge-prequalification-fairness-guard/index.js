@@ -62,6 +62,22 @@ function criterionIdFor(criterion) {
   return typeof criterion.id === 'string' ? criterion.id.trim() : criterion.id;
 }
 
+function criterionIsRecord(criterion) {
+  return Boolean(criterion && typeof criterion === 'object' && !Array.isArray(criterion));
+}
+
+function criterionRecordFor(criterion) {
+  if (criterionIsRecord(criterion)) {
+    return criterion;
+  }
+
+  return {
+    id: '',
+    weight: null,
+    malformedCriterionEntry: true
+  };
+}
+
 function duplicatePublishedCriterionIds(round) {
   const criterionCounts = criteriaListFor(round).reduce((counts, criterion) => {
     const criterionId = criterionIdFor(criterion);
@@ -162,11 +178,15 @@ function reviewListHasMalformedEntries(round) {
 }
 
 function criteriaListFor(round) {
-  return Array.isArray(round.criteria) ? round.criteria : [];
+  return Array.isArray(round.criteria) ? round.criteria.map(criterionRecordFor) : [];
 }
 
 function criteriaListIsMissing(round) {
   return !Array.isArray(round.criteria);
+}
+
+function criteriaListHasMalformedEntries(round) {
+  return Array.isArray(round.criteria) && round.criteria.some((criterion) => !criterionIsRecord(criterion));
 }
 
 function applicantListFor(round) {
@@ -348,6 +368,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-published-criteria-list');
   }
 
+  if (criteriaListHasMalformedEntries(round)) {
+    reasons.push('malformed-published-criterion-entry');
+  }
+
   if (duplicateReviewerIds.length > 0) {
     reasons.push('duplicate-reviewer-score-evidence');
   }
@@ -447,6 +471,10 @@ function remediationAction(applicant, reasons) {
   }
 
   if (reasons.includes('missing-published-criteria-list')) {
+    return 'publish-complete-screening-criteria';
+  }
+
+  if (reasons.includes('malformed-published-criterion-entry')) {
     return 'publish-complete-screening-criteria';
   }
 
@@ -609,6 +637,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('duplicate-published-criterion') ||
         decision.reasons.includes('missing-published-criterion-id') ||
         decision.reasons.includes('missing-published-criteria-list') ||
+        decision.reasons.includes('malformed-published-criterion-entry') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('malformed-review-entry') ||

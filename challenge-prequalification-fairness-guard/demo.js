@@ -16,6 +16,7 @@ const duplicateApplicantIdentityResult = evaluatePrequalificationRound(buildDupl
 const missingReviewListResult = evaluatePrequalificationRound(buildMissingReviewListRound());
 const malformedReviewEntryResult = evaluatePrequalificationRound(buildMalformedReviewEntryRound());
 const missingCriteriaListResult = evaluatePrequalificationRound(buildMissingCriteriaListRound());
+const malformedCriterionEntryResult = evaluatePrequalificationRound(buildMalformedCriterionEntryRound());
 const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApplicantListRound());
 const malformedApplicantEntryResult = evaluatePrequalificationRound(buildMalformedApplicantEntryRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
@@ -43,6 +44,10 @@ const malformedReviewEntryPacketPath = path.join(
   'malformed-review-entry-packet.json'
 );
 const missingCriteriaListPacketPath = path.join(reportsDir, 'missing-criteria-list-packet.json');
+const malformedCriterionEntryPacketPath = path.join(
+  reportsDir,
+  'malformed-criterion-entry-packet.json'
+);
 const missingApplicantListPacketPath = path.join(reportsDir, 'missing-applicant-list-packet.json');
 const malformedApplicantEntryPacketPath = path.join(
   reportsDir,
@@ -77,6 +82,10 @@ fs.writeFileSync(
 fs.writeFileSync(
   missingCriteriaListPacketPath,
   `${JSON.stringify(missingCriteriaListResult, null, 2)}\n`
+);
+fs.writeFileSync(
+  malformedCriterionEntryPacketPath,
+  `${JSON.stringify(malformedCriterionEntryResult, null, 2)}\n`
 );
 fs.writeFileSync(
   missingApplicantListPacketPath,
@@ -204,6 +213,14 @@ ${actions}
 - Remediation: ${missingCriteriaListResult.remediationActions[0].action}
 - Audit digest: ${missingCriteriaListResult.auditDigest}
 
+## Malformed Criterion Entry Packet
+
+- Applicant: ${malformedCriterionEntryResult.decisions[0].applicantId}
+- Decision: ${malformedCriterionEntryResult.decisions[0].decision}
+- Reasons: ${malformedCriterionEntryResult.decisions[0].reasons.join(', ')}
+- Remediation: ${malformedCriterionEntryResult.remediationActions[0].action}
+- Audit digest: ${malformedCriterionEntryResult.auditDigest}
+
 ## Missing Applicant List Packet
 
 - Applicant: ${missingApplicantListResult.decisions[0].applicantId}
@@ -262,6 +279,7 @@ console.log(`Wrote ${path.relative(__dirname, duplicateApplicantIdentityPacketPa
 console.log(`Wrote ${path.relative(__dirname, missingReviewListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedReviewEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingCriteriaListPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedCriterionEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedApplicantEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
@@ -680,6 +698,20 @@ function buildMissingCriteriaListRound() {
     }
   ];
   delete round.criteria;
+  return round;
+}
+
+function buildMalformedCriterionEntryRound() {
+  const round = buildSampleRound();
+  round.criteria = [null];
+  round.applicants = [
+    {
+      id: 'applicant-malformed-criterion-entry',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
   return round;
 }
 

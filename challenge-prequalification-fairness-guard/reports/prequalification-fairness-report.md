@@ -106,6 +106,14 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: publish-complete-screening-criteria
 - Audit digest: sha256:c2d8b60e1ca8cc50e8b8c072ee2a22a9a832df09b59e63d60dd21b41b1f17fd3
 
+## Malformed Criterion Entry Packet
+
+- Applicant: applicant-malformed-criterion-entry
+- Decision: hold-for-fairness-review
+- Reasons: criteria-weight-total-invalid, criteria-weight-value-invalid, inconsistent-threshold-decision, malformed-published-criterion-entry, missing-published-criterion-id, reviewer-quorum-shortfall
+- Remediation: publish-complete-screening-criteria
+- Audit digest: sha256:288e8b93e7b316689b59f0d21d90d99e579ad0231804b4d64291f20e66d7ec4a
+
 ## Missing Applicant List Packet
 
 - Applicant: unidentified-applicant

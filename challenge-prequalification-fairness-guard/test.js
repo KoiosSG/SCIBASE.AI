@@ -1010,6 +1010,29 @@ function testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing() {
   assert.ok(result.criteriaDigest.startsWith('sha256:'));
 }
 
+function testMalformedCriterionEntryHoldsPrequalificationRoundWithoutCrashing() {
+  const round = buildSampleRound();
+  round.criteria = [null];
+  round.applicants = [
+    {
+      id: 'applicant-malformed-criterion-entry',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-malformed-criterion-entry');
+  const action = byId(result.remediationActions, 'remediate-applicant-malformed-criterion-entry');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('malformed-published-criterion-entry'), true);
+  assert.equal(action.action, 'publish-complete-screening-criteria');
+  assert.equal(action.priority, 'high');
+  assert.ok(result.criteriaDigest.startsWith('sha256:'));
+}
+
 function testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing() {
   const round = buildSampleRound();
   delete round.applicants;
@@ -1166,6 +1189,7 @@ const tests = [
   testMissingReviewListHoldsPrequalificationRoundWithoutCrashing,
   testMalformedReviewEntryHoldsPrequalificationRoundWithoutCrashing,
   testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing,
+  testMalformedCriterionEntryHoldsPrequalificationRoundWithoutCrashing,
   testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
