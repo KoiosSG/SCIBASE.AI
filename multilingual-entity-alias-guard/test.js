@@ -408,6 +408,22 @@ function testMalformedMentionTextIsHeldForCuratorReview() {
   assert.equal(result.recommendationGuards.safeEntityIds.includes('entity:mesh:D003920'), false);
 }
 
+function testMalformedMentionEntriesAreHeldForCuratorReview() {
+  const corpus = JSON.parse(JSON.stringify(buildSampleCorpus()));
+  corpus.mentions = [null];
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'malformed-mention-entry-1');
+  const action = byId(result.curatorActions, 'curate-malformed-mention-entry-1');
+
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'malformed-mention-entry');
+  assert.equal(event.valueType, 'null');
+  assert.equal(action.priority, 'high');
+  assert.equal(action.action, 'review-multilingual-malformed-mention');
+  assert.equal(result.recommendationGuards.safeEntityIds.includes('entity:mesh:D003920'), false);
+}
+
 function testLanguageTaggedSynonymsArePreservedForEntityPages() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
@@ -449,6 +465,7 @@ const tests = [
   testMissingMentionListProducesEmptyAliasReview,
   testMissingHomographPolicyDefaultsToEmptyPolicy,
   testMalformedMentionTextIsHeldForCuratorReview,
+  testMalformedMentionEntriesAreHeldForCuratorReview,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

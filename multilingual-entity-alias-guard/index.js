@@ -182,7 +182,23 @@ function buildAliasIndex(entities) {
   return index;
 }
 
-function mentionDecision(mention, aliasIndex, homographs) {
+function mentionDecision(mention, aliasIndex, homographs, index) {
+  if (!mention || typeof mention !== 'object' || Array.isArray(mention)) {
+    return {
+      id: `malformed-mention-entry-${index + 1}`,
+      language: null,
+      text: null,
+      documentId: null,
+      decision: 'hold-for-curator-review',
+      reason: 'malformed-mention-entry',
+      valueType: valueType(mention),
+      candidateEntityId: null,
+      candidateEntityIds: [],
+      confidence: null,
+      preservedLanguageTag: null
+    };
+  }
+
   const languageKeys = languageLookupKeys(mention.language);
   if (!isTextValue(mention.text)) {
     const candidateEntityId = mention.candidateEntityId || null;
@@ -315,7 +331,8 @@ function curatorActionForDecision(decision) {
         ? 'review-multilingual-candidate-alias-conflict'
         : decision.reason === 'script-confusable-alias'
         ? 'review-multilingual-script-confusable'
-        : decision.reason === 'malformed-mention-text'
+        : decision.reason === 'malformed-mention-text' ||
+          decision.reason === 'malformed-mention-entry'
         ? 'review-multilingual-malformed-mention'
         : decision.reason === 'false-friend-or-homograph'
         ? 'review-multilingual-homograph'
@@ -325,7 +342,8 @@ function curatorActionForDecision(decision) {
       decision.reason === 'alias-collision' ||
       decision.reason === 'candidate-alias-conflict' ||
       decision.reason === 'script-confusable-alias' ||
-      decision.reason === 'malformed-mention-text'
+      decision.reason === 'malformed-mention-text' ||
+      decision.reason === 'malformed-mention-entry'
         ? 'high'
         : 'normal',
     language: decision.language,
@@ -384,8 +402,8 @@ function buildEntityPackets(entities, decisions) {
 
 function evaluateAliasGuard(corpus) {
   const aliasIndex = buildAliasIndex(corpus.entities);
-  const mentionDecisions = evidenceList(corpus.mentions).map((mention) =>
-    mentionDecision(mention, aliasIndex, evidenceObject(corpus.homographs))
+  const mentionDecisions = evidenceList(corpus.mentions).map((mention, index) =>
+    mentionDecision(mention, aliasIndex, evidenceObject(corpus.homographs), index)
   );
   const curatorActions = mentionDecisions.map(curatorActionForDecision).filter(Boolean);
   const entityPackets = buildEntityPackets(corpus.entities, mentionDecisions);

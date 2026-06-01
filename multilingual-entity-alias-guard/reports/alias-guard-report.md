@@ -43,6 +43,10 @@ Extractor candidates that disagree with trusted multilingual alias lookup are he
 
 Malformed mention text values are held for curator review instead of crashing alias normalization. The malformed fixture decision is hold-for-curator-review with reason malformed-mention-text, and it emits review-multilingual-malformed-mention.
 
+## Malformed Mention Entry Guard
+
+Malformed mention rows such as null entries are held for curator review instead of crashing before graph packets are produced. The malformed entry fixture decision is hold-for-curator-review with reason malformed-mention-entry, and it emits review-multilingual-malformed-mention.
+
 ## Malformed Alias Evidence Guard
 
 Malformed localized-name evidence is omitted from alias lookup and JSON-LD alternate names instead of crashing ontology review. The malformed alias fixture records 1 alias evidence issue with reason malformed-localized-name.

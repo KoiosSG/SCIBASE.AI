@@ -48,6 +48,12 @@ const malformedMentionResult = evaluateAliasGuard({
     }
   ]
 });
+const malformedMentionEntryResult = evaluateAliasGuard({
+  ...buildSampleCorpus(),
+  corpusId: 'kg-malformed-mention-entry-17',
+  generatedAt: '2026-06-01T18:55:00Z',
+  mentions: [null]
+});
 const malformedAliasEvidenceResult = evaluateAliasGuard({
   ...buildSampleCorpus(),
   corpusId: 'kg-malformed-localized-name-17',
@@ -78,6 +84,7 @@ const packetPath = path.join(reportsDir, 'alias-guard-packet.json');
 const sparsePacketPath = path.join(reportsDir, 'sparse-alias-guard-packet.json');
 const conflictPacketPath = path.join(reportsDir, 'candidate-alias-conflict-packet.json');
 const malformedMentionPacketPath = path.join(reportsDir, 'malformed-mention-text-packet.json');
+const malformedMentionEntryPacketPath = path.join(reportsDir, 'malformed-mention-entry-packet.json');
 const malformedAliasEvidencePacketPath = path.join(reportsDir, 'malformed-alias-evidence-packet.json');
 const reportPath = path.join(reportsDir, 'alias-guard-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
@@ -86,6 +93,10 @@ fs.writeFileSync(packetPath, `${JSON.stringify(result, null, 2)}\n`);
 fs.writeFileSync(sparsePacketPath, `${JSON.stringify(sparseResult, null, 2)}\n`);
 fs.writeFileSync(conflictPacketPath, `${JSON.stringify(conflictResult, null, 2)}\n`);
 fs.writeFileSync(malformedMentionPacketPath, `${JSON.stringify(malformedMentionResult, null, 2)}\n`);
+fs.writeFileSync(
+  malformedMentionEntryPacketPath,
+  `${JSON.stringify(malformedMentionEntryResult, null, 2)}\n`
+);
 fs.writeFileSync(malformedAliasEvidencePacketPath, `${JSON.stringify(malformedAliasEvidenceResult, null, 2)}\n`);
 
 const accepted = result.mentionDecisions
@@ -134,6 +145,10 @@ Extractor candidates that disagree with trusted multilingual alias lookup are he
 
 Malformed mention text values are held for curator review instead of crashing alias normalization. The malformed fixture decision is ${malformedMentionResult.mentionDecisions[0].decision} with reason ${malformedMentionResult.mentionDecisions[0].reason}, and it emits ${malformedMentionResult.curatorActions[0].action}.
 
+## Malformed Mention Entry Guard
+
+Malformed mention rows such as null entries are held for curator review instead of crashing before graph packets are produced. The malformed entry fixture decision is ${malformedMentionEntryResult.mentionDecisions[0].decision} with reason ${malformedMentionEntryResult.mentionDecisions[0].reason}, and it emits ${malformedMentionEntryResult.curatorActions[0].action}.
+
 ## Malformed Alias Evidence Guard
 
 Malformed localized-name evidence is omitted from alias lookup and JSON-LD alternate names instead of crashing ontology review. The malformed alias fixture records ${malformedAliasEvidenceResult.entityPackets[0].aliasEvidenceIssues.length} alias evidence issue with reason ${malformedAliasEvidenceResult.entityPackets[0].aliasEvidenceIssues[0].reason}.
@@ -165,6 +180,7 @@ console.log(`Wrote ${path.relative(__dirname, packetPath)}`);
 console.log(`Wrote ${path.relative(__dirname, sparsePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, conflictPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedMentionPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedMentionEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedAliasEvidencePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
