@@ -82,7 +82,15 @@ function hasMissingPublishedCriterionIds(round) {
   );
 }
 
+function reviewIsRecord(review) {
+  return Boolean(review && typeof review === 'object' && !Array.isArray(review));
+}
+
 function reviewerIdFor(review) {
+  if (!reviewIsRecord(review)) {
+    return '';
+  }
+
   return typeof review.reviewerId === 'string' ? review.reviewerId.trim() : '';
 }
 
@@ -134,15 +142,23 @@ function duplicateApplicantIds(round) {
 }
 
 function reviewApplicantIdFor(review) {
+  if (!reviewIsRecord(review)) {
+    return '';
+  }
+
   return typeof review.applicantId === 'string' ? review.applicantId.trim() : review.applicantId;
 }
 
 function reviewListFor(round) {
-  return Array.isArray(round.reviews) ? round.reviews : [];
+  return Array.isArray(round.reviews) ? round.reviews.filter(reviewIsRecord) : [];
 }
 
 function reviewListIsMissing(round) {
   return !Array.isArray(round.reviews);
+}
+
+function reviewListHasMalformedEntries(round) {
+  return Array.isArray(round.reviews) && round.reviews.some((review) => !reviewIsRecord(review));
 }
 
 function criteriaListFor(round) {
@@ -215,7 +231,7 @@ function publicCriteriaIds(round) {
 }
 
 function reviewScores(review) {
-  return review.scores && typeof review.scores === 'object' ? review.scores : {};
+  return reviewIsRecord(review) && review.scores && typeof review.scores === 'object' ? review.scores : {};
 }
 
 function isValidReviewerScore(score) {
@@ -338,6 +354,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (hasMissingReviewerIdentity(reviews)) {
     reasons.push('missing-reviewer-identity');
+  }
+
+  if (reviewListHasMalformedEntries(round)) {
+    reasons.push('malformed-review-entry');
   }
 
   if (reviewListIsMissing(round)) {
@@ -491,6 +511,10 @@ function remediationAction(applicant, reasons) {
     return 'complete-prequalification-evidence';
   }
 
+  if (reasons.includes('malformed-review-entry')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('missing-review-list')) {
     return 'complete-prequalification-evidence';
   }
@@ -587,6 +611,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('missing-published-criteria-list') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
+        decision.reasons.includes('malformed-review-entry') ||
         decision.reasons.includes('missing-review-list') ||
         decision.reasons.includes('missing-applicant-list') ||
         decision.reasons.includes('malformed-applicant-entry') ||

@@ -14,6 +14,7 @@ const invalidSponsorDecisionResult = evaluatePrequalificationRound(buildInvalidS
 const missingApplicantIdentityResult = evaluatePrequalificationRound(buildMissingApplicantIdentityRound());
 const duplicateApplicantIdentityResult = evaluatePrequalificationRound(buildDuplicateApplicantIdentityRound());
 const missingReviewListResult = evaluatePrequalificationRound(buildMissingReviewListRound());
+const malformedReviewEntryResult = evaluatePrequalificationRound(buildMalformedReviewEntryRound());
 const missingCriteriaListResult = evaluatePrequalificationRound(buildMissingCriteriaListRound());
 const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApplicantListRound());
 const malformedApplicantEntryResult = evaluatePrequalificationRound(buildMalformedApplicantEntryRound());
@@ -37,6 +38,10 @@ const duplicateApplicantIdentityPacketPath = path.join(
   'duplicate-applicant-identity-packet.json'
 );
 const missingReviewListPacketPath = path.join(reportsDir, 'missing-review-list-packet.json');
+const malformedReviewEntryPacketPath = path.join(
+  reportsDir,
+  'malformed-review-entry-packet.json'
+);
 const missingCriteriaListPacketPath = path.join(reportsDir, 'missing-criteria-list-packet.json');
 const missingApplicantListPacketPath = path.join(reportsDir, 'missing-applicant-list-packet.json');
 const malformedApplicantEntryPacketPath = path.join(
@@ -65,6 +70,10 @@ fs.writeFileSync(
   `${JSON.stringify(duplicateApplicantIdentityResult, null, 2)}\n`
 );
 fs.writeFileSync(missingReviewListPacketPath, `${JSON.stringify(missingReviewListResult, null, 2)}\n`);
+fs.writeFileSync(
+  malformedReviewEntryPacketPath,
+  `${JSON.stringify(malformedReviewEntryResult, null, 2)}\n`
+);
 fs.writeFileSync(
   missingCriteriaListPacketPath,
   `${JSON.stringify(missingCriteriaListResult, null, 2)}\n`
@@ -178,6 +187,15 @@ ${actions}
 - Remediation: ${missingReviewListResult.remediationActions[0].action}
 - Audit digest: ${missingReviewListResult.auditDigest}
 
+## Malformed Review Entry Packet
+
+- Applicant: ${malformedReviewEntryResult.decisions[0].applicantId}
+- Decision: ${malformedReviewEntryResult.decisions[0].decision}
+- Reviewers counted: ${malformedReviewEntryResult.decisions[0].reviewersCounted}
+- Reasons: ${malformedReviewEntryResult.decisions[0].reasons.join(', ')}
+- Remediation: ${malformedReviewEntryResult.remediationActions[0].action}
+- Audit digest: ${malformedReviewEntryResult.auditDigest}
+
 ## Missing Criteria List Packet
 
 - Applicant: ${missingCriteriaListResult.decisions[0].applicantId}
@@ -242,6 +260,7 @@ console.log(`Wrote ${path.relative(__dirname, invalidSponsorDecisionPacketPath)}
 console.log(`Wrote ${path.relative(__dirname, missingApplicantIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, duplicateApplicantIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingReviewListPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedReviewEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingCriteriaListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedApplicantEntryPacketPath)}`);
@@ -577,6 +596,48 @@ function buildMissingReviewListRound() {
     }
   ];
   delete round.reviews;
+  return round;
+}
+
+function buildMalformedReviewEntryRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-malformed-review-entry',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    null,
+    {
+      applicantId: 'applicant-malformed-review-entry',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-malformed-review-entry',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
   return round;
 }
 

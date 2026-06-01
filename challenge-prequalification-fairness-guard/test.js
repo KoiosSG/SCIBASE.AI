@@ -906,6 +906,57 @@ function testMissingReviewListHoldsPrequalificationRoundWithoutCrashing() {
   assert.equal(action.priority, 'high');
 }
 
+function testMalformedReviewEntryHoldsPrequalificationRoundWithoutCrashing() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-malformed-review-entry',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    null,
+    {
+      applicantId: 'applicant-malformed-review-entry',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-malformed-review-entry',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-malformed-review-entry');
+  const action = byId(result.remediationActions, 'remediate-applicant-malformed-review-entry');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reviewersCounted, 2);
+  assert.equal(decision.reasons.includes('malformed-review-entry'), true);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing() {
   const round = buildSampleRound();
   delete round.criteria;
@@ -1113,6 +1164,7 @@ const tests = [
   testBlankRejectionReasonTextHoldsRejectedApplicant,
   testIncompleteReviewerScoreEvidenceHoldsWithoutCrashing,
   testMissingReviewListHoldsPrequalificationRoundWithoutCrashing,
+  testMalformedReviewEntryHoldsPrequalificationRoundWithoutCrashing,
   testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing,
   testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,

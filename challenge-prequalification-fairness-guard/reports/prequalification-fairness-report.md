@@ -89,6 +89,15 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-prequalification-evidence
 - Audit digest: sha256:205a2e89821f1f3e7c9b83e959f0b123967d8af29b659d89af898e473ed4033d
 
+## Malformed Review Entry Packet
+
+- Applicant: applicant-malformed-review-entry
+- Decision: hold-for-fairness-review
+- Reviewers counted: 2
+- Reasons: malformed-review-entry
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:92f8e6dbb21bc4f859670a8add42b7e265487aec1eead2c48a87adc717d95976
+
 ## Missing Criteria List Packet
 
 - Applicant: applicant-missing-criteria-list
