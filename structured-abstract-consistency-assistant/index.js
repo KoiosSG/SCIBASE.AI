@@ -47,6 +47,13 @@ function assessSourceEvidence(manuscript) {
       target: 'results',
       message: 'Structured abstract release requires a source results evidence packet.'
     }));
+  } else if (!hasText(manuscript.results.primaryEndpoint)) {
+    findings.push(finding({
+      code: 'MISSING_RESULTS_ENDPOINT',
+      severity: 'blocker',
+      target: 'results.primaryEndpoint',
+      message: 'Results evidence must name the primary endpoint before structured abstract release.'
+    }));
   }
 
   return findings;
@@ -209,6 +216,7 @@ function buildActions(manuscript, findings) {
   const actions = new Set();
   const codes = new Set(findings.map((finding) => finding.code));
   if (codes.has('MISSING_METHODS_EVIDENCE') || codes.has('MISSING_RESULTS_EVIDENCE')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
+  if (codes.has('MISSING_RESULTS_ENDPOINT')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_ABSTRACT_SECTION')) actions.add(`add_missing_sections:${manuscript.manuscriptId}`);
   if (codes.has('METHODS_DESIGN_MISMATCH') || codes.has('SAMPLE_SIZE_MISMATCH')) actions.add(`revise_methods_summary:${manuscript.manuscriptId}`);
   if (codes.has('ENDPOINT_MISMATCH') || codes.has('RESULT_DIRECTION_MISMATCH')) actions.add(`align_results_with_primary_endpoint:${manuscript.manuscriptId}`);
@@ -226,7 +234,7 @@ function buildSignals(findings) {
   return {
     sectionsComplete: !codes.has('MISSING_ABSTRACT_SECTION'),
     methodsAligned: !codes.has('MISSING_METHODS_EVIDENCE') && !codes.has('METHODS_DESIGN_MISMATCH') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'methods.'),
-    resultsAligned: !codes.has('MISSING_RESULTS_EVIDENCE') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'results.') && !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
+    resultsAligned: !codes.has('MISSING_RESULTS_EVIDENCE') && !codes.has('MISSING_RESULTS_ENDPOINT') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'results.') && !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
     limitationsBalanced: !codes.has('MISSING_LIMITATION_LANGUAGE') && !codes.has('CONCLUSION_OVERSTATES_EVIDENCE')
   };
 }

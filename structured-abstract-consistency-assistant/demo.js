@@ -19,6 +19,7 @@ const {
   hyphenatedMeasurementSampleSizeManuscript,
   ordinalSampleSizeManuscript,
   noDifferenceOutcomeManuscript,
+  missingResultsEndpointManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -42,6 +43,7 @@ const packets = [
   ['hyphenated-measurement-sample-size-packet.json', assessStructuredAbstract(hyphenatedMeasurementSampleSizeManuscript)],
   ['ordinal-sample-size-packet.json', assessStructuredAbstract(ordinalSampleSizeManuscript)],
   ['no-difference-outcome-packet.json', assessStructuredAbstract(noDifferenceOutcomeManuscript)],
+  ['missing-results-endpoint-packet.json', assessStructuredAbstract(missingResultsEndpointManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 
