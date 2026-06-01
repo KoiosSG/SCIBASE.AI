@@ -122,6 +122,15 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-prequalification-evidence
 - Audit digest: sha256:c77ccb7f1875504454711c406569be8b6b9b34789239e956635850890ecf1a90
 
+## Missing Challenge Identity Packet
+
+- Challenge: unidentified-challenge
+- Applicant: applicant-missing-challenge-identity
+- Decision: hold-for-fairness-review
+- Reasons: missing-challenge-identity
+- Remediation: complete-challenge-identity-evidence
+- Audit digest: sha256:dcd93740470a0b4a16d6e7913c2f62a81fc895d7cbf664b4317b239bddd1ae6d
+
 ## Malformed Applicant Entry Packet
 
 - Applicant: unidentified-applicant

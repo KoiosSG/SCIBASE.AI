@@ -1049,6 +1049,58 @@ function testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing() {
   assert.equal(result.summary.held, 1);
 }
 
+function testMissingChallengeIdentityHoldsPrequalificationRound() {
+  const round = buildSampleRound();
+  round.challengeId = '   ';
+  round.applicants = [
+    {
+      id: 'applicant-missing-challenge-identity',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-missing-challenge-identity',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-missing-challenge-identity',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-missing-challenge-identity');
+  const action = byId(result.remediationActions, 'remediate-applicant-missing-challenge-identity');
+
+  assert.equal(result.challengeId, 'unidentified-challenge');
+  assert.equal(decision.challengeId, 'unidentified-challenge');
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('missing-challenge-identity'), true);
+  assert.equal(action.action, 'complete-challenge-identity-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
   const round = buildSampleRound();
   round.minReviewers = 2;
@@ -1191,6 +1243,7 @@ const tests = [
   testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing,
   testMalformedCriterionEntryHoldsPrequalificationRoundWithoutCrashing,
   testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing,
+  testMissingChallengeIdentityHoldsPrequalificationRound,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree

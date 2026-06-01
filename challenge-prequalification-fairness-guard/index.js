@@ -58,6 +58,18 @@ function uniqueSorted(values) {
   return Array.from(new Set(values)).sort();
 }
 
+function challengeIdFor(round) {
+  return typeof round.challengeId === 'string' ? round.challengeId.trim() : '';
+}
+
+function outputChallengeIdFor(round) {
+  return challengeIdFor(round) || 'unidentified-challenge';
+}
+
+function challengeIdentityIsMissing(round) {
+  return !challengeIdFor(round);
+}
+
 function criterionIdFor(criterion) {
   return typeof criterion.id === 'string' ? criterion.id.trim() : criterion.id;
 }
@@ -348,6 +360,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     return ['malformed-applicant-entry'];
   }
 
+  if (challengeIdentityIsMissing(round)) {
+    reasons.push('missing-challenge-identity');
+  }
+
   if (round.anonymousScreeningRequired && reviews.some((review) => !review.anonymousScreeningObserved)) {
     reasons.push('anonymous-screening-leak');
   }
@@ -466,6 +482,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 }
 
 function remediationAction(applicant, reasons) {
+  if (reasons.includes('missing-challenge-identity')) {
+    return 'complete-challenge-identity-evidence';
+  }
+
   if (reasons.includes('anonymous-screening-leak')) {
     return 'rerun-blinded-prequalification-review';
   }
@@ -571,6 +591,7 @@ function remediationAction(applicant, reasons) {
 }
 
 function evaluatePrequalificationRound(round) {
+  const challengeId = outputChallengeIdFor(round);
   const reviewsByApplicant = groupBy(reviewListFor(round), reviewApplicantIdFor);
   const applicants = applicantListIsMissing(round)
     ? [
@@ -600,7 +621,7 @@ function evaluatePrequalificationRound(round) {
     return {
       id: applicantId,
       applicantId,
-      challengeId: round.challengeId,
+      challengeId,
       decision,
       sponsorDecision: applicant.sponsorDecision,
       weightedScore: score,
@@ -612,7 +633,7 @@ function evaluatePrequalificationRound(round) {
       appealStatus: appealStatus(applicant, round),
       auditDigest: digest({
         applicantId,
-        challengeId: round.challengeId,
+        challengeId,
         score,
         reasons,
         reviews: reviews.map((review) => ({
@@ -638,6 +659,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('missing-published-criterion-id') ||
         decision.reasons.includes('missing-published-criteria-list') ||
         decision.reasons.includes('malformed-published-criterion-entry') ||
+        decision.reasons.includes('missing-challenge-identity') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('malformed-review-entry') ||
@@ -667,7 +689,7 @@ function evaluatePrequalificationRound(round) {
   };
 
   return {
-    challengeId: round.challengeId,
+    challengeId,
     generatedAt: round.generatedAt,
     criteriaDigest: digest(criteriaListFor(round)),
     decisions,

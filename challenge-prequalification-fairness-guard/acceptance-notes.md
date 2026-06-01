@@ -38,6 +38,7 @@ Validation coverage:
 - missing published criteria lists are held for evidence completion instead of crashing sparse prequalification packets
 - malformed published criteria entries such as `null` are held for evidence completion instead of crashing sparse prequalification packets
 - missing applicant lists are held for evidence completion instead of crashing sparse prequalification packets
+- missing or blank challenge identities are held before solver access decisions can detach from a specific challenge audit trail
 - duplicate reviewer score evidence is held and deduplicated before quorum or weighted threshold scoring
 - missing or blank reviewer identities are held and excluded from reviewer quorum until evidence is completed
 - audit digests are deterministic and private-data free

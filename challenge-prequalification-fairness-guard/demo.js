@@ -18,6 +18,7 @@ const malformedReviewEntryResult = evaluatePrequalificationRound(buildMalformedR
 const missingCriteriaListResult = evaluatePrequalificationRound(buildMissingCriteriaListRound());
 const malformedCriterionEntryResult = evaluatePrequalificationRound(buildMalformedCriterionEntryRound());
 const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApplicantListRound());
+const missingChallengeIdentityResult = evaluatePrequalificationRound(buildMissingChallengeIdentityRound());
 const malformedApplicantEntryResult = evaluatePrequalificationRound(buildMalformedApplicantEntryRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
 
@@ -49,6 +50,10 @@ const malformedCriterionEntryPacketPath = path.join(
   'malformed-criterion-entry-packet.json'
 );
 const missingApplicantListPacketPath = path.join(reportsDir, 'missing-applicant-list-packet.json');
+const missingChallengeIdentityPacketPath = path.join(
+  reportsDir,
+  'missing-challenge-identity-packet.json'
+);
 const malformedApplicantEntryPacketPath = path.join(
   reportsDir,
   'malformed-applicant-entry-packet.json'
@@ -90,6 +95,10 @@ fs.writeFileSync(
 fs.writeFileSync(
   missingApplicantListPacketPath,
   `${JSON.stringify(missingApplicantListResult, null, 2)}\n`
+);
+fs.writeFileSync(
+  missingChallengeIdentityPacketPath,
+  `${JSON.stringify(missingChallengeIdentityResult, null, 2)}\n`
 );
 fs.writeFileSync(
   malformedApplicantEntryPacketPath,
@@ -229,6 +238,15 @@ ${actions}
 - Remediation: ${missingApplicantListResult.remediationActions[0].action}
 - Audit digest: ${missingApplicantListResult.auditDigest}
 
+## Missing Challenge Identity Packet
+
+- Challenge: ${missingChallengeIdentityResult.challengeId}
+- Applicant: ${missingChallengeIdentityResult.decisions[0].applicantId}
+- Decision: ${missingChallengeIdentityResult.decisions[0].decision}
+- Reasons: ${missingChallengeIdentityResult.decisions[0].reasons.join(', ')}
+- Remediation: ${missingChallengeIdentityResult.remediationActions[0].action}
+- Audit digest: ${missingChallengeIdentityResult.auditDigest}
+
 ## Malformed Applicant Entry Packet
 
 - Applicant: ${malformedApplicantEntryResult.decisions[0].applicantId}
@@ -281,6 +299,7 @@ console.log(`Wrote ${path.relative(__dirname, malformedReviewEntryPacketPath)}`)
 console.log(`Wrote ${path.relative(__dirname, missingCriteriaListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedCriterionEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, missingChallengeIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedApplicantEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
@@ -718,6 +737,48 @@ function buildMalformedCriterionEntryRound() {
 function buildMissingApplicantListRound() {
   const round = buildSampleRound();
   delete round.applicants;
+  return round;
+}
+
+function buildMissingChallengeIdentityRound() {
+  const round = buildSampleRound();
+  round.challengeId = '   ';
+  round.applicants = [
+    {
+      id: 'applicant-missing-challenge-identity',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-missing-challenge-identity',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-missing-challenge-identity',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
   return round;
 }
 
