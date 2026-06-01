@@ -12,6 +12,7 @@ This module evaluates institutional admin dashboard releases before they are sho
 - Keyboard reachability and focus traps
 - Missing visible focus indicators for keyboard-reachable dashboard controls
 - Malformed dashboard component evidence that would otherwise crash release assessment
+- Malformed top-level dashboard packets that would otherwise crash before reviewer evidence is generated
 - Private user or project data embedded in screen-reader labels, table summaries, or export summaries
 - Missing table and export summaries
 - Heading-order skips

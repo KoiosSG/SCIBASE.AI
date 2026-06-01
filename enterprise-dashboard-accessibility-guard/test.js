@@ -235,6 +235,17 @@ function testMalformedDashboardComponentEntriesBlockRelease() {
   assert.ok(packet.actions.includes('repair_dashboard_component_evidence:widgets[0]'));
 }
 
+function testMalformedDashboardPacketBlocksRelease() {
+  const packet = assessDashboardRelease(null);
+
+  assert.equal(packet.dashboardId, 'unidentified-dashboard');
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'blocked');
+  assert.deepEqual(codes(packet), ['MALFORMED_DASHBOARD_PACKET']);
+  assert.equal(packet.wcagSignals.robust, false);
+  assert.ok(packet.actions.includes('repair_dashboard_packet:unidentified-dashboard'));
+}
+
 function testShorthandHexContrastEvidenceRemainsValid() {
   const packet = assessDashboardRelease({
     dashboardId: 'enterprise-admin-shorthand-contrast',
@@ -310,6 +321,7 @@ const tests = [
   testMissingCriticalContrastEvidenceBlocksRelease,
   testMissingNoncriticalContrastEvidenceRequiresRemediation,
   testMalformedDashboardComponentEntriesBlockRelease,
+  testMalformedDashboardPacketBlocksRelease,
   testShorthandHexContrastEvidenceRemainsValid,
   testMissingVisibleFocusIndicatorBlocksKeyboardRelease
 ];

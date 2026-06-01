@@ -213,11 +213,14 @@ const malformedComponentDashboard = {
   }
 };
 
+const malformedDashboardPacket = null;
+
 module.exports = {
   blockedDashboard,
   cleanDashboard,
   warningDashboard,
   missingContrastDashboard,
   missingNoncriticalContrastDashboard,
-  malformedComponentDashboard
+  malformedComponentDashboard,
+  malformedDashboardPacket
 };

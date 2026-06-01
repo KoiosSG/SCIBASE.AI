@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="576" viewBox="0 0 1200 576">
-  <rect width="1200" height="576" fill="#e2e8f0"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="648" viewBox="0 0 1200 648">
+  <rect width="1200" height="648" fill="#e2e8f0"/>
   <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#0f172a">Enterprise Dashboard Accessibility Guard</text>
   <text x="48" y="80" font-size="16" font-family="Arial" fill="#334155">Institutional dashboards, exports, and webhook notices are gated before release.</text>
 
@@ -29,11 +29,17 @@
       </g>
       <g transform="translate(48 393)">
         <rect width="1104" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="25" r="11" fill="#dc2626"/>
+        <text x="58" y="21" font-size="18" font-family="Arial" fill="#0f172a">unidentified-dashboard</text>
+        <text x="58" y="39" font-size="13" font-family="Arial" fill="#475569">hold_accessibility_release | findings 1 | digest 516d9cbe81ea9fa4</text>
+      </g>
+      <g transform="translate(48 465)">
+        <rect width="1104" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="25" r="11" fill="#16a34a"/>
         <text x="58" y="21" font-size="18" font-family="Arial" fill="#0f172a">enterprise-admin-clean</text>
         <text x="58" y="39" font-size="13" font-family="Arial" fill="#475569">release_with_accessibility_monitoring | findings 0 | digest e3abe7a1521f5654</text>
       </g>
-      <g transform="translate(48 465)">
+      <g transform="translate(48 537)">
         <rect width="1104" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="25" r="11" fill="#d97706"/>
         <text x="58" y="21" font-size="18" font-family="Arial" fill="#0f172a">enterprise-admin-motion-warning</text>

@@ -1,26 +1,54 @@
 const crypto = require('crypto');
 
 function assessDashboardRelease(dashboard) {
+  const normalized = normalizeDashboardPacket(dashboard);
   const findings = [
-    ...assessVisualAndOperableComponents(dashboard),
-    ...assessMotion(dashboard)
+    ...normalized.findings,
+    ...assessVisualAndOperableComponents(normalized.dashboard),
+    ...assessMotion(normalized.dashboard)
   ];
   const blockerCount = findings.filter((finding) => finding.severity === 'blocker').length;
   const warningCount = findings.filter((finding) => finding.severity === 'warning').length;
 
   const packet = {
-    dashboardId: dashboard.dashboardId,
-    institutionId: dashboard.institutionId,
+    dashboardId: normalized.dashboard.dashboardId,
+    institutionId: normalized.dashboard.institutionId,
     status: chooseStatus(blockerCount, warningCount),
     releaseLanes: chooseReleaseLanes(blockerCount, warningCount),
     findings,
-    actions: buildActions(dashboard, findings),
+    actions: buildActions(normalized.dashboard, findings),
     wcagSignals: buildWcagSignals(findings),
-    assessedAt: dashboard.assessedAt
+    assessedAt: normalized.dashboard.assessedAt
   };
 
   packet.auditDigest = digestPacket(packet);
   return packet;
+}
+
+function normalizeDashboardPacket(dashboard) {
+  if (dashboard && typeof dashboard === 'object' && !Array.isArray(dashboard)) {
+    return { dashboard, findings: [] };
+  }
+
+  const normalizedDashboard = {
+    dashboardId: 'unidentified-dashboard',
+    institutionId: 'unidentified-institution',
+    assessedAt: null,
+    widgets: [],
+    alerts: [],
+    exports: [],
+    motion: {}
+  };
+
+  return {
+    dashboard: normalizedDashboard,
+    findings: [{
+      componentId: normalizedDashboard.dashboardId,
+      code: 'MALFORMED_DASHBOARD_PACKET',
+      severity: 'blocker',
+      message: 'Dashboard release evidence must be an object before accessibility assessment.'
+    }]
+  };
 }
 
 function assessVisualAndOperableComponents(dashboard) {
@@ -232,6 +260,9 @@ function buildActions(dashboard, findings) {
     if (item.code === 'MALFORMED_DASHBOARD_COMPONENT_ENTRY') {
       actions.add(`repair_dashboard_component_evidence:${item.componentId}`);
     }
+    if (item.code === 'MALFORMED_DASHBOARD_PACKET') {
+      actions.add(`repair_dashboard_packet:${item.componentId}`);
+    }
   }
 
   return [...actions].sort();
@@ -250,7 +281,10 @@ function buildWcagSignals(findings) {
       !codes.has('MISSING_REDUCED_MOTION_FALLBACK') &&
       !codes.has('MISSING_VISIBLE_FOCUS_INDICATOR'),
     understandable: !codes.has('PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') && !codes.has('HEADING_ORDER_SKIP'),
-    robust: !codes.has('MISSING_SCREEN_READER_LABEL') && !codes.has('MALFORMED_DASHBOARD_COMPONENT_ENTRY')
+    robust:
+      !codes.has('MISSING_SCREEN_READER_LABEL') &&
+      !codes.has('MALFORMED_DASHBOARD_COMPONENT_ENTRY') &&
+      !codes.has('MALFORMED_DASHBOARD_PACKET')
   };
 }
 
