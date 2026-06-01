@@ -481,6 +481,44 @@ function testMissingReviewTimestampRequiresRecertification() {
   assert.equal(action.effectiveDelta, 0);
 }
 
+function testReviewRecertificationBeforeSubmissionRequiresRecertification() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-14T09:30:00Z',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-backdated-recertification',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      recertifiedAt: '2026-05-15T11:00:00Z',
+      reputationDelta: 14
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-backdated-recertification');
+  const task = byId(result.recertificationTasks, 'recertify-review-backdated-recertification');
+  const action = byId(result.reputationActions, 'review-backdated-recertification');
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['recertification-before-submission']);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['recertification-before-submission']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+}
+
 function testPublicReviewWithoutReviewerIdentityFreezesReputation() {
   const project = buildSampleProject();
   project.artifacts = [
@@ -899,6 +937,7 @@ const tests = [
   testStaleInlineCommentsBlockReputationUpdateWithoutStaleReviews,
   testInvalidReviewTimestampRequiresRecertification,
   testMissingReviewTimestampRequiresRecertification,
+  testReviewRecertificationBeforeSubmissionRequiresRecertification,
   testPublicReviewWithoutReviewerIdentityFreezesReputation,
   testInvalidReputationDeltaRequiresRecertification,
   testInvalidArtifactTimestampRequiresReviewRecertification,

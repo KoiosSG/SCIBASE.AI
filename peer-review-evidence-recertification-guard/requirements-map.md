@@ -3,7 +3,7 @@
 ## Peer Reviews & Comments
 
 - Structured peer-review evidence is tied to reviewed artifact digests.
-- Missing or malformed review submission or recertification timestamps require recertification before review credit is applied.
+- Missing, malformed, or backdated review submission and recertification timestamps require recertification before review credit is applied.
 - Missing or malformed artifact change timestamps require review and inline-comment recertification before review credit or comment evidence is applied.
 - Inline comments track artifact anchors and require recertification when anchors shift, artifact digests change, artifact timestamps postdate the comment, artifact timing evidence is missing or malformed, anchor metadata is missing, artifact anchor maps are missing, or comment timing evidence is missing or malformed.
 - Stale review or inline-comment evidence blocks reputation updates until recertification is complete.

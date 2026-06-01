@@ -41,6 +41,10 @@ Malformed review and inline-comment entries inside otherwise valid evidence arra
 
 Malformed non-array review and inline-comment collections are converted into recertification holds instead of being treated like omitted evidence. The malformed-collection fixture recommends block-reputation-update, emits 1 stale review and 1 stale inline comment, and creates 2 recertification tasks.
 
+## Backdated Recertification Packet
+
+Recertification timestamps that predate the original review submission are blocked as impossible audit chronology. The backdated-recertification fixture recommends block-reputation-update, emits 1 stale review, and records recertification-before-submission before profile credit is applied.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.

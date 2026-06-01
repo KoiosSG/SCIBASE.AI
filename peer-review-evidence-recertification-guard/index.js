@@ -161,10 +161,16 @@ function evaluateReview(project, review) {
   const reasons = [];
   const reviewTime = review.recertifiedAt || review.submittedAt;
   const reviewTimeIsValid = hasValidTime(reviewTime);
+  const submittedAtIsValid = hasValidTime(review.submittedAt);
+  const recertifiedAtIsValid = hasValidTime(review.recertifiedAt);
   const reviewedAt = reviewTimeIsValid ? isoTime(reviewTime) : null;
 
   if (!reviewTimeIsValid) {
     reasons.push('invalid-review-timestamp');
+  }
+
+  if (recertifiedAtIsValid && submittedAtIsValid && isoTime(review.recertifiedAt) < isoTime(review.submittedAt)) {
+    reasons.push('recertification-before-submission');
   }
 
   if (!isBlindOrAnonymous(review.mode) && !hasText(review.reviewerId)) {
