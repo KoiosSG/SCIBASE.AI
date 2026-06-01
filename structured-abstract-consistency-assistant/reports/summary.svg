@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1554" viewBox="0 0 1200 1554">
-  <rect width="1200" height="1554" fill="#eef2f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1628" viewBox="0 0 1200 1628">
+  <rect width="1200" height="1628" fill="#eef2f7"/>
   <text x="48" y="52" font-size="31" font-family="Arial" font-weight="700" fill="#111827">Structured Abstract Consistency Assistant</text>
   <text x="48" y="80" font-size="16" font-family="Arial" fill="#374151">Abstracts are checked against counts, methods, results, and limitations before AI review release.</text>
 
@@ -108,10 +108,16 @@
       <g transform="translate(48 1366)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-missing-methods-endpoint</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 1 | digest cd382aadb1d1f621</text>
+      </g>
+      <g transform="translate(48 1440)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-source-endpoint-mismatch</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">hold_peer_review_packet | findings 1 | digest 0cd33ec6c1533993</text>
       </g>
-      <g transform="translate(48 1440)">
+      <g transform="translate(48 1514)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#15803d"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">ms-abstract-clean</text>

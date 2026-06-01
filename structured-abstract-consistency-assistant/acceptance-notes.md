@@ -16,7 +16,7 @@ Expected evidence:
 - `reports/blocked-packet.json` holds AI peer-review release when abstract claims conflict with methods and results.
 - Same-code findings are preserved when methods and results disagree on different evidence targets.
 - Missing source methods/results evidence packets hold release instead of treating a complete abstract as verified.
-- Missing source primary-endpoint evidence holds release instead of letting generic primary-endpoint wording become reviewer-facing evidence.
+- Missing source methods/results primary-endpoint evidence holds release instead of letting generic primary-endpoint wording become reviewer-facing evidence.
 - Source methods/results primary-endpoint disagreements hold release instead of letting the abstract follow only one source evidence packet.
 - Negated methods design statements such as "not a retrospective cohort" are blocked instead of satisfying the expected design by substring.
 - Negated primary endpoint statements such as "not comment triage time" are blocked instead of satisfying the expected endpoint by substring.
@@ -45,6 +45,7 @@ Expected evidence:
 - `reports/negated-primary-endpoint-packet.json` holds an abstract that mentions the expected primary endpoint only to deny it.
 - `reports/missing-source-evidence-packet.json` holds an otherwise polished abstract until source methods/results evidence is attached.
 - `reports/missing-results-endpoint-packet.json` holds an otherwise complete abstract until source results evidence names the primary endpoint.
+- `reports/missing-methods-endpoint-packet.json` holds an otherwise complete abstract until source methods evidence names the primary endpoint.
 - `reports/source-endpoint-mismatch-packet.json` holds an otherwise complete abstract until methods/results source endpoint evidence is reconciled.
 - `reports/result-certainty-packet.json` holds an abstract whose results overstate uncertain or null-crossing evidence.
 - `reports/mixed-certainty-packet.json` holds an abstract whose results mix negated statistical significance with an asserted clinical-meaningfulness overclaim.

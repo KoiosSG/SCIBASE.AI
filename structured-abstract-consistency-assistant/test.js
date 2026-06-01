@@ -156,6 +156,36 @@ function testBlocksReleaseWhenResultsEvidenceOmitsPrimaryEndpoint() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksReleaseWhenMethodsEvidenceOmitsPrimaryEndpoint() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-missing-methods-endpoint',
+    assessedAt: '2026-06-01T14:55:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingTargets(packet, 'MISSING_METHODS_ENDPOINT'), ['methods.primaryEndpoint']);
+  assert.ok(packet.actions.includes('attach_source_evidence:ms-abstract-missing-methods-endpoint'));
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+}
+
 function testBlocksReleaseWhenSourceEvidenceEndpointsDisagree() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-source-endpoint-mismatch',
@@ -1053,6 +1083,7 @@ const tests = [
   testPreservesSameCodeFindingsForDifferentEvidenceTargets,
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
   testBlocksReleaseWhenResultsEvidenceOmitsPrimaryEndpoint,
+  testBlocksReleaseWhenMethodsEvidenceOmitsPrimaryEndpoint,
   testBlocksReleaseWhenSourceEvidenceEndpointsDisagree,
   testBlocksNegatedPrimaryEndpointStatement,
   testBlocksNegatedMethodsDesignStatement,

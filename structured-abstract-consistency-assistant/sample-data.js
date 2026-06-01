@@ -393,6 +393,29 @@ const missingResultsEndpointManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const missingMethodsEndpointManuscript = {
+  manuscriptId: 'ms-abstract-missing-methods-endpoint',
+  assessedAt: '2026-06-01T14:55:00Z',
+  abstract: {
+    background: 'Automated checks may reduce manual reviewer triage.',
+    methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+    results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+    conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+  },
+  methods: {
+    design: 'retrospective cohort',
+    sampleSize: 96,
+    confidenceIntervalCrossesNull: false
+  },
+  results: {
+    primaryEndpoint: 'comment triage time',
+    direction: 'improved',
+    sampleSize: 96,
+    exploratory: false
+  },
+  limitations: ['single-institution retrospective data']
+};
+
 const sourceEndpointMismatchManuscript = {
   manuscriptId: 'ms-abstract-source-endpoint-mismatch',
   assessedAt: '2026-06-01T13:05:00Z',
@@ -459,6 +482,7 @@ module.exports = {
   ordinalSampleSizeManuscript,
   noDifferenceOutcomeManuscript,
   missingResultsEndpointManuscript,
+  missingMethodsEndpointManuscript,
   sourceEndpointMismatchManuscript,
   cleanManuscript
 };
