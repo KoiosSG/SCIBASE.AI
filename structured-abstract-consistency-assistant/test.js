@@ -156,6 +156,38 @@ function testBlocksReleaseWhenResultsEvidenceOmitsPrimaryEndpoint() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksReleaseWhenSourceEvidenceEndpointsDisagree() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-source-endpoint-mismatch',
+    assessedAt: '2026-06-01T13:05:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort using reviewer workload score as the endpoint.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'reviewer workload score',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingTargets(packet, 'SOURCE_ENDPOINT_MISMATCH'), ['methods.primaryEndpoint']);
+  assert.ok(packet.actions.includes('reconcile_source_endpoints:ms-abstract-source-endpoint-mismatch'));
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testBlocksNegatedPrimaryEndpointStatement() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-negated-primary-endpoint',
@@ -1021,6 +1053,7 @@ const tests = [
   testPreservesSameCodeFindingsForDifferentEvidenceTargets,
   testBlocksGenericPrimaryEndpointLanguageWithoutNamedEndpoint,
   testBlocksReleaseWhenResultsEvidenceOmitsPrimaryEndpoint,
+  testBlocksReleaseWhenSourceEvidenceEndpointsDisagree,
   testBlocksNegatedPrimaryEndpointStatement,
   testBlocksNegatedMethodsDesignStatement,
   testHoldsAbstractWhenSourceEvidencePacketsAreMissing,

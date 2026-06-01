@@ -7,6 +7,7 @@ It evaluates synthetic manuscript packets for:
 - missing structured abstract sections
 - missing source methods/results evidence packets, so a polished abstract cannot be released without authoritative comparison data
 - missing primary-endpoint identifiers in source results evidence, so generic primary-endpoint claims cannot release without a named evidence anchor
+- disagreement between source methods and results primary endpoints, so an abstract cannot release by following only one source packet
 - target-specific sample-size mismatches between abstract, methods, and results, while accepting normal comma-formatted counts such as `1,200` and rejecting percentages, decimal values, duration/effect measurements, abbreviated scientific/time units, hyphenated measurement wording, and ordinal measurements as count evidence
 - methods design mismatches, including negated design statements that mention the expected design only to deny it
 - primary endpoint mismatches, including negated endpoint statements that mention the expected endpoint only to deny it

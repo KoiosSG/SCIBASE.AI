@@ -20,6 +20,7 @@ const {
   ordinalSampleSizeManuscript,
   noDifferenceOutcomeManuscript,
   missingResultsEndpointManuscript,
+  sourceEndpointMismatchManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -44,6 +45,7 @@ const packets = [
   ['ordinal-sample-size-packet.json', assessStructuredAbstract(ordinalSampleSizeManuscript)],
   ['no-difference-outcome-packet.json', assessStructuredAbstract(noDifferenceOutcomeManuscript)],
   ['missing-results-endpoint-packet.json', assessStructuredAbstract(missingResultsEndpointManuscript)],
+  ['source-endpoint-mismatch-packet.json', assessStructuredAbstract(sourceEndpointMismatchManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 

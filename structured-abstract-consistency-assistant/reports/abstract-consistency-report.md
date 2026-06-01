@@ -19,6 +19,7 @@
 | ordinal-sample-size-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SAMPLE_SIZE_MISMATCH, SAMPLE_SIZE_MISMATCH |
 | no-difference-outcome-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | CONCLUSION_RESULT_DIRECTION_MISMATCH, RESULT_DIRECTION_MISMATCH |
 | missing-results-endpoint-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | MISSING_RESULTS_ENDPOINT |
+| source-endpoint-mismatch-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SOURCE_ENDPOINT_MISMATCH |
 | clean-packet.json | release_peer_review_packet | allowed | allowed | allowed | none |
 
 All packets use synthetic manuscript records and deterministic SHA-256 audit digests.
