@@ -50,6 +50,10 @@ function assessReference(reference, assessedAt, policy) {
 
   const findings = [];
 
+  if (reference.__missingReferenceId) {
+    findings.push(finding(reference, 'MISSING_REFERENCE_ID', 'blocker', 'External reference entry needs a stable ID before reviewer remediation or export release.'));
+  }
+
   if (hasInvalidChecksumEvidence(reference)) {
     findings.push(finding(reference, 'INVALID_CHECKSUM_EVIDENCE', 'blocker', 'Checksum evidence must use a supported algorithm and full-length hexadecimal digest.'));
   }
@@ -125,7 +129,14 @@ function normalizeReferenceEntries(value) {
   }
 
   return value.map((reference, index) => {
-    if (isRecord(reference)) return reference;
+    if (isRecord(reference)) {
+      if (hasText(reference.id)) return reference;
+      return {
+        ...reference,
+        id: `unidentified-reference-${index + 1}`,
+        __missingReferenceId: true
+      };
+    }
 
     return {
       id: `malformed-reference-entry-${index + 1}`,
@@ -230,6 +241,7 @@ function buildActions(repository, findings) {
   for (const [referenceId, codes] of byReference.entries()) {
     if (codes.has('MALFORMED_REFERENCE_MANIFEST')) actions.add(`repair_reference_manifest:${referenceId}`);
     if (codes.has('MALFORMED_REFERENCE_ENTRY')) actions.add(`repair_reference_entry:${referenceId}`);
+    if (codes.has('MISSING_REFERENCE_ID')) actions.add(`assign_reference_id:${referenceId}`);
     if (codes.has('AUTH_REQUIRED_REFERENCE')) actions.add(`replace_or_snapshot_auth_reference:${referenceId}`);
     if (codes.has('FLOATING_GIT_REFERENCE') || codes.has('FLOATING_API_REFERENCE')) actions.add(`pin_external_reference:${referenceId}`);
     if (codes.has('INVALID_CHECKSUM_EVIDENCE') || codes.has('INVALID_DOI_EVIDENCE')) actions.add(`repair_reference_evidence:${referenceId}`);
@@ -246,20 +258,24 @@ function buildSignals(findings) {
   return {
     immutablePins: !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
+      && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('FLOATING_GIT_REFERENCE')
       && !codes.has('FLOATING_API_REFERENCE'),
     exportable: !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
+      && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('AUTH_REQUIRED_REFERENCE')
       && !codes.has('MISSING_DURABLE_IDENTIFIER')
       && !codes.has('INVALID_CHECKSUM_EVIDENCE')
       && !codes.has('INVALID_DOI_EVIDENCE'),
     attributionComplete: !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
+      && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('MISSING_LICENSE')
       && !codes.has('MISSING_ATTRIBUTION'),
     verificationFresh: !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
+      && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('STALE_REFERENCE_EVIDENCE')
   };
 }

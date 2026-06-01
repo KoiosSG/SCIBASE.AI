@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="408" viewBox="0 0 1200 408">
-  <rect width="1200" height="408" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="476" viewBox="0 0 1200 476">
+  <rect width="1200" height="476" fill="#ffffff"/>
   <text x="48" y="48" font-size="28" font-family="Arial" font-weight="700" fill="#111827">Repository External Reference Pin Guard</text>
   <text x="48" y="74" font-size="15" font-family="Arial" fill="#475569">Issue #10 release/export gate for submodules, linked datasets, API sources, and model references</text>
 
@@ -23,11 +23,17 @@
       </g>
       <g transform="translate(48 298)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <circle cx="28" cy="26" r="11" fill="#b91c1c"/>
+        <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-missing-identity</text>
+        <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">missing-reference-id-packet.json | findings 1 | digest 8e92d816b839b031</text>
+      </g>
+      <g transform="translate(48 366)">
+        <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#047857"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-clean</text>
         <text x="58" y="41" font-size="13" font-family="Arial" fill="#475569">clean-packet.json | findings 0 | digest 5b1ede709bdfe56b</text>
       </g>
-      <g transform="translate(48 366)">
+      <g transform="translate(48 434)">
         <rect width="1104" height="52" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
         <circle cx="28" cy="26" r="11" fill="#a16207"/>
         <text x="58" y="22" font-size="18" font-family="Arial" fill="#111827">repo-reference-warning</text>

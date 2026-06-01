@@ -11,6 +11,7 @@ This module checks whether a scientific repository can safely publish a DOI, cit
 - Supplied checksum and DOI metadata must be valid even when another durable identifier is present, so malformed evidence cannot slip into export or citation packets.
 - The external-reference manifest itself must be an array, so object-shaped or missing reviewer data cannot be treated as a clean empty audit.
 - Malformed external-reference entries create release-blocking repair actions instead of crashing assessment or disappearing from reviewer packets.
+- Blank or missing reference IDs are normalized to stable `unidentified-reference-*` placeholders and blocked with explicit ID-assignment remediation.
 - API sources use parseable, non-future dated snapshots with full-length SHA checksum evidence instead of floating "latest" endpoints.
 - Export bundles do not require authenticated external references.
 - License and attribution metadata are present before DOI publication.

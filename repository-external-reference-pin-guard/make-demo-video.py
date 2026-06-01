@@ -35,18 +35,19 @@ draw.text((48, 26), "Repository External Reference Pin Guard", fill="#ffffff", f
 cards = [
     ("MALFORMED_REFERENCE_MANIFEST", "#991b1b", "Blocks object-shaped or missing reference manifests before they pass as clean audits"),
     ("MALFORMED_REFERENCE_ENTRY", "#991b1b", "Turns malformed external-reference entries into release-blocking repair evidence"),
+    ("MISSING_REFERENCE_ID", "#991b1b", "Assigns stable placeholder IDs so remediation targets are never blank or undefined"),
     ("hold_repository_release", "#991b1b", "Blocks floating git refs, auth-only APIs, stale dataset evidence"),
     ("stage_reference_metadata_revision", "#a16207", "Stages pinned references that still need license or attribution"),
     ("release_repository_references", "#047857", "Allows DOI/export release only with immutable pins, parseable DOIs, and checksums"),
 ]
 
 for index, (status, color, description) in enumerate(cards):
-    y = 112 + index * 90
-    draw.rounded_rectangle((58, y, 1222, y + 72), radius=8, outline="#cbd5e1", width=2, fill="#f8fafc")
-    draw.ellipse((88, y + 18, 126, y + 56), fill=color)
-    draw.text((150, y + 12), status, fill="#111827", font=body_font)
+    y = 108 + index * 78
+    draw.rounded_rectangle((58, y, 1222, y + 62), radius=8, outline="#cbd5e1", width=2, fill="#f8fafc")
+    draw.ellipse((88, y + 14, 122, y + 48), fill=color)
+    draw.text((150, y + 8), status, fill="#111827", font=body_font)
     for line_index, line in enumerate(textwrap.wrap(description, width=78)):
-        draw.text((150, y + 42 + line_index * 22), line, fill="#475569", font=small_font)
+        draw.text((150, y + 36 + line_index * 20), line, fill="#475569", font=small_font)
 
 draw.text((58, 596), "Synthetic evidence only. No external repositories, APIs, DOI registries, or private data sources are contacted.", fill="#334155", font=small_font)
 img.save(FRAME)

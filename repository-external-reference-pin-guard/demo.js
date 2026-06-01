@@ -7,7 +7,8 @@ const {
   cleanRepository,
   warningRepository,
   malformedRepository,
-  malformedManifestRepository
+  malformedManifestRepository,
+  missingIdentityRepository
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -17,6 +18,7 @@ const packets = [
   ['blocked-packet.json', assessExternalReferences(riskyRepository)],
   ['malformed-manifest-packet.json', assessExternalReferences(malformedManifestRepository)],
   ['malformed-packet.json', assessExternalReferences(malformedRepository)],
+  ['missing-reference-id-packet.json', assessExternalReferences(missingIdentityRepository)],
   ['clean-packet.json', assessExternalReferences(cleanRepository)],
   ['warning-packet.json', assessExternalReferences(warningRepository)]
 ];
@@ -49,7 +51,7 @@ const rows = packets.map(([fileName, packet], index) => {
       </g>`;
 }).join('');
 
-const svgHeight = 408;
+const svgHeight = 476;
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${svgHeight}" viewBox="0 0 1200 ${svgHeight}">
   <rect width="1200" height="${svgHeight}" fill="#ffffff"/>
   <text x="48" y="48" font-size="28" font-family="Arial" font-weight="700" fill="#111827">Repository External Reference Pin Guard</text>

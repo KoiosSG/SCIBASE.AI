@@ -111,10 +111,28 @@ const malformedManifestRepository = {
   }
 };
 
+const missingIdentityRepository = {
+  repositoryId: 'repo-reference-missing-identity',
+  assessedAt: '2026-05-28T12:00:00Z',
+  references: [
+    {
+      id: '',
+      kind: 'linked_dataset',
+      target: 'https://doi.org/10.5281/zenodo.5678901',
+      checksum: 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+      doi: '10.5281/zenodo.5678901',
+      license: 'CC-BY-4.0',
+      attribution: 'Example Lab',
+      lastVerifiedAt: '2026-05-20T08:00:00Z'
+    }
+  ]
+};
+
 module.exports = {
   riskyRepository,
   cleanRepository,
   warningRepository,
   malformedRepository,
-  malformedManifestRepository
+  malformedManifestRepository,
+  missingIdentityRepository
 };

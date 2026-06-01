@@ -21,6 +21,7 @@ Expected evidence:
 - Truncated checksum values such as `sha256:abcdef` do not count as API snapshot evidence or export metadata even when another identifier is valid.
 - Malformed object-shaped reference manifests produce `MALFORMED_REFERENCE_MANIFEST` blockers and `repair_reference_manifest:*` actions instead of being treated as empty clean audits.
 - Malformed external-reference entries produce `MALFORMED_REFERENCE_ENTRY` blockers and `repair_reference_entry:*` actions instead of crashing or disappearing from reviewer packets.
+- Blank or missing reference IDs produce `MISSING_REFERENCE_ID` blockers, stable `unidentified-reference-*` packet IDs, and `assign_reference_id:*` actions instead of releasing ambiguous remediation evidence.
 - Future-dated API snapshots do not count as pinned snapshot evidence for DOI/export release.
 - Otherwise pinned references without verification timestamps are blocked until verification evidence is refreshed.
 - `reports/warning-packet.json` stages pinned references that still need license and attribution metadata.
