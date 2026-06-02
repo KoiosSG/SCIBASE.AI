@@ -21,6 +21,7 @@
 | missing-results-endpoint-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | MISSING_RESULTS_ENDPOINT |
 | missing-methods-endpoint-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | MISSING_METHODS_ENDPOINT |
 | source-endpoint-mismatch-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | SOURCE_ENDPOINT_MISMATCH |
+| malformed-manuscript-packet.json | hold_peer_review_packet | revise_required | blocked | blocked | MALFORMED_MANUSCRIPT_PACKET, MISSING_ABSTRACT_SECTION, MISSING_ABSTRACT_SECTION, MISSING_ABSTRACT_SECTION, MISSING_ABSTRACT_SECTION, MISSING_METHODS_EVIDENCE, MISSING_RESULTS_EVIDENCE |
 | clean-packet.json | release_peer_review_packet | allowed | allowed | allowed | none |
 
 All packets use synthetic manuscript records and deterministic SHA-256 audit digests.

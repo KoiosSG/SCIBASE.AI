@@ -106,6 +106,8 @@ const missingSourceEvidenceManuscript = {
   limitations: ['single-institution retrospective data']
 };
 
+const malformedManuscript = null;
+
 const resultCertaintyOverclaimManuscript = {
   manuscriptId: 'ms-abstract-result-certainty-overclaim',
   assessedAt: '2026-05-30T02:55:00Z',
@@ -470,6 +472,7 @@ module.exports = {
   negatedDesignManuscript,
   negatedPrimaryEndpointManuscript,
   missingSourceEvidenceManuscript,
+  malformedManuscript,
   resultCertaintyOverclaimManuscript,
   mixedCertaintyOverclaimManuscript,
   conclusionCertaintyOverclaimManuscript,

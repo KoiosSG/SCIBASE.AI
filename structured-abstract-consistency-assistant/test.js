@@ -303,6 +303,32 @@ function testHoldsAbstractWhenSourceEvidencePacketsAreMissing() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testMalformedTopLevelManuscriptIsHeldWithoutCrashing() {
+  const packet = assessStructuredAbstract(null);
+
+  assert.equal(packet.manuscriptId, 'unknown-manuscript');
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.equal(packet.reviewLanes.aiPeerReview, 'blocked');
+  assert.deepEqual(findingCodes(packet), [
+    'MALFORMED_MANUSCRIPT_PACKET',
+    'MISSING_ABSTRACT_SECTION',
+    'MISSING_ABSTRACT_SECTION',
+    'MISSING_ABSTRACT_SECTION',
+    'MISSING_ABSTRACT_SECTION',
+    'MISSING_METHODS_EVIDENCE',
+    'MISSING_RESULTS_EVIDENCE'
+  ]);
+  assert.deepEqual(packet.actions, [
+    'add_missing_sections:unknown-manuscript',
+    'attach_source_evidence:unknown-manuscript',
+    'repair_manuscript_packet:unknown-manuscript'
+  ]);
+  assert.equal(packet.abstractSignals.sectionsComplete, false);
+  assert.equal(packet.abstractSignals.methodsAligned, false);
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+  assert.match(packet.auditDigest, /^[a-f0-9]{64}$/);
+}
+
 function testBlocksImprovementClaimWhenResultsShowWorseDirection() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-direction',
@@ -1088,6 +1114,7 @@ const tests = [
   testBlocksNegatedPrimaryEndpointStatement,
   testBlocksNegatedMethodsDesignStatement,
   testHoldsAbstractWhenSourceEvidencePacketsAreMissing,
+  testMalformedTopLevelManuscriptIsHeldWithoutCrashing,
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
   testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,

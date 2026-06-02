@@ -22,6 +22,7 @@ const {
   missingResultsEndpointManuscript,
   missingMethodsEndpointManuscript,
   sourceEndpointMismatchManuscript,
+  malformedManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -48,6 +49,7 @@ const packets = [
   ['missing-results-endpoint-packet.json', assessStructuredAbstract(missingResultsEndpointManuscript)],
   ['missing-methods-endpoint-packet.json', assessStructuredAbstract(missingMethodsEndpointManuscript)],
   ['source-endpoint-mismatch-packet.json', assessStructuredAbstract(sourceEndpointMismatchManuscript)],
+  ['malformed-manuscript-packet.json', assessStructuredAbstract(malformedManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 

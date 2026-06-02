@@ -3,29 +3,53 @@ const crypto = require('crypto');
 const REQUIRED_SECTIONS = ['background', 'methods', 'results', 'conclusions'];
 
 function assessStructuredAbstract(manuscript) {
+  const manuscriptRecord = manuscriptRecordFor(manuscript);
   const findings = dedupeFindings([
-    ...assessSourceEvidence(manuscript),
-    ...assessRequiredSections(manuscript),
-    ...assessMethodsAlignment(manuscript),
-    ...assessResultsAlignment(manuscript),
-    ...assessConclusionBalance(manuscript)
+    ...assessManuscriptShape(manuscriptRecord),
+    ...assessSourceEvidence(manuscriptRecord),
+    ...assessRequiredSections(manuscriptRecord),
+    ...assessMethodsAlignment(manuscriptRecord),
+    ...assessResultsAlignment(manuscriptRecord),
+    ...assessConclusionBalance(manuscriptRecord)
   ]).sort(compareFindings);
 
   const blockerCount = findings.filter((finding) => finding.severity === 'blocker').length;
   const warningCount = findings.filter((finding) => finding.severity === 'warning').length;
 
   const packet = {
-    manuscriptId: manuscript.manuscriptId,
+    manuscriptId: manuscriptRecord.manuscriptId,
     status: chooseStatus(blockerCount, warningCount),
     reviewLanes: chooseReviewLanes(blockerCount, warningCount),
     findings,
-    actions: buildActions(manuscript, findings),
+    actions: buildActions(manuscriptRecord, findings),
     abstractSignals: buildSignals(findings),
-    assessedAt: manuscript.assessedAt
+    assessedAt: manuscriptRecord.assessedAt
   };
 
   packet.auditDigest = digestPacket(packet);
   return packet;
+}
+
+function manuscriptRecordFor(manuscript) {
+  if (isEvidenceObject(manuscript)) return manuscript;
+  return {
+    manuscriptId: 'unknown-manuscript',
+    assessedAt: null,
+    abstract: {},
+    __malformedManuscriptPacket: true
+  };
+}
+
+function assessManuscriptShape(manuscript) {
+  if (!manuscript.__malformedManuscriptPacket) return [];
+  return [
+    finding({
+      code: 'MALFORMED_MANUSCRIPT_PACKET',
+      severity: 'blocker',
+      target: 'manuscript',
+      message: 'Structured abstract manuscript packet is malformed and cannot release AI peer-review evidence.'
+    })
+  ];
 }
 
 function assessSourceEvidence(manuscript) {
@@ -239,6 +263,7 @@ function buildActions(manuscript, findings) {
 
   const actions = new Set();
   const codes = new Set(findings.map((finding) => finding.code));
+  if (codes.has('MALFORMED_MANUSCRIPT_PACKET')) actions.add(`repair_manuscript_packet:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_METHODS_EVIDENCE') || codes.has('MISSING_RESULTS_EVIDENCE')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_METHODS_ENDPOINT')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_RESULTS_ENDPOINT')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
