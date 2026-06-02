@@ -19,6 +19,7 @@ Expected evidence:
 - Invalid checksum placeholders such as `pending` do not count as durable identifier or API snapshot evidence and now produce explicit evidence-repair actions.
 - Invalid DOI placeholders such as `pending` do not count as durable identifier evidence and now produce explicit evidence-repair actions.
 - Truncated checksum values such as `sha256:abcdef` do not count as API snapshot evidence or export metadata even when another identifier is valid.
+- Malformed top-level repository packets produce `MALFORMED_REPOSITORY_PACKET` blockers and `repair_repository_packet:*` actions instead of crashing before reviewer packets are generated.
 - Malformed object-shaped reference manifests produce `MALFORMED_REFERENCE_MANIFEST` blockers and `repair_reference_manifest:*` actions instead of being treated as empty clean audits.
 - Malformed external-reference entries produce `MALFORMED_REFERENCE_ENTRY` blockers and `repair_reference_entry:*` actions instead of crashing or disappearing from reviewer packets.
 - Blank or missing reference IDs produce `MISSING_REFERENCE_ID` blockers, stable `unidentified-reference-*` packet IDs, and `assign_reference_id:*` actions instead of releasing ambiguous remediation evidence.

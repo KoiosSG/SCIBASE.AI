@@ -8,7 +8,8 @@ const {
   warningRepository,
   malformedRepository,
   malformedManifestRepository,
-  missingIdentityRepository
+  missingIdentityRepository,
+  malformedRepositoryPacket
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -16,6 +17,7 @@ fs.mkdirSync(reportsDir, { recursive: true });
 
 const packets = [
   ['blocked-packet.json', assessExternalReferences(riskyRepository)],
+  ['malformed-repository-packet.json', assessExternalReferences(malformedRepositoryPacket)],
   ['malformed-manifest-packet.json', assessExternalReferences(malformedManifestRepository)],
   ['malformed-packet.json', assessExternalReferences(malformedRepository)],
   ['missing-reference-id-packet.json', assessExternalReferences(missingIdentityRepository)],

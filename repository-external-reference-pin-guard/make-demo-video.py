@@ -33,6 +33,7 @@ draw.rectangle((0, 0, 1280, 92), fill="#0f172a")
 draw.text((48, 26), "Repository External Reference Pin Guard", fill="#ffffff", font=title_font)
 
 cards = [
+    ("MALFORMED_REPOSITORY_PACKET", "#991b1b", "Blocks malformed top-level repository packets before reviewer evidence can crash"),
     ("MALFORMED_REFERENCE_MANIFEST", "#991b1b", "Blocks object-shaped or missing reference manifests before they pass as clean audits"),
     ("MALFORMED_REFERENCE_ENTRY", "#991b1b", "Turns malformed external-reference entries into release-blocking repair evidence"),
     ("MISSING_REFERENCE_ID", "#991b1b", "Assigns stable placeholder IDs so remediation targets are never blank or undefined"),

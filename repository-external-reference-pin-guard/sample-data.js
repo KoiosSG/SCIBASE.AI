@@ -128,11 +128,14 @@ const missingIdentityRepository = {
   ]
 };
 
+const malformedRepositoryPacket = null;
+
 module.exports = {
   riskyRepository,
   cleanRepository,
   warningRepository,
   malformedRepository,
   malformedManifestRepository,
-  missingIdentityRepository
+  missingIdentityRepository,
+  malformedRepositoryPacket
 };

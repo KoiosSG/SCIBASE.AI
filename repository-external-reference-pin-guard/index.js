@@ -11,28 +11,61 @@ const CHECKSUM_HEX_LENGTHS = {
 };
 
 function assessExternalReferences(repository) {
-  const policy = { ...DEFAULT_POLICY, ...(repository.policy || {}) };
-  const references = normalizeReferenceEntries(repository.references);
-  const findings = references
-    .flatMap((reference) => assessReference(reference, repository.assessedAt, policy))
+  const normalizedRepository = normalizeRepository(repository);
+  const policy = { ...DEFAULT_POLICY, ...(normalizedRepository.policy || {}) };
+  const references = normalizeReferenceEntries(normalizedRepository.references);
+  const findings = [
+    ...assessRepositoryPacket(normalizedRepository),
+    ...references.flatMap((reference) => assessReference(reference, normalizedRepository.assessedAt, policy))
+  ]
     .sort(compareFindings);
 
   const blockerCount = findings.filter((finding) => finding.severity === 'blocker').length;
   const warningCount = findings.filter((finding) => finding.severity === 'warning').length;
 
   const packet = {
-    repositoryId: repository.repositoryId,
+    repositoryId: normalizedRepository.repositoryId,
     status: chooseStatus(blockerCount, warningCount),
     releaseLanes: chooseReleaseLanes(blockerCount, warningCount),
     findings,
-    actions: buildActions(repository, findings),
+    actions: buildActions(normalizedRepository, findings),
     referenceSignals: buildSignals(findings),
     referenceSummary: summarizeReferences(references),
-    assessedAt: repository.assessedAt
+    assessedAt: normalizedRepository.assessedAt
   };
 
   packet.auditDigest = digestPacket(packet);
   return packet;
+}
+
+function normalizeRepository(repository) {
+  if (isRecord(repository)) {
+    return {
+      ...repository,
+      repositoryId: hasText(repository.repositoryId) ? repository.repositoryId : 'unidentified-repository'
+    };
+  }
+
+  return {
+    repositoryId: 'unidentified-repository',
+    assessedAt: null,
+    policy: {},
+    references: [],
+    __malformedRepositoryPacket: true
+  };
+}
+
+function assessRepositoryPacket(repository) {
+  if (!repository.__malformedRepositoryPacket) return [];
+
+  return [
+    finding(
+      { id: repository.repositoryId, kind: 'repository', target: null },
+      'MALFORMED_REPOSITORY_PACKET',
+      'blocker',
+      'Repository external-reference packet must be a structured object before release.'
+    )
+  ];
 }
 
 function assessReference(reference, assessedAt, policy) {
@@ -239,6 +272,7 @@ function buildActions(repository, findings) {
 
   const actions = new Set();
   for (const [referenceId, codes] of byReference.entries()) {
+    if (codes.has('MALFORMED_REPOSITORY_PACKET')) actions.add(`repair_repository_packet:${referenceId}`);
     if (codes.has('MALFORMED_REFERENCE_MANIFEST')) actions.add(`repair_reference_manifest:${referenceId}`);
     if (codes.has('MALFORMED_REFERENCE_ENTRY')) actions.add(`repair_reference_entry:${referenceId}`);
     if (codes.has('MISSING_REFERENCE_ID')) actions.add(`assign_reference_id:${referenceId}`);
@@ -256,24 +290,28 @@ function buildActions(repository, findings) {
 function buildSignals(findings) {
   const codes = new Set(findings.map((finding) => finding.code));
   return {
-    immutablePins: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+    immutablePins: !codes.has('MALFORMED_REPOSITORY_PACKET')
+      && !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('FLOATING_GIT_REFERENCE')
       && !codes.has('FLOATING_API_REFERENCE'),
-    exportable: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+    exportable: !codes.has('MALFORMED_REPOSITORY_PACKET')
+      && !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('AUTH_REQUIRED_REFERENCE')
       && !codes.has('MISSING_DURABLE_IDENTIFIER')
       && !codes.has('INVALID_CHECKSUM_EVIDENCE')
       && !codes.has('INVALID_DOI_EVIDENCE'),
-    attributionComplete: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+    attributionComplete: !codes.has('MALFORMED_REPOSITORY_PACKET')
+      && !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('MISSING_LICENSE')
       && !codes.has('MISSING_ATTRIBUTION'),
-    verificationFresh: !codes.has('MALFORMED_REFERENCE_MANIFEST')
+    verificationFresh: !codes.has('MALFORMED_REPOSITORY_PACKET')
+      && !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('MISSING_REFERENCE_ID')
       && !codes.has('STALE_REFERENCE_EVIDENCE')

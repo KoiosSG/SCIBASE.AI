@@ -495,6 +495,24 @@ function testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder() {
   });
 }
 
+function testMalformedTopLevelRepositoryPacketBlocksReleaseInsteadOfCrashing() {
+  const packet = assessExternalReferences(null);
+
+  assert.equal(packet.repositoryId, 'unidentified-repository');
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['MALFORMED_REPOSITORY_PACKET']);
+  assert.equal(packet.findings[0].kind, 'repository');
+  assert.ok(packet.actions.includes('repair_repository_packet:unidentified-repository'));
+  assert.equal(packet.referenceSignals.immutablePins, false);
+  assert.equal(packet.referenceSignals.exportable, false);
+  assert.equal(packet.referenceSignals.attributionComplete, false);
+  assert.equal(packet.referenceSignals.verificationFresh, false);
+  assert.deepEqual(packet.referenceSummary, {
+    total: 0,
+    byKind: {}
+  });
+}
+
 const tests = [
   testBlocksFloatingAndNonExportableExternalReferences,
   testAllowsPinnedExportableReferences,
@@ -511,7 +529,8 @@ const tests = [
   testMalformedOptionalEvidenceBlocksEvenWhenAnotherIdentifierIsValid,
   testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing,
   testMalformedReferenceManifestBlocksRelease,
-  testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder
+  testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder,
+  testMalformedTopLevelRepositoryPacketBlocksReleaseInsteadOfCrashing
 ];
 
 for (const test of tests) {
