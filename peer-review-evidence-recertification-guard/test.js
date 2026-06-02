@@ -921,6 +921,24 @@ function testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashin
   assert.equal(result.summary.recommendedAction, 'block-reputation-update');
 }
 
+function testMalformedProjectPacketRequiresRecertificationInsteadOfCrashing() {
+  const result = evaluateRecertification(null);
+  const review = byId(result.reviewDecisions, 'malformed-project-evidence');
+  const task = byId(result.recertificationTasks, 'recertify-malformed-project-evidence');
+  const action = byId(result.reputationActions, 'malformed-project-evidence');
+
+  assert.equal(result.projectId, 'unidentified-project');
+  assert.equal(result.generatedAt, null);
+  assert.equal(review.status, 'recertification-required');
+  assert.deepEqual(review.reasons, ['malformed-project-evidence']);
+  assert.equal(task.kind, 'peer-review');
+  assert.deepEqual(task.reasons, ['malformed-project-evidence']);
+  assert.equal(action.action, 'freeze-until-recertified');
+  assert.equal(action.effectiveDelta, 0);
+  assert.equal(result.summary.staleReviews, 1);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 const tests = [
   testStaleReviewsFreezeReputationUntilRecertified,
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
@@ -949,7 +967,8 @@ const tests = [
   testMalformedInlineCommentListRequiresRecertificationInsteadOfAllowingUpdate,
   testMissingArtifactListRequiresRecertificationInsteadOfCrashing,
   testMalformedReviewEntriesRequireRecertificationInsteadOfCrashing,
-  testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashing
+  testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashing,
+  testMalformedProjectPacketRequiresRecertificationInsteadOfCrashing
 ];
 
 for (const test of tests) {

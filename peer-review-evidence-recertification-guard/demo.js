@@ -21,6 +21,7 @@ const malformedCollectionProject = buildMalformedCollectionProject();
 const malformedCollectionResult = evaluateRecertification(malformedCollectionProject);
 const backdatedRecertificationProject = buildBackdatedRecertificationProject();
 const backdatedRecertificationResult = evaluateRecertification(backdatedRecertificationProject);
+const malformedProjectResult = evaluateRecertification(null);
 
 const packetPath = path.join(reportsDir, 'recertification-packet.json');
 const emptyPacketPath = path.join(reportsDir, 'empty-evidence-packet.json');
@@ -28,6 +29,7 @@ const invalidDeltaPacketPath = path.join(reportsDir, 'invalid-reputation-delta-p
 const malformedEvidencePacketPath = path.join(reportsDir, 'malformed-evidence-packet.json');
 const malformedCollectionPacketPath = path.join(reportsDir, 'malformed-collection-packet.json');
 const backdatedRecertificationPacketPath = path.join(reportsDir, 'backdated-recertification-packet.json');
+const malformedProjectPacketPath = path.join(reportsDir, 'malformed-project-packet.json');
 const reportPath = path.join(reportsDir, 'recertification-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
@@ -37,6 +39,7 @@ fs.writeFileSync(invalidDeltaPacketPath, `${JSON.stringify(invalidReputationDelt
 fs.writeFileSync(malformedEvidencePacketPath, `${JSON.stringify(malformedEvidenceResult, null, 2)}\n`);
 fs.writeFileSync(malformedCollectionPacketPath, `${JSON.stringify(malformedCollectionResult, null, 2)}\n`);
 fs.writeFileSync(backdatedRecertificationPacketPath, `${JSON.stringify(backdatedRecertificationResult, null, 2)}\n`);
+fs.writeFileSync(malformedProjectPacketPath, `${JSON.stringify(malformedProjectResult, null, 2)}\n`);
 
 const staleReviewList = result.reviewDecisions
   .filter((decision) => decision.status !== 'current')
@@ -89,6 +92,10 @@ Malformed non-array review and inline-comment collections are converted into rec
 
 Recertification timestamps that predate the original review submission are blocked as impossible audit chronology. The backdated-recertification fixture recommends ${backdatedRecertificationResult.summary.recommendedAction}, emits ${backdatedRecertificationResult.summary.staleReviews} stale review, and records ${backdatedRecertificationResult.reviewDecisions[0].reasons.join(', ')} before profile credit is applied.
 
+## Malformed Project Packet
+
+Malformed top-level recertification packets are converted into reviewer-visible recertification holds instead of crashing before timeline evidence is generated. The malformed-project fixture recommends ${malformedProjectResult.summary.recommendedAction}, emits ${malformedProjectResult.summary.staleReviews} stale review hold, and records ${malformedProjectResult.reviewDecisions[0].reasons.join(', ')} for unidentified-project.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.
@@ -118,6 +125,7 @@ console.log(`Wrote ${path.relative(__dirname, invalidDeltaPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedEvidencePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedCollectionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, backdatedRecertificationPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedProjectPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Recommended action: ${result.summary.recommendedAction}`);

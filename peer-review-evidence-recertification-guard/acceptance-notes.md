@@ -15,6 +15,7 @@ Validation targets:
 - public or semi-private reviews without reviewer identity are frozen for recertification instead of applying credit to an undefined profile
 - malformed reputation-delta evidence is frozen for recertification instead of applying non-numeric profile credit
 - recertification timestamps that predate the original review submission are frozen before profile credit is applied
+- malformed top-level recertification packets create reviewer-visible holds instead of crashing before timeline evidence is generated
 - malformed review and inline-comment entries inside otherwise valid evidence arrays create recertification holds instead of crashing or being silently ignored
 - malformed non-array review and inline-comment collections create recertification holds instead of being treated like omitted evidence
 - stale inline comment anchors generate comment-specific recertification tasks

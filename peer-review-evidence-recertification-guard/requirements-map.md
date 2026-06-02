@@ -9,6 +9,7 @@
 - Stale review or inline-comment evidence blocks reputation updates until recertification is complete.
 - Public, semi-private, and double-blind review modes are represented, with blind and fully anonymous labels normalized across hyphenated, underscored, and space-separated variants.
 - Public and semi-private review credit requires a concrete reviewer identity before reputation deltas are applied.
+- Malformed top-level recertification packets create blocked reviewer evidence for an unidentified project instead of crashing before timeline packets are generated.
 - Malformed review or inline-comment entries inside evidence arrays, and malformed non-array evidence collections, create recertification tasks instead of crashing evaluation or being silently ignored.
 - Review history is emitted in a project timeline packet.
 - Sparse project snapshots that omit review, comment, or artifact collections are evaluated as empty or missing evidence instead of runtime failures.

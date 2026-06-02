@@ -137,6 +137,29 @@ function normalizeInlineCommentEntries(value) {
   });
 }
 
+function normalizeProject(project) {
+  if (isRecord(project)) {
+    return project;
+  }
+
+  return {
+    projectId: 'unidentified-project',
+    asOf: null,
+    artifacts: [],
+    reviews: [
+      {
+        id: 'malformed-project-evidence',
+        artifactId: null,
+        mode: null,
+        reputationDelta: null,
+        malformedReason: 'malformed-project-evidence',
+        __malformedReviewEntry: true
+      }
+    ],
+    inlineComments: []
+  };
+}
+
 function findArtifact(project, artifactId) {
   return evidenceRecords(project.artifacts).find((artifact) => artifact.id === artifactId);
 }
@@ -400,24 +423,25 @@ function buildTimelinePacket(project, reviewDecisions, commentDecisions) {
 }
 
 function evaluateRecertification(project) {
-  const reviews = normalizeReviewEntries(project.reviews);
-  const inlineComments = normalizeInlineCommentEntries(project.inlineComments);
-  const reviewDecisions = reviews.map((review) => evaluateReview(project, review));
+  const normalizedProject = normalizeProject(project);
+  const reviews = normalizeReviewEntries(normalizedProject.reviews);
+  const inlineComments = normalizeInlineCommentEntries(normalizedProject.inlineComments);
+  const reviewDecisions = reviews.map((review) => evaluateReview(normalizedProject, review));
   const reputationActions = reviews.map((review, index) =>
     reputationActionForReview(review, reviewDecisions[index])
   );
-  const commentDecisions = inlineComments.map((comment) => evaluateComment(project, comment));
+  const commentDecisions = inlineComments.map((comment) => evaluateComment(normalizedProject, comment));
   const recertificationTasks = [
     ...reviews.map((review, index) => taskForReview(review, reviewDecisions[index])),
     ...inlineComments.map((comment, index) => taskForComment(comment, commentDecisions[index]))
   ].filter(Boolean);
   const staleReviews = reviewDecisions.filter((decision) => decision.status !== 'current').length;
   const staleComments = commentDecisions.filter((decision) => decision.status !== 'current').length;
-  const timelinePacket = buildTimelinePacket(project, reviewDecisions, commentDecisions);
+  const timelinePacket = buildTimelinePacket(normalizedProject, reviewDecisions, commentDecisions);
 
   return {
-    projectId: project.projectId,
-    generatedAt: project.asOf,
+    projectId: normalizedProject.projectId,
+    generatedAt: normalizedProject.asOf,
     reviewDecisions,
     commentDecisions,
     reputationActions,
