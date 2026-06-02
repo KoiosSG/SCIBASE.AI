@@ -18,6 +18,7 @@ const malformedReviewEntryResult = evaluatePrequalificationRound(buildMalformedR
 const missingCriteriaListResult = evaluatePrequalificationRound(buildMissingCriteriaListRound());
 const malformedCriterionEntryResult = evaluatePrequalificationRound(buildMalformedCriterionEntryRound());
 const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApplicantListRound());
+const malformedPrequalificationRoundResult = evaluatePrequalificationRound(null);
 const missingChallengeIdentityResult = evaluatePrequalificationRound(buildMissingChallengeIdentityRound());
 const malformedApplicantEntryResult = evaluatePrequalificationRound(buildMalformedApplicantEntryRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
@@ -50,6 +51,10 @@ const malformedCriterionEntryPacketPath = path.join(
   'malformed-criterion-entry-packet.json'
 );
 const missingApplicantListPacketPath = path.join(reportsDir, 'missing-applicant-list-packet.json');
+const malformedPrequalificationRoundPacketPath = path.join(
+  reportsDir,
+  'malformed-prequalification-round-packet.json'
+);
 const missingChallengeIdentityPacketPath = path.join(
   reportsDir,
   'missing-challenge-identity-packet.json'
@@ -95,6 +100,10 @@ fs.writeFileSync(
 fs.writeFileSync(
   missingApplicantListPacketPath,
   `${JSON.stringify(missingApplicantListResult, null, 2)}\n`
+);
+fs.writeFileSync(
+  malformedPrequalificationRoundPacketPath,
+  `${JSON.stringify(malformedPrequalificationRoundResult, null, 2)}\n`
 );
 fs.writeFileSync(
   missingChallengeIdentityPacketPath,
@@ -238,6 +247,15 @@ ${actions}
 - Remediation: ${missingApplicantListResult.remediationActions[0].action}
 - Audit digest: ${missingApplicantListResult.auditDigest}
 
+## Malformed Prequalification Round Packet
+
+- Challenge: ${malformedPrequalificationRoundResult.challengeId}
+- Applicant: ${malformedPrequalificationRoundResult.decisions[0].applicantId}
+- Decision: ${malformedPrequalificationRoundResult.decisions[0].decision}
+- Reasons: ${malformedPrequalificationRoundResult.decisions[0].reasons.join(', ')}
+- Remediation: ${malformedPrequalificationRoundResult.remediationActions[0].action}
+- Audit digest: ${malformedPrequalificationRoundResult.auditDigest}
+
 ## Missing Challenge Identity Packet
 
 - Challenge: ${missingChallengeIdentityResult.challengeId}
@@ -299,6 +317,7 @@ console.log(`Wrote ${path.relative(__dirname, malformedReviewEntryPacketPath)}`)
 console.log(`Wrote ${path.relative(__dirname, missingCriteriaListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedCriterionEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedPrequalificationRoundPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingChallengeIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedApplicantEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);

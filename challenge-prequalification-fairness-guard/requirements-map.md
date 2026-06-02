@@ -14,6 +14,7 @@
 - Holds missing round-level criteria lists and review lists before sparse prequalification packets can crash or change solver-team access.
 - Holds malformed review entries before sparse reviewer evidence can crash or change solver-team access.
 - Holds missing applicant lists before sparse prequalification packets can crash or change solver-team access.
+- Holds malformed top-level prequalification packets before sparse challenge payloads can crash or change solver-team access.
 - Holds incomplete reviewer score packets and invalid finite 0-100 score values for evidence completion instead of letting malformed review records crash or drive decisions.
 - Preserves audit evidence for each applicant before access to private challenge workspaces changes.
 
@@ -25,6 +26,7 @@
 - Holds invalid sponsor decision values for fairness review before malformed accept/reject evidence can change solver access.
 - Holds missing, duplicate, or malformed applicant identity evidence for fairness review before anonymous or malformed applicant rows can change solver access.
 - Holds missing applicant-list evidence for fairness review before malformed challenge rounds can change solver access.
+- Holds malformed top-level prequalification-round evidence for fairness review before sparse challenge payloads can change solver access.
 - Holds invalid reviewer score values for fairness review before malformed score evidence can drive sponsor decisions.
 - Holds duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds whitespace-variant duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.

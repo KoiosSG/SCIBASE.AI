@@ -62,6 +62,28 @@ function challengeIdFor(round) {
   return typeof round.challengeId === 'string' ? round.challengeId.trim() : '';
 }
 
+function prequalificationRoundIsRecord(round) {
+  return Boolean(round && typeof round === 'object' && !Array.isArray(round));
+}
+
+function prequalificationRoundRecordFor(round) {
+  if (prequalificationRoundIsRecord(round)) {
+    return round;
+  }
+
+  return {
+    challengeId: '',
+    generatedAt: null,
+    anonymousScreeningRequired: false,
+    minReviewers: null,
+    passThreshold: null,
+    criteria: null,
+    applicants: null,
+    reviews: null,
+    malformedPrequalificationRound: true
+  };
+}
+
 function outputChallengeIdFor(round) {
   return challengeIdFor(round) || 'unidentified-challenge';
 }
@@ -353,11 +375,33 @@ function reasonsForApplicant(applicant, reviews, round) {
   const reasons = [];
 
   if (applicant.missingApplicantList) {
-    return ['missing-applicant-list'];
+    const missingApplicantReasons = ['missing-applicant-list'];
+
+    if (round.malformedPrequalificationRound) {
+      missingApplicantReasons.push('malformed-prequalification-round');
+    }
+
+    if (challengeIdentityIsMissing(round)) {
+      missingApplicantReasons.push('missing-challenge-identity');
+    }
+
+    if (criteriaListIsMissing(round)) {
+      missingApplicantReasons.push('missing-published-criteria-list');
+    }
+
+    if (reviewListIsMissing(round)) {
+      missingApplicantReasons.push('missing-review-list');
+    }
+
+    return uniqueSorted(missingApplicantReasons);
   }
 
   if (applicant.malformedApplicantEntry) {
     return ['malformed-applicant-entry'];
+  }
+
+  if (round.malformedPrequalificationRound) {
+    reasons.push('malformed-prequalification-round');
   }
 
   if (challengeIdentityIsMissing(round)) {
@@ -482,6 +526,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 }
 
 function remediationAction(applicant, reasons) {
+  if (reasons.includes('malformed-prequalification-round')) {
+    return 'complete-prequalification-evidence';
+  }
+
   if (reasons.includes('missing-challenge-identity')) {
     return 'complete-challenge-identity-evidence';
   }
@@ -591,6 +639,8 @@ function remediationAction(applicant, reasons) {
 }
 
 function evaluatePrequalificationRound(round) {
+  round = prequalificationRoundRecordFor(round);
+
   const challengeId = outputChallengeIdFor(round);
   const reviewsByApplicant = groupBy(reviewListFor(round), reviewApplicantIdFor);
   const applicants = applicantListIsMissing(round)
@@ -659,6 +709,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('missing-published-criterion-id') ||
         decision.reasons.includes('missing-published-criteria-list') ||
         decision.reasons.includes('malformed-published-criterion-entry') ||
+        decision.reasons.includes('malformed-prequalification-round') ||
         decision.reasons.includes('missing-challenge-identity') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||

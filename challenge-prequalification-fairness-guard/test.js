@@ -1049,6 +1049,23 @@ function testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing() {
   assert.equal(result.summary.held, 1);
 }
 
+function testMalformedPrequalificationRoundHoldsWithoutCrashing() {
+  const result = evaluatePrequalificationRound(null);
+  const decision = byId(result.decisions, 'unidentified-applicant');
+  const action = byId(result.remediationActions, 'remediate-unidentified-applicant');
+
+  assert.equal(result.challengeId, 'unidentified-challenge');
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('malformed-prequalification-round'), true);
+  assert.equal(decision.reasons.includes('missing-published-criteria-list'), true);
+  assert.equal(decision.reasons.includes('missing-review-list'), true);
+  assert.equal(decision.reasons.includes('missing-applicant-list'), true);
+  assert.deepEqual(decision.criteriaApplied, []);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+  assert.equal(result.summary.held, 1);
+}
+
 function testMissingChallengeIdentityHoldsPrequalificationRound() {
   const round = buildSampleRound();
   round.challengeId = '   ';
@@ -1243,6 +1260,7 @@ const tests = [
   testMissingCriteriaListHoldsPrequalificationRoundWithoutCrashing,
   testMalformedCriterionEntryHoldsPrequalificationRoundWithoutCrashing,
   testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing,
+  testMalformedPrequalificationRoundHoldsWithoutCrashing,
   testMissingChallengeIdentityHoldsPrequalificationRound,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,

@@ -122,6 +122,15 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-prequalification-evidence
 - Audit digest: sha256:c77ccb7f1875504454711c406569be8b6b9b34789239e956635850890ecf1a90
 
+## Malformed Prequalification Round Packet
+
+- Challenge: unidentified-challenge
+- Applicant: unidentified-applicant
+- Decision: hold-for-fairness-review
+- Reasons: malformed-prequalification-round, missing-applicant-list, missing-challenge-identity, missing-published-criteria-list, missing-review-list
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:83b5c9c1376cc3afd1111fb7c9ba79b3fcbd41be82907d10d40590a40d9d9f9e
+
 ## Missing Challenge Identity Packet
 
 - Challenge: unidentified-challenge
