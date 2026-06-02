@@ -470,6 +470,47 @@ function testAllDuplicateAnchorsAreRegeneratedBeforeInsertion() {
   assert.notEqual(firstBlock.anchor, secondBlock.anchor);
 }
 
+function testDuplicateAnchorsWithoutBlockIdsAreRegeneratedUniquely() {
+  const packet = assessImportBatch({
+    importId: 'import-missing-block-ids-anchor-collision',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-06-03T00:20:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'trusted-docx-export',
+      trustLevel: 'trusted',
+      signedAttestation: TRUSTED_EXPORT_ATTESTATION
+    },
+    blocks: [
+      {
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'shared-anchor',
+        content: 'First imported paragraph without a source block id.'
+      },
+      {
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'shared-anchor',
+        content: 'Second imported paragraph without a source block id.'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['DUPLICATE_ANCHOR', 'DUPLICATE_ANCHOR']);
+  assert.deepEqual(packet.findings.map((finding) => finding.blockId), [
+    'unidentified-block-1',
+    'unidentified-block-2'
+  ]);
+  assert.ok(packet.actions.includes('regenerate_anchor:unidentified-block-1'));
+  assert.ok(packet.actions.includes('regenerate_anchor:unidentified-block-2'));
+  assert.equal(packet.actions.includes('regenerate_anchor:undefined'), false);
+  assert.equal(packet.sanitizedBlocks[0].anchor.startsWith('shared-anchor-'), true);
+  assert.equal(packet.sanitizedBlocks[1].anchor.startsWith('shared-anchor-'), true);
+  assert.notEqual(packet.sanitizedBlocks[0].anchor, packet.sanitizedBlocks[1].anchor);
+}
+
 function testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated() {
   const packet = assessImportBatch({
     importId: 'import-existing-anchor-collision',
@@ -759,6 +800,7 @@ const tests = [
   testMalformedTableCellsAreStagedBeforeCollaborativeInsertion,
   testMalformedExistingAnchorsAreStagedBeforeCollisionChecks,
   testAllDuplicateAnchorsAreRegeneratedBeforeInsertion,
+  testDuplicateAnchorsWithoutBlockIdsAreRegeneratedUniquely,
   testImportedAnchorCollidingWithExistingDocumentAnchorIsRegenerated,
   testPrivateReferenceMarkersAreRedactedWithoutFilePaths,
   testLowercaseWindowsUserPathsAreFullyRedacted,

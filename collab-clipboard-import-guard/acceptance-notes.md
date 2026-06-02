@@ -23,6 +23,7 @@ Expected evidence:
 - `reports/malformed-table-row-packet.json` stages malformed table rows before collaborative insertion and normalizes them in sanitized reviewer output.
 - `reports/malformed-table-cells-packet.json` stages malformed table cell metadata before collaborative insertion and normalizes sanitized reviewer output to an empty table.
 - `reports/malformed-existing-anchors-packet.json` stages malformed existing-anchor metadata before collision checks can trust it.
+- `reports/missing-block-ids-anchor-collision-packet.json` quarantines duplicate imported anchors and regenerates unique anchors even when source block IDs are missing.
 - `reports/source-origin-packet.json` quarantines and redacts local/private source-origin metadata.
 - `reports/lowercase-windows-path-packet.json` quarantines and fully redacts lowercase-drive Windows user paths.
 - `reports/forward-slash-windows-path-packet.json` quarantines and fully redacts forward-slash Windows user paths.
@@ -36,7 +37,7 @@ Expected evidence:
 - Malformed table rows stage for curator payload review and normalize to empty rows instead of entering collaborative state.
 - Malformed table cell metadata stages for curator payload review and normalizes to an empty cell matrix instead of entering collaborative state.
 - Malformed existing-anchor metadata stages for curator anchor review instead of crashing before packet generation or claiming collision safety.
-- Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion, including collisions with anchors that already exist in shared manuscript state.
+- Duplicate-anchor collisions flag and regenerate every colliding block before shared insertion, including collisions with anchors that already exist in shared manuscript state and duplicate imported anchors whose source block IDs are missing.
 - Table-cell local/private paths are quarantined, redacted, and still formula-escaped when needed.
 - Lowercase Windows user paths are fully redacted from sanitized reviewer output after quarantine.
 - Forward-slash Windows user paths are fully redacted from sanitized reviewer output after quarantine.

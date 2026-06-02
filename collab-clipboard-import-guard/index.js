@@ -15,8 +15,8 @@ function assessImportBatch(batch) {
   const sanitizedBlocks = [];
   const blockFindings = [];
 
-  for (const block of validBlocks) {
-    const { sanitizedBlock, findings } = assessBlock(block, batch, duplicateAnchorBlocks);
+  for (const [blockIndex, block] of validBlocks.entries()) {
+    const { sanitizedBlock, findings } = assessBlock(block, batch, duplicateAnchorBlocks, blockIndex);
     sanitizedBlocks.push(sanitizedBlock);
     blockFindings.push(...findings);
   }
@@ -194,9 +194,9 @@ function assessSource(batch) {
   return findings;
 }
 
-function assessBlock(block, batch, duplicateAnchorBlocks) {
+function assessBlock(block, batch, duplicateAnchorBlocks, blockIndex) {
   const findings = [];
-  const sanitizedBlock = sanitizeBlockBase(block, duplicateAnchorBlocks);
+  const sanitizedBlock = sanitizeBlockBase(block, duplicateAnchorBlocks, blockIndex);
 
   if (containsHiddenInstruction(block.hiddenText)) {
     findings.push(finding({
@@ -263,11 +263,11 @@ function assessBlock(block, batch, duplicateAnchorBlocks) {
     sanitizedBlock.reviewMetadataStatus = 'dropped_stale';
   }
 
-  if (duplicateAnchorBlocks.has(block.id)) {
+  if (duplicateAnchorBlocks.has(blockIdentity(block, blockIndex))) {
     findings.push(finding({
       code: 'DUPLICATE_ANCHOR',
       severity: 'blocker',
-      blockId: block.id,
+      blockId: blockReference(block, blockIndex),
       message: `Anchor ${block.anchor} appears more than once in the imported payload.`
     }));
   }
@@ -275,7 +275,7 @@ function assessBlock(block, batch, duplicateAnchorBlocks) {
   return { sanitizedBlock, findings };
 }
 
-function sanitizeBlockBase(block, duplicateAnchorBlocks) {
+function sanitizeBlockBase(block, duplicateAnchorBlocks, blockIndex) {
   const sanitized = {};
   for (const [key, value] of Object.entries(block)) {
     if (key !== 'hiddenText') {
@@ -283,8 +283,8 @@ function sanitizeBlockBase(block, duplicateAnchorBlocks) {
     }
   }
 
-  if (sanitized.anchor && duplicateAnchorBlocks.has(block.id)) {
-    sanitized.anchor = `${sanitized.anchor}-${digestValue(block.id || sanitized.anchor).slice(0, 8)}`;
+  if (sanitized.anchor && duplicateAnchorBlocks.has(blockIdentity(block, blockIndex))) {
+    sanitized.anchor = `${sanitized.anchor}-${digestValue(blockIdentity(block, blockIndex)).slice(0, 8)}`;
   }
 
   return sanitized;
@@ -295,23 +295,31 @@ function findAnchorCollisionBlocks(blocks, existingAnchors = []) {
   const duplicates = new Set();
   const existingAnchorSet = new Set(existingAnchors.filter(Boolean));
 
-  for (const block of blocks) {
+  for (const [blockIndex, block] of blocks.entries()) {
     if (!block.anchor) continue;
     if (existingAnchorSet.has(block.anchor)) {
-      duplicates.add(block.id);
+      duplicates.add(blockIdentity(block, blockIndex));
     }
     const anchorBlocks = blocksByAnchor.get(block.anchor) || [];
-    anchorBlocks.push(block);
+    anchorBlocks.push({ block, blockIndex });
     blocksByAnchor.set(block.anchor, anchorBlocks);
   }
 
   for (const anchorBlocks of blocksByAnchor.values()) {
     if (anchorBlocks.length > 1) {
-      anchorBlocks.forEach((block) => duplicates.add(block.id));
+      anchorBlocks.forEach(({ block, blockIndex }) => duplicates.add(blockIdentity(block, blockIndex)));
     }
   }
 
   return duplicates;
+}
+
+function blockIdentity(block, blockIndex) {
+  return block.id || `missing-id:${blockIndex}:${block.anchor || 'unanchored'}`;
+}
+
+function blockReference(block, blockIndex) {
+  return block.id || `unidentified-block-${blockIndex + 1}`;
 }
 
 function hasFormulaCell(block) {

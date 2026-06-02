@@ -246,6 +246,32 @@ const malformedExistingAnchorsImport = {
   ]
 };
 
+const duplicateAnchorMissingIdsImport = {
+  importId: 'import-missing-block-ids-anchor-collision',
+  workspaceId: 'workspace-paper-7',
+  receivedAt: '2026-06-03T00:20:00Z',
+  source: {
+    channel: 'file-import',
+    origin: 'trusted-docx-export',
+    trustLevel: 'trusted',
+    signedAttestation: TRUSTED_EXPORT_ATTESTATION
+  },
+  blocks: [
+    {
+      type: 'paragraph',
+      sectionId: 'methods',
+      anchor: 'shared-anchor',
+      content: 'First imported paragraph without a source block id.'
+    },
+    {
+      type: 'paragraph',
+      sectionId: 'methods',
+      anchor: 'shared-anchor',
+      content: 'Second imported paragraph without a source block id.'
+    }
+  ]
+};
+
 const cleanTrustedImport = {
   importId: 'import-clean-zotero-note',
   workspaceId: 'workspace-paper-7',
@@ -341,6 +367,7 @@ module.exports = {
   malformedTableRowImport,
   malformedTableCellsImport,
   malformedExistingAnchorsImport,
+  duplicateAnchorMissingIdsImport,
   cleanTrustedImport,
   privateSourceOriginImport,
   lowercaseWindowsPathImport,

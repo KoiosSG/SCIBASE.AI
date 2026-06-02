@@ -13,6 +13,7 @@
 | malformed-table-row-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_TABLE_ROW |
 | malformed-table-cells-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_TABLE_CELLS |
 | malformed-existing-anchors-packet.json | stage_for_curator_review | curator_review | watermarked | staged | MALFORMED_EXISTING_ANCHORS |
+| missing-block-ids-anchor-collision-packet.json | quarantine_import | blocked | redacted | quarantine | DUPLICATE_ANCHOR, DUPLICATE_ANCHOR |
 | source-origin-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_SOURCE |
 | lowercase-windows-path-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_PATH |
 | forward-slash-windows-path-packet.json | quarantine_import | blocked | redacted | quarantine | LOCAL_PRIVATE_PATH |

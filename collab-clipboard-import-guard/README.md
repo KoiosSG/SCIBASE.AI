@@ -6,7 +6,7 @@ It evaluates synthetic import batches for:
 
 - untrusted clipboard or file sources
 - missing or unsupported import channel metadata
-- malformed import payloads that do not provide a valid top-level import batch or block list, contain malformed block entries inside an otherwise valid list, contain malformed table cells or rows, or provide malformed existing-anchor metadata
+- malformed import payloads that do not provide a valid top-level import batch or block list, contain malformed block entries inside an otherwise valid list, contain malformed table cells or rows, provide malformed existing-anchor metadata, or collide on anchors before source block IDs are available
 - missing or unrecognized source trust metadata
 - missing, blank, placeholder, or malformed signed source attestations from trusted and partner imports
 - hidden instruction-like text that is not visible to collaborators
@@ -14,7 +14,7 @@ It evaluates synthetic import batches for:
 - notebook output snippets and table cells containing local or private filesystem paths, including lowercase-drive and forward-slash Windows user paths
 - source-origin metadata containing local or private filesystem paths
 - stale or malformed collaborator review metadata bound to old section versions or unverifiable expiry evidence
-- duplicate anchors that would collide inside the import payload or with existing shared-document anchors, with every colliding block regenerated before insertion
+- duplicate anchors that would collide inside the import payload or with existing shared-document anchors, with every colliding block regenerated uniquely before insertion even when source block IDs are missing
 
 The guard emits a deterministic packet with sanitized blocks, reviewer actions, insertion lanes, findings, and a SHA-256 audit digest.
 
@@ -29,7 +29,7 @@ npm run check
 
 The demo writes JSON, Markdown, SVG, and MP4 evidence to `reports/`.
 
-Generated packets include unsafe clipboard, partner-review, trusted-attestation, placeholder-attestation, unsupported-channel, malformed-import-batch, malformed-block-list, malformed-block-entry, malformed-table-row, malformed-table-cells, malformed-existing-anchors, private source-origin, lowercase Windows path, forward-slash Windows path, and clean trusted import examples.
+Generated packets include unsafe clipboard, partner-review, trusted-attestation, placeholder-attestation, unsupported-channel, malformed-import-batch, malformed-block-list, malformed-block-entry, malformed-table-row, malformed-table-cells, malformed-existing-anchors, missing block-ID anchor collision, private source-origin, lowercase Windows path, forward-slash Windows path, and clean trusted import examples.
 
 ## Scope
 
