@@ -27,6 +27,54 @@ function valueType(value) {
   return value === null ? 'null' : Array.isArray(value) ? 'array' : typeof value;
 }
 
+function isCorpusObject(corpus) {
+  return Boolean(corpus && typeof corpus === 'object' && !Array.isArray(corpus));
+}
+
+function malformedCorpusPacket(corpus) {
+  const decision = {
+    id: 'malformed-corpus-packet',
+    language: null,
+    text: null,
+    documentId: null,
+    decision: 'hold-for-curator-review',
+    reason: 'malformed-corpus-packet',
+    valueType: valueType(corpus),
+    candidateEntityId: null,
+    candidateEntityIds: [],
+    confidence: null,
+    preservedLanguageTag: null
+  };
+  const entityPackets = [];
+  const curatorActions = [curatorActionForDecision(decision)];
+  const summary = {
+    acceptedMentions: 0,
+    heldMentions: 1,
+    suppressedMentions: 0,
+    entityPackets: 0
+  };
+
+  return {
+    corpusId: 'unidentified-corpus',
+    generatedAt: null,
+    mentionDecisions: [decision],
+    entityPackets,
+    curatorActions,
+    recommendationGuards: {
+      suppressedMentionIds: [decision.id],
+      safeEntityIds: []
+    },
+    summary,
+    auditDigest: digest({
+      corpusId: 'unidentified-corpus',
+      mentionDecisions: [decision],
+      entityPackets,
+      curatorActions,
+      summary
+    })
+  };
+}
+
 function localizedNamesFor(entity) {
   const localizedNames =
     entity.localizedNames && typeof entity.localizedNames === 'object' ? entity.localizedNames : {};
@@ -331,6 +379,8 @@ function curatorActionForDecision(decision) {
         ? 'review-multilingual-candidate-alias-conflict'
         : decision.reason === 'script-confusable-alias'
         ? 'review-multilingual-script-confusable'
+        : decision.reason === 'malformed-corpus-packet'
+        ? 'review-multilingual-malformed-corpus'
         : decision.reason === 'malformed-mention-text' ||
           decision.reason === 'malformed-mention-entry'
         ? 'review-multilingual-malformed-mention'
@@ -342,6 +392,7 @@ function curatorActionForDecision(decision) {
       decision.reason === 'alias-collision' ||
       decision.reason === 'candidate-alias-conflict' ||
       decision.reason === 'script-confusable-alias' ||
+      decision.reason === 'malformed-corpus-packet' ||
       decision.reason === 'malformed-mention-text' ||
       decision.reason === 'malformed-mention-entry'
         ? 'high'
@@ -401,6 +452,10 @@ function buildEntityPackets(entities, decisions) {
 }
 
 function evaluateAliasGuard(corpus) {
+  if (!isCorpusObject(corpus)) {
+    return malformedCorpusPacket(corpus);
+  }
+
   const aliasIndex = buildAliasIndex(corpus.entities);
   const mentionDecisions = evidenceList(corpus.mentions).map((mention, index) =>
     mentionDecision(mention, aliasIndex, evidenceObject(corpus.homographs), index)

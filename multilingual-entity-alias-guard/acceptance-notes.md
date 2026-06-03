@@ -25,5 +25,6 @@ Validation coverage:
 - malformed localized-name entries are omitted from alias lookup and JSON-LD alternate names, with alias evidence issues preserved for review
 - malformed mention text values are held for curator review instead of crashing alias normalization or reaching recommendation-safe IDs
 - malformed mention rows such as null entries are held for curator review instead of crashing before graph packets are produced
+- malformed top-level corpus packets are held for curator review instead of crashing before graph evidence is produced
 - localized names remain language-tagged on entity packets
 - audit output is deterministic and private-data free

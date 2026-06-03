@@ -51,6 +51,10 @@ Malformed mention rows such as null entries are held for curator review instead 
 
 Malformed localized-name evidence is omitted from alias lookup and JSON-LD alternate names instead of crashing ontology review. The malformed alias fixture records 1 alias evidence issue with reason malformed-localized-name.
 
+## Malformed Corpus Guard
+
+Malformed top-level corpus packets are held for curator review instead of crashing before graph evidence is produced. The malformed corpus fixture emits malformed-corpus-packet, review-multilingual-malformed-corpus, and no recommendation-safe entity IDs.
+
 ## Safety
 
 All fixtures are synthetic. The module does not call live ontologies, identity providers, external APIs, private corpora, search indexes, or recommendation systems.

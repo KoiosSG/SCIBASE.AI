@@ -79,6 +79,7 @@ const malformedAliasEvidenceResult = evaluateAliasGuard({
     }
   ]
 });
+const malformedCorpusResult = evaluateAliasGuard(null);
 
 const packetPath = path.join(reportsDir, 'alias-guard-packet.json');
 const sparsePacketPath = path.join(reportsDir, 'sparse-alias-guard-packet.json');
@@ -86,6 +87,7 @@ const conflictPacketPath = path.join(reportsDir, 'candidate-alias-conflict-packe
 const malformedMentionPacketPath = path.join(reportsDir, 'malformed-mention-text-packet.json');
 const malformedMentionEntryPacketPath = path.join(reportsDir, 'malformed-mention-entry-packet.json');
 const malformedAliasEvidencePacketPath = path.join(reportsDir, 'malformed-alias-evidence-packet.json');
+const malformedCorpusPacketPath = path.join(reportsDir, 'malformed-corpus-packet.json');
 const reportPath = path.join(reportsDir, 'alias-guard-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
@@ -98,6 +100,7 @@ fs.writeFileSync(
   `${JSON.stringify(malformedMentionEntryResult, null, 2)}\n`
 );
 fs.writeFileSync(malformedAliasEvidencePacketPath, `${JSON.stringify(malformedAliasEvidenceResult, null, 2)}\n`);
+fs.writeFileSync(malformedCorpusPacketPath, `${JSON.stringify(malformedCorpusResult, null, 2)}\n`);
 
 const accepted = result.mentionDecisions
   .filter((decision) => decision.decision === 'accept-canonical-entity')
@@ -153,6 +156,10 @@ Malformed mention rows such as null entries are held for curator review instead 
 
 Malformed localized-name evidence is omitted from alias lookup and JSON-LD alternate names instead of crashing ontology review. The malformed alias fixture records ${malformedAliasEvidenceResult.entityPackets[0].aliasEvidenceIssues.length} alias evidence issue with reason ${malformedAliasEvidenceResult.entityPackets[0].aliasEvidenceIssues[0].reason}.
 
+## Malformed Corpus Guard
+
+Malformed top-level corpus packets are held for curator review instead of crashing before graph evidence is produced. The malformed corpus fixture emits ${malformedCorpusResult.mentionDecisions[0].reason}, ${malformedCorpusResult.curatorActions[0].action}, and no recommendation-safe entity IDs.
+
 ## Safety
 
 All fixtures are synthetic. The module does not call live ontologies, identity providers, external APIs, private corpora, search indexes, or recommendation systems.
@@ -182,6 +189,7 @@ console.log(`Wrote ${path.relative(__dirname, conflictPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedMentionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedMentionEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedAliasEvidencePacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, malformedCorpusPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Accepted mentions: ${result.summary.acceptedMentions}`);

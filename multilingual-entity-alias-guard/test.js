@@ -424,6 +424,25 @@ function testMalformedMentionEntriesAreHeldForCuratorReview() {
   assert.equal(result.recommendationGuards.safeEntityIds.includes('entity:mesh:D003920'), false);
 }
 
+function testMalformedTopLevelCorpusIsHeldForCuratorReview() {
+  const result = evaluateAliasGuard(null);
+  const event = byId(result.mentionDecisions, 'malformed-corpus-packet');
+  const action = byId(result.curatorActions, 'curate-malformed-corpus-packet');
+
+  assert.equal(result.corpusId, 'unidentified-corpus');
+  assert.equal(result.generatedAt, null);
+  assert.equal(event.decision, 'hold-for-curator-review');
+  assert.equal(event.reason, 'malformed-corpus-packet');
+  assert.equal(event.valueType, 'null');
+  assert.equal(action.priority, 'high');
+  assert.equal(action.action, 'review-multilingual-malformed-corpus');
+  assert.deepEqual(result.entityPackets, []);
+  assert.deepEqual(result.recommendationGuards.safeEntityIds, []);
+  assert.deepEqual(result.recommendationGuards.suppressedMentionIds, ['malformed-corpus-packet']);
+  assert.equal(result.summary.heldMentions, 1);
+  assert.ok(result.auditDigest.startsWith('sha256:'));
+}
+
 function testLanguageTaggedSynonymsArePreservedForEntityPages() {
   const result = evaluateAliasGuard(buildSampleCorpus());
   const diabetes = byId(result.entityPackets, 'entity:mesh:D003920');
@@ -466,6 +485,7 @@ const tests = [
   testMissingHomographPolicyDefaultsToEmptyPolicy,
   testMalformedMentionTextIsHeldForCuratorReview,
   testMalformedMentionEntriesAreHeldForCuratorReview,
+  testMalformedTopLevelCorpusIsHeldForCuratorReview,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

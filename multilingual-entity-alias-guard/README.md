@@ -2,7 +2,7 @@
 
 This module adds a focused Scientific Knowledge Graph Integration slice for SCIBASE issue #17. It normalizes multilingual scientific mentions before they become graph nodes, entity-page aliases, or recommendation signals.
 
-The guard accepts trusted translated aliases only when numeric confidence evidence is present, preserves original language tags, normalizes language-tag casing and underscore or hyphen regional separators for lookup, falls back from regional language tags to their base language, emits JSON-LD-style entity packets, holds homographs, false friends, same-language alias collisions, extractor-candidate/alias conflicts, malformed mention entries or mention text, and mixed-script Latin-language lookalikes including lowercase Greek or Cyrillic confusables for curator review, suppresses low-confidence or missing-confidence aliases before recommendations are shown, and treats omitted or malformed localized names, mentions, or homograph policies as sparse graph evidence instead of crashing corpus review.
+The guard accepts trusted translated aliases only when numeric confidence evidence is present, preserves original language tags, normalizes language-tag casing and underscore or hyphen regional separators for lookup, falls back from regional language tags to their base language, emits JSON-LD-style entity packets, holds homographs, false friends, same-language alias collisions, extractor-candidate/alias conflicts, malformed top-level corpus packets, malformed mention entries or mention text, and mixed-script Latin-language lookalikes including lowercase Greek or Cyrillic confusables for curator review, suppresses low-confidence or missing-confidence aliases before recommendations are shown, and treats omitted or malformed localized names, mentions, or homograph policies as sparse graph evidence instead of crashing corpus review.
 
 ## Run
 
@@ -21,6 +21,7 @@ npm run check
 - `reports/malformed-mention-text-packet.json`
 - `reports/malformed-mention-entry-packet.json`
 - `reports/malformed-alias-evidence-packet.json`
+- `reports/malformed-corpus-packet.json`
 - `reports/alias-guard-report.md`
 - `reports/summary.svg`
 - `reports/demo.mp4`
