@@ -32,6 +32,10 @@ Receipts with non-numeric totals, quantities, or line-item amounts are held befo
 
 Malformed line-item entries are held before delivery instead of crashing receipt review. The malformed line-item fixture decision is hold-for-finance-review, and the customer-facing line item id is line-malformed-1.
 
+## Malformed Billing Batch Guard
+
+Malformed top-level billing batches are held before delivery instead of crashing receipt review. The malformed batch fixture decision is hold-for-finance-review, and the finance-review finding is malformed-billing-batch.
+
 ## Safety
 
 All fixtures are synthetic. The guard does not call payment processors, customer systems, private workspaces, institutional finance tools, or external APIs.

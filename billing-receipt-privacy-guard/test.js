@@ -502,6 +502,25 @@ function testMalformedLineItemEntriesAreHeldInsteadOfCrashing() {
   assert.equal(action.priority, 'normal');
 }
 
+function testMalformedTopLevelBatchIsHeldInsteadOfCrashing() {
+  let result;
+  assert.doesNotThrow(() => {
+    result = evaluateReceiptPrivacy(null);
+  });
+
+  const receipt = result.receipts[0];
+
+  assert.equal(result.batchId, 'malformed-billing-batch');
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('malformed-billing-batch'), true);
+  assert.equal(receipt.customerCopy.receiptId, 'receipt-malformed-batch');
+  assert.equal(receipt.customerCopy.totalCents, null);
+
+  const action = result.remediationActions[0];
+  assert.equal(action.action, 'repair-malformed-billing-fields-before-delivery');
+  assert.equal(action.priority, 'normal');
+}
+
 function testCustomerCopyRemainsUsefulAfterRedaction() {
   const result = evaluateReceiptPrivacy(buildSampleBatch());
   const receipt = byId(result.receipts, 'receipt-private-compute');
@@ -541,6 +560,7 @@ const tests = [
   testCustomerFacingMoneyAndQuantityFieldsAreRedacted,
   testMalformedCustomerFacingMoneyAndQuantityFieldsAreHeld,
   testMalformedLineItemEntriesAreHeldInsteadOfCrashing,
+  testMalformedTopLevelBatchIsHeldInsteadOfCrashing,
   testCustomerCopyRemainsUsefulAfterRedaction,
   testAuditDigestIsDeterministicAndPrivateFree
 ];

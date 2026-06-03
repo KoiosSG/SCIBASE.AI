@@ -21,6 +21,7 @@ Validation coverage:
 - customer-facing currency labels are replaced with `XXX` when they carry restricted dataset context
 - customer-facing totals, quantities, and line-item amounts are replaced with `null` when they carry restricted dataset context
 - customer-facing totals, quantities, and line-item amounts are replaced with `null` when they are malformed or negative, even without private research text
+- malformed top-level billing batches are held with `malformed-billing-batch` findings instead of crashing receipt review
 - malformed line-item entries are held with `malformed-line-item` findings instead of crashing receipt review
 - customer-facing line-item identifiers and units are redacted when they contain restricted dataset context
 - missing provider metadata is treated as an empty provider packet instead of crashing receipt review

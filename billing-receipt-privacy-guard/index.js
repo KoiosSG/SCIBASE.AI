@@ -283,6 +283,7 @@ function remediationAction(receipt) {
   if (
     receipt.findings.includes('invalid-billing-amount') ||
     receipt.findings.includes('invalid-billing-quantity') ||
+    receipt.findings.includes('malformed-billing-batch') ||
     receipt.findings.includes('malformed-line-item')
   ) {
     return 'repair-malformed-billing-fields-before-delivery';
@@ -291,7 +292,71 @@ function remediationAction(receipt) {
   return 'redact-private-research-context';
 }
 
+function malformedBatchReceipt() {
+  const customerCopy = {
+    receiptId: 'receipt-malformed-batch',
+    customerId: 'customer-malformed-batch',
+    currency: 'XXX',
+    totalCents: null,
+    lineItems: []
+  };
+
+  return {
+    id: 'receipt-malformed-batch',
+    invoiceId: 'invoice-malformed-batch',
+    customerId: 'customer-malformed-batch',
+    decision: 'hold-for-finance-review',
+    findings: ['malformed-billing-batch'],
+    removedMetadataKeys: [],
+    providerMetadata: {},
+    redactedLineItems: [],
+    customerCopy,
+    auditDigest: digest({
+      id: 'receipt-malformed-batch',
+      invoiceId: 'invoice-malformed-batch',
+      decision: 'hold-for-finance-review',
+      findings: ['malformed-billing-batch'],
+      providerMetadata: {},
+      customerCopy
+    })
+  };
+}
+
 function evaluateReceiptPrivacy(batch) {
+  if (!isRecord(batch)) {
+    const receipt = malformedBatchReceipt();
+    const remediationActions = [
+      {
+        id: `remediate-${receipt.id}`,
+        receiptId: receipt.id,
+        action: remediationAction(receipt),
+        priority: 'normal',
+        findings: receipt.findings
+      }
+    ];
+    const summary = {
+      deliverableReceipts: 0,
+      heldReceipts: 1,
+      remediationActions: 1,
+      totalCentsReviewed: 0
+    };
+
+    return {
+      batchId: 'malformed-billing-batch',
+      generatedAt: null,
+      receipts: [receipt],
+      remediationActions,
+      summary,
+      auditDigest: digest({
+        batchId: 'malformed-billing-batch',
+        generatedAt: null,
+        receipts: [receipt],
+        remediationActions,
+        summary
+      })
+    };
+  }
+
   const receipts = evidenceList(batch.receipts).map((receipt, index) => evaluateReceipt(receipt, index));
   const remediationActions = receipts
     .filter((receipt) => receipt.decision === 'hold-for-finance-review')

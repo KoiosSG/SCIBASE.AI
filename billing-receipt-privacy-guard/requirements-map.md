@@ -12,6 +12,7 @@
 - Redacts unsafe customer-facing totals, quantities, and line-item amounts when they carry restricted dataset context.
 - Holds receipts and redacts customer-facing totals, quantities, and line-item amounts when numeric billing fields are malformed or negative.
 - Redacts customer-facing line-item identifiers and units when they carry restricted dataset context.
+- Holds malformed top-level billing batches with finance-repair evidence instead of crashing receipt review.
 - Holds malformed line-item entries with finance-repair evidence instead of crashing receipt review.
 - Treats omitted receipt and line-item collections as empty billing evidence instead of crashing receipt review.
 - Preserves customer-useful totals, billing period, plan, and invoice references after redaction.
