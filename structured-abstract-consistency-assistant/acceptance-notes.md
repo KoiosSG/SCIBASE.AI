@@ -19,6 +19,7 @@ Expected evidence:
 - Missing source methods/results primary-endpoint evidence holds release instead of letting generic primary-endpoint wording become reviewer-facing evidence.
 - Source methods/results primary-endpoint disagreements hold release instead of letting the abstract follow only one source evidence packet.
 - Malformed top-level manuscript packets hold release with stable `unknown-manuscript` evidence instead of crashing before AI peer-review gating.
+- Invalid or missing `assessedAt` timestamps hold release instead of allowing reviewer packets with unauditable structured-abstract timing evidence.
 - Negated methods design statements such as "not a retrospective cohort" are blocked instead of satisfying the expected design by substring.
 - Negated primary endpoint statements such as "not comment triage time" are blocked instead of satisfying the expected endpoint by substring.
 - Comma-formatted manuscript counts such as `1,200` are accepted as matching numeric sample-size evidence.
@@ -49,6 +50,7 @@ Expected evidence:
 - `reports/missing-methods-endpoint-packet.json` holds an otherwise complete abstract until source methods evidence names the primary endpoint.
 - `reports/source-endpoint-mismatch-packet.json` holds an otherwise complete abstract until methods/results source endpoint evidence is reconciled.
 - `reports/malformed-manuscript-packet.json` holds malformed top-level manuscript input with repair and source-evidence remediation.
+- `reports/invalid-assessed-at-packet.json` holds an otherwise complete abstract until assessment timestamp evidence is repaired.
 - `reports/result-certainty-packet.json` holds an abstract whose results overstate uncertain or null-crossing evidence.
 - `reports/mixed-certainty-packet.json` holds an abstract whose results mix negated statistical significance with an asserted clinical-meaningfulness overclaim.
 - `reports/conclusion-certainty-packet.json` holds an abstract whose conclusion overstates uncertain or null-crossing evidence.

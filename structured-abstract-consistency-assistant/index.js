@@ -6,6 +6,7 @@ function assessStructuredAbstract(manuscript) {
   const manuscriptRecord = manuscriptRecordFor(manuscript);
   const findings = dedupeFindings([
     ...assessManuscriptShape(manuscriptRecord),
+    ...assessAssessmentTimestamp(manuscriptRecord),
     ...assessSourceEvidence(manuscriptRecord),
     ...assessRequiredSections(manuscriptRecord),
     ...assessMethodsAlignment(manuscriptRecord),
@@ -48,6 +49,18 @@ function assessManuscriptShape(manuscript) {
       severity: 'blocker',
       target: 'manuscript',
       message: 'Structured abstract manuscript packet is malformed and cannot release AI peer-review evidence.'
+    })
+  ];
+}
+
+function assessAssessmentTimestamp(manuscript) {
+  if (manuscript.__malformedManuscriptPacket || hasValidTimestamp(manuscript.assessedAt)) return [];
+  return [
+    finding({
+      code: 'INVALID_ASSESSMENT_TIMESTAMP',
+      severity: 'blocker',
+      target: 'assessedAt',
+      message: 'Structured abstract assessment timestamp must be a valid ISO-style timestamp before AI peer-review evidence can release.'
     })
   ];
 }
@@ -264,6 +277,7 @@ function buildActions(manuscript, findings) {
   const actions = new Set();
   const codes = new Set(findings.map((finding) => finding.code));
   if (codes.has('MALFORMED_MANUSCRIPT_PACKET')) actions.add(`repair_manuscript_packet:${manuscript.manuscriptId}`);
+  if (codes.has('INVALID_ASSESSMENT_TIMESTAMP')) actions.add(`repair_assessment_timestamp:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_METHODS_EVIDENCE') || codes.has('MISSING_RESULTS_EVIDENCE')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_METHODS_ENDPOINT')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_RESULTS_ENDPOINT')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
@@ -356,6 +370,10 @@ function isMeasurementValueNotSampleSize(followingText) {
 
 function hasText(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function hasValidTimestamp(value) {
+  return hasText(value) && Number.isFinite(Date.parse(value));
 }
 
 function impliesImprovement(value) {
