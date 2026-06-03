@@ -102,6 +102,7 @@
     "totalReviews": 1,
     "staleReviews": 1,
     "staleComments": 1,
+    "staleProjectEvidence": 0,
     "frozenReputationDelta": 0,
     "recommendedAction": "block-reputation-update"
   }

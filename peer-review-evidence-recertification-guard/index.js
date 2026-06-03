@@ -387,7 +387,30 @@ function taskForComment(comment, decision) {
   };
 }
 
-function buildTimelinePacket(project, reviewDecisions, commentDecisions) {
+function taskForProjectTimestamp(project, projectIssues) {
+  if (projectIssues.length === 0) {
+    return null;
+  }
+
+  return {
+    id: 'recertify-project-timestamp',
+    kind: 'project-evidence',
+    projectId: project.projectId,
+    priority: 'high',
+    requiredAction: 'repair-project-timestamp-before-reputation-update',
+    reasons: projectIssues
+  };
+}
+
+function buildTimelinePacket(project, reviewDecisions, commentDecisions, projectIssues) {
+  const generatedAt = hasValidTime(project.asOf) ? project.asOf : null;
+  const projectEvents = projectIssues.map((reason) => ({
+    type: 'project-recertification-required',
+    projectId: project.projectId,
+    status: 'recertification-required',
+    reasons: [reason]
+  }));
+
   const reviewEvents = reviewDecisions.map((decision) => ({
     type: decision.status === 'current' ? 'review-evidence-current' : 'review-recertification-required',
     reviewId: decision.id,
@@ -408,15 +431,15 @@ function buildTimelinePacket(project, reviewDecisions, commentDecisions) {
       reasons: decision.reasons
     }));
 
-  const events = [...reviewEvents, ...commentEvents];
+  const events = [...projectEvents, ...reviewEvents, ...commentEvents];
 
   return {
     projectId: project.projectId,
-    generatedAt: project.asOf,
+    generatedAt,
     events,
     auditDigest: digest({
       projectId: project.projectId,
-      generatedAt: project.asOf,
+      generatedAt,
       events
     })
   };
@@ -424,6 +447,9 @@ function buildTimelinePacket(project, reviewDecisions, commentDecisions) {
 
 function evaluateRecertification(project) {
   const normalizedProject = normalizeProject(project);
+  const projectIssues = isRecord(project) && !hasValidTime(normalizedProject.asOf)
+    ? ['invalid-project-timestamp']
+    : [];
   const reviews = normalizeReviewEntries(normalizedProject.reviews);
   const inlineComments = normalizeInlineCommentEntries(normalizedProject.inlineComments);
   const reviewDecisions = reviews.map((review) => evaluateReview(normalizedProject, review));
@@ -432,12 +458,18 @@ function evaluateRecertification(project) {
   );
   const commentDecisions = inlineComments.map((comment) => evaluateComment(normalizedProject, comment));
   const recertificationTasks = [
+    taskForProjectTimestamp(normalizedProject, projectIssues),
     ...reviews.map((review, index) => taskForReview(review, reviewDecisions[index])),
     ...inlineComments.map((comment, index) => taskForComment(comment, commentDecisions[index]))
   ].filter(Boolean);
   const staleReviews = reviewDecisions.filter((decision) => decision.status !== 'current').length;
   const staleComments = commentDecisions.filter((decision) => decision.status !== 'current').length;
-  const timelinePacket = buildTimelinePacket(normalizedProject, reviewDecisions, commentDecisions);
+  const timelinePacket = buildTimelinePacket(
+    normalizedProject,
+    reviewDecisions,
+    commentDecisions,
+    projectIssues
+  );
 
   return {
     projectId: normalizedProject.projectId,
@@ -451,10 +483,11 @@ function evaluateRecertification(project) {
       totalReviews: reviewDecisions.length,
       staleReviews,
       staleComments,
+      staleProjectEvidence: projectIssues.length,
       frozenReputationDelta: reputationActions
         .filter((action) => action.action === 'freeze-until-recertified')
         .reduce((sum, action) => sum + action.originalDelta, 0),
-      recommendedAction: (staleReviews > 0 || staleComments > 0)
+      recommendedAction: (projectIssues.length > 0 || staleReviews > 0 || staleComments > 0)
         ? 'block-reputation-update'
         : 'allow-reputation-update'
     }

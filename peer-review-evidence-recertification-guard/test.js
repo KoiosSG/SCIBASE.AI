@@ -939,6 +939,41 @@ function testMalformedProjectPacketRequiresRecertificationInsteadOfCrashing() {
   assert.equal(result.summary.recommendedAction, 'block-reputation-update');
 }
 
+function testInvalidProjectTimestampBlocksReputationUpdate() {
+  const project = buildSampleProject();
+  project.asOf = 'not-a-date';
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-10T10:00:00Z',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-current-with-invalid-project-time',
+      reviewerId: 'orcid:0000-0002-reviewer-c',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      reputationDelta: 14
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const task = byId(result.recertificationTasks, 'recertify-project-timestamp');
+
+  assert.equal(result.timelinePacket.generatedAt, null);
+  assert.ok(task, 'expected invalid project timestamp to create a recertification task');
+  assert.equal(task.kind, 'project-evidence');
+  assert.deepEqual(task.reasons, ['invalid-project-timestamp']);
+  assert.equal(result.summary.recommendedAction, 'block-reputation-update');
+}
+
 const tests = [
   testStaleReviewsFreezeReputationUntilRecertified,
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
@@ -968,7 +1003,8 @@ const tests = [
   testMissingArtifactListRequiresRecertificationInsteadOfCrashing,
   testMalformedReviewEntriesRequireRecertificationInsteadOfCrashing,
   testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashing,
-  testMalformedProjectPacketRequiresRecertificationInsteadOfCrashing
+  testMalformedProjectPacketRequiresRecertificationInsteadOfCrashing,
+  testInvalidProjectTimestampBlocksReputationUpdate
 ];
 
 for (const test of tests) {

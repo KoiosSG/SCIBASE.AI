@@ -49,6 +49,10 @@ Recertification timestamps that predate the original review submission are block
 
 Malformed top-level recertification packets are converted into reviewer-visible recertification holds instead of crashing before timeline evidence is generated. The malformed-project fixture recommends block-reputation-update, emits 1 stale review hold, and records malformed-project-evidence for unidentified-project.
 
+## Invalid Project Timestamp Packet
+
+Project snapshot timestamps must be valid before reputation updates can be applied. The invalid-project-timestamp fixture recommends block-reputation-update, emits 1 project evidence hold, creates 1 recertification task, and records null generatedAt in the audit timeline packet.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.

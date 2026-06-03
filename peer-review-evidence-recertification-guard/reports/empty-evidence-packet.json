@@ -15,6 +15,7 @@
     "totalReviews": 0,
     "staleReviews": 0,
     "staleComments": 0,
+    "staleProjectEvidence": 0,
     "frozenReputationDelta": 0,
     "recommendedAction": "allow-reputation-update"
   }

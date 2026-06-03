@@ -22,6 +22,8 @@ const malformedCollectionResult = evaluateRecertification(malformedCollectionPro
 const backdatedRecertificationProject = buildBackdatedRecertificationProject();
 const backdatedRecertificationResult = evaluateRecertification(backdatedRecertificationProject);
 const malformedProjectResult = evaluateRecertification(null);
+const invalidProjectTimestampProject = buildInvalidProjectTimestampProject();
+const invalidProjectTimestampResult = evaluateRecertification(invalidProjectTimestampProject);
 
 const packetPath = path.join(reportsDir, 'recertification-packet.json');
 const emptyPacketPath = path.join(reportsDir, 'empty-evidence-packet.json');
@@ -30,6 +32,7 @@ const malformedEvidencePacketPath = path.join(reportsDir, 'malformed-evidence-pa
 const malformedCollectionPacketPath = path.join(reportsDir, 'malformed-collection-packet.json');
 const backdatedRecertificationPacketPath = path.join(reportsDir, 'backdated-recertification-packet.json');
 const malformedProjectPacketPath = path.join(reportsDir, 'malformed-project-packet.json');
+const invalidProjectTimestampPacketPath = path.join(reportsDir, 'invalid-project-timestamp-packet.json');
 const reportPath = path.join(reportsDir, 'recertification-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
@@ -40,6 +43,7 @@ fs.writeFileSync(malformedEvidencePacketPath, `${JSON.stringify(malformedEvidenc
 fs.writeFileSync(malformedCollectionPacketPath, `${JSON.stringify(malformedCollectionResult, null, 2)}\n`);
 fs.writeFileSync(backdatedRecertificationPacketPath, `${JSON.stringify(backdatedRecertificationResult, null, 2)}\n`);
 fs.writeFileSync(malformedProjectPacketPath, `${JSON.stringify(malformedProjectResult, null, 2)}\n`);
+fs.writeFileSync(invalidProjectTimestampPacketPath, `${JSON.stringify(invalidProjectTimestampResult, null, 2)}\n`);
 
 const staleReviewList = result.reviewDecisions
   .filter((decision) => decision.status !== 'current')
@@ -96,6 +100,10 @@ Recertification timestamps that predate the original review submission are block
 
 Malformed top-level recertification packets are converted into reviewer-visible recertification holds instead of crashing before timeline evidence is generated. The malformed-project fixture recommends ${malformedProjectResult.summary.recommendedAction}, emits ${malformedProjectResult.summary.staleReviews} stale review hold, and records ${malformedProjectResult.reviewDecisions[0].reasons.join(', ')} for unidentified-project.
 
+## Invalid Project Timestamp Packet
+
+Project snapshot timestamps must be valid before reputation updates can be applied. The invalid-project-timestamp fixture recommends ${invalidProjectTimestampResult.summary.recommendedAction}, emits ${invalidProjectTimestampResult.summary.staleProjectEvidence} project evidence hold, creates ${invalidProjectTimestampResult.recertificationTasks.length} recertification task, and records ${invalidProjectTimestampResult.timelinePacket.generatedAt === null ? 'null generatedAt' : invalidProjectTimestampResult.timelinePacket.generatedAt} in the audit timeline packet.
+
 ## Privacy Notes
 
 Double-blind reviewer identifiers are replaced with reviewer-safe anonymous labels in tasks and timeline events. The audit packet uses synthetic data only and does not contain private profile emails, live profile IDs, credentials, or external API output.
@@ -126,6 +134,7 @@ console.log(`Wrote ${path.relative(__dirname, malformedEvidencePacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedCollectionPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, backdatedRecertificationPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedProjectPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, invalidProjectTimestampPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Recommended action: ${result.summary.recommendedAction}`);
@@ -233,6 +242,34 @@ function buildBackdatedRecertificationProject() {
         evidenceDigest: 'sha256:code-v3',
         submittedAt: '2026-05-16T11:00:00Z',
         recertifiedAt: '2026-05-15T11:00:00Z',
+        reputationDelta: 14
+      }
+    ],
+    inlineComments: []
+  };
+}
+
+function buildInvalidProjectTimestampProject() {
+  return {
+    projectId: 'project-invalid-project-timestamp',
+    asOf: 'not-a-date',
+    artifacts: [
+      {
+        id: 'analysis-code',
+        type: 'code',
+        currentDigest: 'sha256:code-v3',
+        changedAt: '2026-05-10T10:00:00Z',
+        currentAnchors: {}
+      }
+    ],
+    reviews: [
+      {
+        id: 'review-current-with-invalid-project-time',
+        reviewerId: 'orcid:0000-0002-reviewer-c',
+        mode: 'public',
+        artifactId: 'analysis-code',
+        evidenceDigest: 'sha256:code-v3',
+        submittedAt: '2026-05-16T11:00:00Z',
         reputationDelta: 14
       }
     ],
