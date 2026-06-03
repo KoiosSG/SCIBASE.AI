@@ -13,6 +13,7 @@ This module checks whether a scientific repository can safely publish a DOI, cit
 - Malformed top-level repository packets create `MALFORMED_REPOSITORY_PACKET` blocker evidence instead of crashing before reviewer packets are generated.
 - Malformed external-reference entries create release-blocking repair actions instead of crashing assessment or disappearing from reviewer packets.
 - Blank or missing reference IDs are normalized to stable `unidentified-reference-*` placeholders and blocked with explicit ID-assignment remediation.
+- Repository-level assessment timestamps must be present and parseable before otherwise pinned references can release.
 - API sources use parseable, non-future dated snapshots with full-length SHA checksum evidence instead of floating "latest" endpoints.
 - Export bundles do not require authenticated external references.
 - License and attribution metadata are present before DOI publication.

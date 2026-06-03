@@ -130,6 +130,22 @@ const missingIdentityRepository = {
 
 const malformedRepositoryPacket = null;
 
+const missingAssessmentTimestampRepository = {
+  repositoryId: 'repo-reference-missing-assessed-at',
+  references: [
+    {
+      id: 'dataset-with-current-evidence',
+      kind: 'linked_dataset',
+      target: 'https://doi.org/10.5281/zenodo.6789012',
+      checksum: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      doi: '10.5281/zenodo.6789012',
+      license: 'CC-BY-4.0',
+      attribution: 'Example Lab',
+      lastVerifiedAt: '2026-05-20T08:00:00Z'
+    }
+  ]
+};
+
 module.exports = {
   riskyRepository,
   cleanRepository,
@@ -137,5 +153,6 @@ module.exports = {
   malformedRepository,
   malformedManifestRepository,
   missingIdentityRepository,
-  malformedRepositoryPacket
+  malformedRepositoryPacket,
+  missingAssessmentTimestampRepository
 };

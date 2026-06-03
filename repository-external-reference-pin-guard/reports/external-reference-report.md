@@ -7,6 +7,7 @@
 | malformed-manifest-packet.json | hold_repository_release | blocked | blocked | metadata_only | MALFORMED_REFERENCE_MANIFEST |
 | malformed-packet.json | hold_repository_release | blocked | blocked | metadata_only | MALFORMED_REFERENCE_ENTRY |
 | missing-reference-id-packet.json | hold_repository_release | blocked | blocked | metadata_only | MISSING_REFERENCE_ID |
+| missing-assessed-at-packet.json | hold_repository_release | blocked | blocked | metadata_only | INVALID_REPOSITORY_ASSESSED_AT |
 | clean-packet.json | release_repository_references | allowed | allowed | allowed | none |
 | warning-packet.json | stage_reference_metadata_revision | metadata_revision | draft_only | allowed | MISSING_ATTRIBUTION, MISSING_LICENSE |
 

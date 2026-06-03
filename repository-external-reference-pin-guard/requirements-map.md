@@ -7,7 +7,7 @@ Issue #10 asks for robust project repositories with versioned files, collaborati
 | File and metadata versioning | Holds releases when Git submodules or external code are not pinned to immutable commits, including null all-zero commit placeholders. |
 | Hash-based integrity | Requires full-length SHA checksums, parseable DOI evidence, or non-floating immutable versions for external datasets and model weights, and blocks malformed checksum evidence even when another identifier is present. |
 | Computation-aware reproducibility | Blocks reproducibility/export lanes when API data sources are floating, authenticated only, or backed by malformed/future snapshot dates, invalid checksum evidence, or truncated checksum evidence. |
-| Repository identifiers and citation | Prevents DOI publication when external references lack verification timestamps, are stale, future-dated, contain malformed DOI evidence, or lack license/attribution metadata. |
+| Repository identifiers and citation | Prevents DOI publication when repository assessment timestamps are missing or malformed, or when external references lack verification timestamps, are stale, future-dated, contain malformed DOI evidence, or lack license/attribution metadata. |
 | Programmatic access and export | Separates API metadata-only access from export-bundle and DOI publication release lanes, blocks malformed reference manifests or entries with explicit repair actions, and holds references that lack stable IDs before reviewer remediation can become ambiguous. |
 
 ## Non-Overlap

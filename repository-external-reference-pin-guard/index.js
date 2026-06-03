@@ -56,16 +56,29 @@ function normalizeRepository(repository) {
 }
 
 function assessRepositoryPacket(repository) {
-  if (!repository.__malformedRepositoryPacket) return [];
+  if (repository.__malformedRepositoryPacket) {
+    return [
+      finding(
+        { id: repository.repositoryId, kind: 'repository', target: null },
+        'MALFORMED_REPOSITORY_PACKET',
+        'blocker',
+        'Repository external-reference packet must be a structured object before release.'
+      )
+    ];
+  }
 
-  return [
-    finding(
-      { id: repository.repositoryId, kind: 'repository', target: null },
-      'MALFORMED_REPOSITORY_PACKET',
-      'blocker',
-      'Repository external-reference packet must be a structured object before release.'
-    )
-  ];
+  if (!hasValidTimestamp(repository.assessedAt)) {
+    return [
+      finding(
+        { id: repository.repositoryId, kind: 'repository', target: null },
+        'INVALID_REPOSITORY_ASSESSED_AT',
+        'blocker',
+        'Repository assessment timestamp must be present and parseable before reference release.'
+      )
+    ];
+  }
+
+  return [];
 }
 
 function assessReference(reference, assessedAt, policy) {
@@ -273,6 +286,7 @@ function buildActions(repository, findings) {
   const actions = new Set();
   for (const [referenceId, codes] of byReference.entries()) {
     if (codes.has('MALFORMED_REPOSITORY_PACKET')) actions.add(`repair_repository_packet:${referenceId}`);
+    if (codes.has('INVALID_REPOSITORY_ASSESSED_AT')) actions.add(`repair_repository_assessed_at:${referenceId}`);
     if (codes.has('MALFORMED_REFERENCE_MANIFEST')) actions.add(`repair_reference_manifest:${referenceId}`);
     if (codes.has('MALFORMED_REFERENCE_ENTRY')) actions.add(`repair_reference_entry:${referenceId}`);
     if (codes.has('MISSING_REFERENCE_ID')) actions.add(`assign_reference_id:${referenceId}`);
@@ -297,6 +311,7 @@ function buildSignals(findings) {
       && !codes.has('FLOATING_GIT_REFERENCE')
       && !codes.has('FLOATING_API_REFERENCE'),
     exportable: !codes.has('MALFORMED_REPOSITORY_PACKET')
+      && !codes.has('INVALID_REPOSITORY_ASSESSED_AT')
       && !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('MISSING_REFERENCE_ID')
@@ -311,6 +326,7 @@ function buildSignals(findings) {
       && !codes.has('MISSING_LICENSE')
       && !codes.has('MISSING_ATTRIBUTION'),
     verificationFresh: !codes.has('MALFORMED_REPOSITORY_PACKET')
+      && !codes.has('INVALID_REPOSITORY_ASSESSED_AT')
       && !codes.has('MALFORMED_REFERENCE_MANIFEST')
       && !codes.has('MALFORMED_REFERENCE_ENTRY')
       && !codes.has('MISSING_REFERENCE_ID')
@@ -343,6 +359,10 @@ function compareFindings(left, right) {
 
 function hasText(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function hasValidTimestamp(value) {
+  return hasText(value) && !Number.isNaN(Date.parse(value));
 }
 
 function digestPacket(packet) {

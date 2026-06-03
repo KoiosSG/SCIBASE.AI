@@ -495,6 +495,31 @@ function testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder() {
   });
 }
 
+function testMissingRepositoryAssessmentTimestampBlocksOtherwisePinnedReferences() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-missing-assessed-at',
+    references: [
+      {
+        id: 'dataset-with-current-evidence',
+        kind: 'linked_dataset',
+        target: 'https://doi.org/10.5281/zenodo.6789012',
+        checksum: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        doi: '10.5281/zenodo.6789012',
+        license: 'CC-BY-4.0',
+        attribution: 'Example Lab',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['INVALID_REPOSITORY_ASSESSED_AT']);
+  assert.equal(packet.findings[0].kind, 'repository');
+  assert.ok(packet.actions.includes('repair_repository_assessed_at:repo-reference-missing-assessed-at'));
+  assert.equal(packet.referenceSignals.exportable, false);
+  assert.equal(packet.referenceSignals.verificationFresh, false);
+}
+
 function testMalformedTopLevelRepositoryPacketBlocksReleaseInsteadOfCrashing() {
   const packet = assessExternalReferences(null);
 
@@ -530,6 +555,7 @@ const tests = [
   testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing,
   testMalformedReferenceManifestBlocksRelease,
   testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder,
+  testMissingRepositoryAssessmentTimestampBlocksOtherwisePinnedReferences,
   testMalformedTopLevelRepositoryPacketBlocksReleaseInsteadOfCrashing
 ];
 
