@@ -92,6 +92,14 @@ function challengeIdentityIsMissing(round) {
   return !challengeIdFor(round);
 }
 
+function generatedAtIsInvalid(round) {
+  return (
+    typeof round.generatedAt !== 'string' ||
+    round.generatedAt.trim().length === 0 ||
+    !Number.isFinite(Date.parse(round.generatedAt))
+  );
+}
+
 function criterionIdFor(criterion) {
   return typeof criterion.id === 'string' ? criterion.id.trim() : criterion.id;
 }
@@ -408,6 +416,10 @@ function reasonsForApplicant(applicant, reviews, round) {
     reasons.push('missing-challenge-identity');
   }
 
+  if (generatedAtIsInvalid(round)) {
+    reasons.push('generated-at-invalid');
+  }
+
   if (round.anonymousScreeningRequired && reviews.some((review) => !review.anonymousScreeningObserved)) {
     reasons.push('anonymous-screening-leak');
   }
@@ -532,6 +544,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('missing-challenge-identity')) {
     return 'complete-challenge-identity-evidence';
+  }
+
+  if (reasons.includes('generated-at-invalid')) {
+    return 'complete-prequalification-evidence';
   }
 
   if (reasons.includes('anonymous-screening-leak')) {
@@ -711,6 +727,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('malformed-published-criterion-entry') ||
         decision.reasons.includes('malformed-prequalification-round') ||
         decision.reasons.includes('missing-challenge-identity') ||
+        decision.reasons.includes('generated-at-invalid') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('malformed-review-entry') ||

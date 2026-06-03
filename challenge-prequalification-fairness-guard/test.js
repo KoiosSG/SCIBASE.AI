@@ -1118,6 +1118,56 @@ function testMissingChallengeIdentityHoldsPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testInvalidGeneratedAtHoldsPrequalificationRound() {
+  const round = buildSampleRound();
+  round.generatedAt = 'not-a-date';
+  round.applicants = [
+    {
+      id: 'applicant-invalid-generated-at',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-generated-at',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-invalid-generated-at',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-invalid-generated-at');
+  const action = byId(result.remediationActions, 'remediate-applicant-invalid-generated-at');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('generated-at-invalid'), true);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
   const round = buildSampleRound();
   round.minReviewers = 2;
@@ -1262,6 +1312,7 @@ const tests = [
   testMissingApplicantListHoldsPrequalificationRoundWithoutCrashing,
   testMalformedPrequalificationRoundHoldsWithoutCrashing,
   testMissingChallengeIdentityHoldsPrequalificationRound,
+  testInvalidGeneratedAtHoldsPrequalificationRound,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree

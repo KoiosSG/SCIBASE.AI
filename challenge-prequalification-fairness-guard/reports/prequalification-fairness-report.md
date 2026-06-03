@@ -140,6 +140,15 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-challenge-identity-evidence
 - Audit digest: sha256:dcd93740470a0b4a16d6e7913c2f62a81fc895d7cbf664b4317b239bddd1ae6d
 
+## Invalid Generated At Packet
+
+- Generated: "not-a-date"
+- Applicant: applicant-invalid-generated-at
+- Decision: hold-for-fairness-review
+- Reasons: generated-at-invalid
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:38cad55f45671cce8012765784d45b26647492bc4668b416088522d9b4baec31
+
 ## Malformed Applicant Entry Packet
 
 - Applicant: unidentified-applicant

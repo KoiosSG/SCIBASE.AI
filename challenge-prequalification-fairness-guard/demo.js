@@ -20,6 +20,7 @@ const malformedCriterionEntryResult = evaluatePrequalificationRound(buildMalform
 const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApplicantListRound());
 const malformedPrequalificationRoundResult = evaluatePrequalificationRound(null);
 const missingChallengeIdentityResult = evaluatePrequalificationRound(buildMissingChallengeIdentityRound());
+const invalidGeneratedAtResult = evaluatePrequalificationRound(buildInvalidGeneratedAtRound());
 const malformedApplicantEntryResult = evaluatePrequalificationRound(buildMalformedApplicantEntryRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
 
@@ -59,6 +60,7 @@ const missingChallengeIdentityPacketPath = path.join(
   reportsDir,
   'missing-challenge-identity-packet.json'
 );
+const invalidGeneratedAtPacketPath = path.join(reportsDir, 'invalid-generated-at-packet.json');
 const malformedApplicantEntryPacketPath = path.join(
   reportsDir,
   'malformed-applicant-entry-packet.json'
@@ -108,6 +110,10 @@ fs.writeFileSync(
 fs.writeFileSync(
   missingChallengeIdentityPacketPath,
   `${JSON.stringify(missingChallengeIdentityResult, null, 2)}\n`
+);
+fs.writeFileSync(
+  invalidGeneratedAtPacketPath,
+  `${JSON.stringify(invalidGeneratedAtResult, null, 2)}\n`
 );
 fs.writeFileSync(
   malformedApplicantEntryPacketPath,
@@ -265,6 +271,15 @@ ${actions}
 - Remediation: ${missingChallengeIdentityResult.remediationActions[0].action}
 - Audit digest: ${missingChallengeIdentityResult.auditDigest}
 
+## Invalid Generated At Packet
+
+- Generated: ${JSON.stringify(invalidGeneratedAtResult.generatedAt)}
+- Applicant: ${invalidGeneratedAtResult.decisions[0].applicantId}
+- Decision: ${invalidGeneratedAtResult.decisions[0].decision}
+- Reasons: ${invalidGeneratedAtResult.decisions[0].reasons.join(', ')}
+- Remediation: ${invalidGeneratedAtResult.remediationActions[0].action}
+- Audit digest: ${invalidGeneratedAtResult.auditDigest}
+
 ## Malformed Applicant Entry Packet
 
 - Applicant: ${malformedApplicantEntryResult.decisions[0].applicantId}
@@ -319,6 +334,7 @@ console.log(`Wrote ${path.relative(__dirname, malformedCriterionEntryPacketPath)
 console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedPrequalificationRoundPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingChallengeIdentityPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, invalidGeneratedAtPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedApplicantEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
@@ -786,6 +802,48 @@ function buildMissingChallengeIdentityRound() {
     },
     {
       applicantId: 'applicant-missing-challenge-identity',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+  return round;
+}
+
+function buildInvalidGeneratedAtRound() {
+  const round = buildSampleRound();
+  round.generatedAt = 'not-a-date';
+  round.applicants = [
+    {
+      id: 'applicant-invalid-generated-at',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-invalid-generated-at',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-invalid-generated-at',
       reviewerId: 'reviewer-independent-b',
       anonymousScreeningObserved: true,
       conflict: false,
