@@ -215,6 +215,31 @@ const malformedComponentDashboard = {
 
 const malformedDashboardPacket = null;
 
+const malformedMotionDashboard = {
+  dashboardId: 'enterprise-admin-malformed-motion',
+  institutionId: 'institution-redacted',
+  assessedAt: '2026-06-10T13:10:00Z',
+  widgets: [
+    {
+      id: 'animated-usage-trend',
+      type: 'metric',
+      title: 'Usage trend',
+      foreground: '#111827',
+      background: '#ffffff',
+      critical: false,
+      keyboardReachable: true,
+      screenReaderLabel: 'Usage trend across departments',
+      headingLevel: 2
+    }
+  ],
+  alerts: [],
+  exports: [],
+  motion: {
+    animatedCharts: 'animated-usage-trend',
+    reducedMotionFallback: false
+  }
+};
+
 module.exports = {
   blockedDashboard,
   cleanDashboard,
@@ -222,5 +247,6 @@ module.exports = {
   missingContrastDashboard,
   missingNoncriticalContrastDashboard,
   malformedComponentDashboard,
-  malformedDashboardPacket
+  malformedDashboardPacket,
+  malformedMotionDashboard
 };

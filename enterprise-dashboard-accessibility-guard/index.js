@@ -177,8 +177,19 @@ function assessHeadingOrder(components) {
 }
 
 function assessMotion(dashboard) {
-  if (dashboard.motion?.animatedCharts?.length && !dashboard.motion.reducedMotionFallback) {
-    return dashboard.motion.animatedCharts.map((componentId) => ({
+  const animatedCharts = dashboard.motion?.animatedCharts;
+  if (animatedCharts == null) return [];
+  if (!Array.isArray(animatedCharts) || animatedCharts.some((componentId) => typeof componentId !== 'string' || !componentId.trim())) {
+    return [{
+      componentId: 'motion.animatedCharts',
+      code: 'MALFORMED_MOTION_EVIDENCE',
+      severity: 'blocker',
+      message: 'Dashboard motion evidence must list animated component IDs before reduced-motion release assessment.'
+    }];
+  }
+
+  if (animatedCharts.length && !dashboard.motion.reducedMotionFallback) {
+    return animatedCharts.map((componentId) => ({
       componentId,
       code: 'MISSING_REDUCED_MOTION_FALLBACK',
       severity: 'warning',
@@ -263,6 +274,9 @@ function buildActions(dashboard, findings) {
     if (item.code === 'MALFORMED_DASHBOARD_PACKET') {
       actions.add(`repair_dashboard_packet:${item.componentId}`);
     }
+    if (item.code === 'MALFORMED_MOTION_EVIDENCE') {
+      actions.add(`repair_motion_evidence:${item.componentId}`);
+    }
   }
 
   return [...actions].sort();
@@ -279,7 +293,8 @@ function buildWcagSignals(findings) {
     operable:
       !codes.has('KEYBOARD_TRAP') &&
       !codes.has('MISSING_REDUCED_MOTION_FALLBACK') &&
-      !codes.has('MISSING_VISIBLE_FOCUS_INDICATOR'),
+      !codes.has('MISSING_VISIBLE_FOCUS_INDICATOR') &&
+      !codes.has('MALFORMED_MOTION_EVIDENCE'),
     understandable: !codes.has('PRIVATE_DATA_IN_ACCESSIBILITY_TEXT') && !codes.has('HEADING_ORDER_SKIP'),
     robust:
       !codes.has('MISSING_SCREEN_READER_LABEL') &&

@@ -9,7 +9,8 @@ const {
   missingContrastDashboard,
   missingNoncriticalContrastDashboard,
   malformedComponentDashboard,
-  malformedDashboardPacket
+  malformedDashboardPacket,
+  malformedMotionDashboard
 } = require('./sample-data');
 
 const reportsDir = path.join(__dirname, 'reports');
@@ -21,6 +22,7 @@ const packets = [
   ['missing-noncritical-contrast-packet.json', assessDashboardRelease(missingNoncriticalContrastDashboard)],
   ['malformed-component-packet.json', assessDashboardRelease(malformedComponentDashboard)],
   ['malformed-dashboard-packet.json', assessDashboardRelease(malformedDashboardPacket)],
+  ['malformed-motion-packet.json', assessDashboardRelease(malformedMotionDashboard)],
   ['clean-packet.json', assessDashboardRelease(cleanDashboard)],
   ['warning-packet.json', assessDashboardRelease(warningDashboard)]
 ];

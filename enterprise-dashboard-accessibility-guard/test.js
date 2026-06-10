@@ -246,6 +246,39 @@ function testMalformedDashboardPacketBlocksRelease() {
   assert.ok(packet.actions.includes('repair_dashboard_packet:unidentified-dashboard'));
 }
 
+function testMalformedMotionEvidenceBlocksRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-malformed-motion',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-06-10T13:10:00Z',
+    widgets: [
+      {
+        id: 'animated-usage-trend',
+        type: 'metric',
+        title: 'Usage trend',
+        foreground: '#111827',
+        background: '#ffffff',
+        critical: false,
+        keyboardReachable: true,
+        screenReaderLabel: 'Usage trend across departments',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: 'animated-usage-trend',
+      reducedMotionFallback: false
+    }
+  });
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.releaseLanes.adminDashboard, 'blocked');
+  assert.deepEqual(codes(packet), ['MALFORMED_MOTION_EVIDENCE']);
+  assert.equal(packet.wcagSignals.operable, false);
+  assert.ok(packet.actions.includes('repair_motion_evidence:motion.animatedCharts'));
+}
+
 function testShorthandHexContrastEvidenceRemainsValid() {
   const packet = assessDashboardRelease({
     dashboardId: 'enterprise-admin-shorthand-contrast',
@@ -322,6 +355,7 @@ const tests = [
   testMissingNoncriticalContrastEvidenceRequiresRemediation,
   testMalformedDashboardComponentEntriesBlockRelease,
   testMalformedDashboardPacketBlocksRelease,
+  testMalformedMotionEvidenceBlocksRelease,
   testShorthandHexContrastEvidenceRemainsValid,
   testMissingVisibleFocusIndicatorBlocksKeyboardRelease
 ];

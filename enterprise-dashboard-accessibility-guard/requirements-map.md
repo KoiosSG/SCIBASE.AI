@@ -9,7 +9,7 @@ Issue #19 asks for enterprise tooling around admin dashboards, API and webhook i
 | Compliance tracking | Produces WCAG-oriented readiness signals and deterministic audit evidence for institutional governance. |
 | Export pipelines | Blocks scheduled exports when tables lack summaries or dashboard views are not accessible enough for release. |
 | Webhook support | Keeps webhook notices internal-only when the dashboard state has nonblocking accessibility warnings. |
-| Enterprise governance | Detects private-data leakage in screen-reader labels, table summaries, and export summaries before dashboard or export surfaces are published, and blocks malformed dashboard packets or component evidence instead of crashing before audit packet generation. |
+| Enterprise governance | Detects private-data leakage in screen-reader labels, table summaries, and export summaries before dashboard or export surfaces are published, and blocks malformed dashboard packets, component evidence, or reduced-motion evidence instead of crashing before audit packet generation. |
 
 ## Non-Overlap
 
