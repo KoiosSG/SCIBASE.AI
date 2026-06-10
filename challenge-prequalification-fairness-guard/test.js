@@ -215,6 +215,55 @@ function testInvalidAppealWindowHoldsRejectedApplicantForFairnessReview() {
   assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
 }
 
+function testImpossibleAppealWindowHoldsRejectedApplicantForFairnessReview() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-impossible-appeal',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      appealDueAt: '2026-06-31T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-impossible-appeal',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      scores: {
+        'domain-fit': 60,
+        'data-readiness': 58,
+        'safety-plan': 62
+      }
+    },
+    {
+      applicantId: 'applicant-impossible-appeal',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['evidence package missed challenge-specific validation'],
+      scores: {
+        'domain-fit': 62,
+        'data-readiness': 57,
+        'safety-plan': 61
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-impossible-appeal');
+  const action = byId(result.remediationActions, 'remediate-applicant-impossible-appeal');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.appealStatus, 'invalid');
+  assert.equal(decision.reasons.includes('invalid-appeal-window'), true);
+  assert.equal(action.action, 'publish-rejection-reasons-and-appeal-window');
+}
+
 function testInvalidCriterionWeightsHoldPrequalificationRound() {
   const round = buildSampleRound();
   round.criteria = [
@@ -1168,6 +1217,56 @@ function testInvalidGeneratedAtHoldsPrequalificationRound() {
   assert.equal(action.priority, 'high');
 }
 
+function testImpossibleGeneratedAtHoldsPrequalificationRound() {
+  const round = buildSampleRound();
+  round.generatedAt = '2026-02-30T08:00:00Z';
+  round.applicants = [
+    {
+      id: 'applicant-impossible-generated-at',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-impossible-generated-at',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-impossible-generated-at',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-impossible-generated-at');
+  const action = byId(result.remediationActions, 'remediate-applicant-impossible-generated-at');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('generated-at-invalid'), true);
+  assert.equal(action.action, 'complete-prequalification-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum() {
   const round = buildSampleRound();
   round.minReviewers = 2;
@@ -1290,6 +1389,7 @@ const tests = [
   testHiddenCriteriaAreBlockedBeforeScreeningResultsPublish,
   testExpiredAppealWindowHoldsRejectedApplicantForFairnessReview,
   testInvalidAppealWindowHoldsRejectedApplicantForFairnessReview,
+  testImpossibleAppealWindowHoldsRejectedApplicantForFairnessReview,
   testInvalidCriterionWeightsHoldPrequalificationRound,
   testInvalidIndividualCriterionWeightsHoldPrequalificationRound,
   testDuplicatePublishedCriterionIdsHoldPrequalificationRound,
@@ -1313,6 +1413,7 @@ const tests = [
   testMalformedPrequalificationRoundHoldsWithoutCrashing,
   testMissingChallengeIdentityHoldsPrequalificationRound,
   testInvalidGeneratedAtHoldsPrequalificationRound,
+  testImpossibleGeneratedAtHoldsPrequalificationRound,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAuditDigestIsDeterministicAndPrivateFree

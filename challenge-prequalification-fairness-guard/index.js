@@ -93,10 +93,47 @@ function challengeIdentityIsMissing(round) {
 }
 
 function generatedAtIsInvalid(round) {
+  return !hasStrictUtcTimestamp(round.generatedAt);
+}
+
+function hasStrictUtcTimestamp(value) {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return false;
+  }
+
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/.exec(value.trim());
+  if (!match) {
+    return false;
+  }
+
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText, millisecondText = '0'] = match;
+  const parts = {
+    year: Number(yearText),
+    month: Number(monthText),
+    day: Number(dayText),
+    hour: Number(hourText),
+    minute: Number(minuteText),
+    second: Number(secondText),
+    millisecond: Number(millisecondText.padEnd(3, '0'))
+  };
+  const parsed = new Date(Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+    parts.millisecond
+  ));
+
   return (
-    typeof round.generatedAt !== 'string' ||
-    round.generatedAt.trim().length === 0 ||
-    !Number.isFinite(Date.parse(round.generatedAt))
+    parsed.getUTCFullYear() === parts.year
+    && parsed.getUTCMonth() + 1 === parts.month
+    && parsed.getUTCDate() === parts.day
+    && parsed.getUTCHours() === parts.hour
+    && parsed.getUTCMinutes() === parts.minute
+    && parsed.getUTCSeconds() === parts.second
+    && parsed.getUTCMilliseconds() === parts.millisecond
   );
 }
 
@@ -364,12 +401,12 @@ function appealStatus(applicant, round) {
     return 'missing';
   }
 
-  const appealDueAt = Date.parse(applicant.appealDueAt);
-  const generatedAt = Date.parse(round.generatedAt);
-  if (!Number.isFinite(appealDueAt) || !Number.isFinite(generatedAt)) {
+  if (!hasStrictUtcTimestamp(applicant.appealDueAt) || !hasStrictUtcTimestamp(round.generatedAt)) {
     return 'invalid';
   }
 
+  const appealDueAt = Date.parse(applicant.appealDueAt);
+  const generatedAt = Date.parse(round.generatedAt);
   return appealDueAt >= generatedAt ? 'open' : 'expired';
 }
 

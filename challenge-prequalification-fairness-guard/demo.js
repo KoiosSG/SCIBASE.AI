@@ -21,8 +21,10 @@ const missingApplicantListResult = evaluatePrequalificationRound(buildMissingApp
 const malformedPrequalificationRoundResult = evaluatePrequalificationRound(null);
 const missingChallengeIdentityResult = evaluatePrequalificationRound(buildMissingChallengeIdentityRound());
 const invalidGeneratedAtResult = evaluatePrequalificationRound(buildInvalidGeneratedAtRound());
+const impossibleGeneratedAtResult = evaluatePrequalificationRound(buildImpossibleGeneratedAtRound());
 const malformedApplicantEntryResult = evaluatePrequalificationRound(buildMalformedApplicantEntryRound());
 const blankRejectionReasonResult = evaluatePrequalificationRound(buildBlankRejectionReasonRound());
+const impossibleAppealWindowResult = evaluatePrequalificationRound(buildImpossibleAppealWindowRound());
 
 const packetPath = path.join(reportsDir, 'prequalification-fairness-packet.json');
 const missingCriterionPacketPath = path.join(reportsDir, 'missing-criterion-id-packet.json');
@@ -61,11 +63,19 @@ const missingChallengeIdentityPacketPath = path.join(
   'missing-challenge-identity-packet.json'
 );
 const invalidGeneratedAtPacketPath = path.join(reportsDir, 'invalid-generated-at-packet.json');
+const impossibleGeneratedAtPacketPath = path.join(
+  reportsDir,
+  'impossible-generated-at-packet.json'
+);
 const malformedApplicantEntryPacketPath = path.join(
   reportsDir,
   'malformed-applicant-entry-packet.json'
 );
 const blankRejectionReasonPacketPath = path.join(reportsDir, 'blank-rejection-reason-packet.json');
+const impossibleAppealWindowPacketPath = path.join(
+  reportsDir,
+  'impossible-appeal-window-packet.json'
+);
 const reportPath = path.join(reportsDir, 'prequalification-fairness-report.md');
 const svgPath = path.join(reportsDir, 'summary.svg');
 
@@ -116,10 +126,18 @@ fs.writeFileSync(
   `${JSON.stringify(invalidGeneratedAtResult, null, 2)}\n`
 );
 fs.writeFileSync(
+  impossibleGeneratedAtPacketPath,
+  `${JSON.stringify(impossibleGeneratedAtResult, null, 2)}\n`
+);
+fs.writeFileSync(
   malformedApplicantEntryPacketPath,
   `${JSON.stringify(malformedApplicantEntryResult, null, 2)}\n`
 );
 fs.writeFileSync(blankRejectionReasonPacketPath, `${JSON.stringify(blankRejectionReasonResult, null, 2)}\n`);
+fs.writeFileSync(
+  impossibleAppealWindowPacketPath,
+  `${JSON.stringify(impossibleAppealWindowResult, null, 2)}\n`
+);
 
 const decisions = result.decisions
   .map(
@@ -280,6 +298,15 @@ ${actions}
 - Remediation: ${invalidGeneratedAtResult.remediationActions[0].action}
 - Audit digest: ${invalidGeneratedAtResult.auditDigest}
 
+## Impossible Generated At Packet
+
+- Generated: ${JSON.stringify(impossibleGeneratedAtResult.generatedAt)}
+- Applicant: ${impossibleGeneratedAtResult.decisions[0].applicantId}
+- Decision: ${impossibleGeneratedAtResult.decisions[0].decision}
+- Reasons: ${impossibleGeneratedAtResult.decisions[0].reasons.join(', ')}
+- Remediation: ${impossibleGeneratedAtResult.remediationActions[0].action}
+- Audit digest: ${impossibleGeneratedAtResult.auditDigest}
+
 ## Malformed Applicant Entry Packet
 
 - Applicant: ${malformedApplicantEntryResult.decisions[0].applicantId}
@@ -295,6 +322,15 @@ ${actions}
 - Reasons: ${blankRejectionReasonResult.decisions[0].reasons.join(', ')}
 - Remediation: ${blankRejectionReasonResult.remediationActions[0].action}
 - Audit digest: ${blankRejectionReasonResult.auditDigest}
+
+## Impossible Appeal Window Packet
+
+- Applicant: ${impossibleAppealWindowResult.decisions[0].applicantId}
+- Decision: ${impossibleAppealWindowResult.decisions[0].decision}
+- Appeal status: ${impossibleAppealWindowResult.decisions[0].appealStatus}
+- Reasons: ${impossibleAppealWindowResult.decisions[0].reasons.join(', ')}
+- Remediation: ${impossibleAppealWindowResult.remediationActions[0].action}
+- Audit digest: ${impossibleAppealWindowResult.auditDigest}
 
 ## Safety
 
@@ -335,8 +371,10 @@ console.log(`Wrote ${path.relative(__dirname, missingApplicantListPacketPath)}`)
 console.log(`Wrote ${path.relative(__dirname, malformedPrequalificationRoundPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, missingChallengeIdentityPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, invalidGeneratedAtPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, impossibleGeneratedAtPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, malformedApplicantEntryPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, blankRejectionReasonPacketPath)}`);
+console.log(`Wrote ${path.relative(__dirname, impossibleAppealWindowPacketPath)}`);
 console.log(`Wrote ${path.relative(__dirname, reportPath)}`);
 console.log(`Wrote ${path.relative(__dirname, svgPath)}`);
 console.log(`Accepted applicants: ${result.summary.accepted}`);
@@ -859,6 +897,48 @@ function buildInvalidGeneratedAtRound() {
   return round;
 }
 
+function buildImpossibleGeneratedAtRound() {
+  const round = buildSampleRound();
+  round.generatedAt = '2026-02-30T08:00:00Z';
+  round.applicants = [
+    {
+      id: 'applicant-impossible-generated-at',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-impossible-generated-at',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 94,
+        'data-readiness': 96,
+        'safety-plan': 93
+      }
+    },
+    {
+      applicantId: 'applicant-impossible-generated-at',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'accept',
+      rejectionReasons: [],
+      scores: {
+        'domain-fit': 92,
+        'data-readiness': 94,
+        'safety-plan': 91
+      }
+    }
+  ];
+  return round;
+}
+
 function buildMalformedApplicantEntryRound() {
   const round = buildSampleRound();
   round.applicants = [null];
@@ -892,6 +972,47 @@ function buildBlankRejectionReasonRound() {
     },
     {
       applicantId: 'applicant-blank-rejection-reason',
+      reviewerId: 'reviewer-independent-b',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 59,
+        'data-readiness': 61,
+        'safety-plan': 60
+      }
+    }
+  ];
+  return round;
+}
+
+function buildImpossibleAppealWindowRound() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'applicant-impossible-appeal',
+      sponsorDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      appealDueAt: '2026-06-31T08:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'applicant-impossible-appeal',
+      reviewerId: 'reviewer-independent-a',
+      anonymousScreeningObserved: true,
+      conflict: false,
+      recommendedDecision: 'reject',
+      rejectionReasons: ['insufficient validation plan'],
+      scores: {
+        'domain-fit': 58,
+        'data-readiness': 60,
+        'safety-plan': 62
+      }
+    },
+    {
+      applicantId: 'applicant-impossible-appeal',
       reviewerId: 'reviewer-independent-b',
       anonymousScreeningObserved: true,
       conflict: false,

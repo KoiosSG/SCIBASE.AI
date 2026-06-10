@@ -2,9 +2,9 @@
 
 ## Challenge Posting Portal
 
-- Verifies that prequalification rounds use complete published criteria lists, complete and unique criterion identifiers after trimming, nonnegative weights, valid weight totals, valid 0-100 pass thresholds, valid positive reviewer quorum requirements, explicit sponsor accept/reject decisions, complete applicant lists, and complete unique applicant identities after trimming.
+- Verifies that prequalification rounds use strict UTC generated-at timestamps, complete published criteria lists, complete and unique criterion identifiers after trimming, nonnegative weights, valid weight totals, valid 0-100 pass thresholds, valid positive reviewer quorum requirements, explicit sponsor accept/reject decisions, complete applicant lists, complete unique applicant identities after trimming, and strict UTC appeal-window timestamps for rejected applicants.
 - Blocks unpublished sponsor preferences from entering solver-screening decisions.
-- Keeps prequalification decisions tied to challenge timelines and parseable appeal windows.
+- Keeps prequalification decisions tied to challenge timelines and calendar-valid appeal windows.
 
 ## Submission Engine
 
@@ -31,7 +31,7 @@
 - Holds duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds whitespace-variant duplicate published criterion identifiers for fairness review before ambiguous rubric evidence can drive sponsor decisions.
 - Holds missing or blank published criterion identifiers for fairness review before unauditable rubric evidence can drive sponsor decisions.
-- Flags reviewer conflicts, missing, omitted, or blank rejection reason evidence, and invalid appeal-window evidence for arbitration-ready remediation.
+- Flags reviewer conflicts, missing, omitted, or blank rejection reason evidence, and invalid or calendar-impossible appeal-window evidence for arbitration-ready remediation.
 - Excludes conflicted reviewer scores from weighted threshold evidence while retaining the conflict finding.
 - Deduplicates repeated reviewer identities before quorum and weighted threshold scoring while retaining the duplicate-evidence finding.
 - Holds missing reviewer identity evidence before anonymous or malformed reviewer rows can satisfy quorum.

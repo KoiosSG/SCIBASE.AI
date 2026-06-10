@@ -149,6 +149,15 @@ Generated: 2026-05-28T08:00:00Z
 - Remediation: complete-prequalification-evidence
 - Audit digest: sha256:38cad55f45671cce8012765784d45b26647492bc4668b416088522d9b4baec31
 
+## Impossible Generated At Packet
+
+- Generated: "2026-02-30T08:00:00Z"
+- Applicant: applicant-impossible-generated-at
+- Decision: hold-for-fairness-review
+- Reasons: generated-at-invalid
+- Remediation: complete-prequalification-evidence
+- Audit digest: sha256:db2ef3d0e48beabe7b8481dc62e45e20bf84d4adaf6c28280a9fe963e0ea0c9b
+
 ## Malformed Applicant Entry Packet
 
 - Applicant: unidentified-applicant
@@ -164,6 +173,15 @@ Generated: 2026-05-28T08:00:00Z
 - Reasons: missing-rejection-reason
 - Remediation: publish-rejection-reasons-and-appeal-window
 - Audit digest: sha256:bbd51d47794aadc8faa0eda8231781f66d0e4eacde31bd0362b6e723834a444c
+
+## Impossible Appeal Window Packet
+
+- Applicant: applicant-impossible-appeal
+- Decision: hold-for-fairness-review
+- Appeal status: invalid
+- Reasons: invalid-appeal-window
+- Remediation: publish-rejection-reasons-and-appeal-window
+- Audit digest: sha256:6ef2884f4bd43b760c3c674bfaf0d3e0283d9cc0de73fdba0fc1630bc9c393b8
 
 ## Safety
 
