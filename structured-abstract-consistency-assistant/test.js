@@ -360,6 +360,37 @@ function testBlocksReleaseWhenAssessmentTimestampIsInvalid() {
   assert.equal(packet.reviewLanes.aiPeerReview, 'blocked');
 }
 
+function testBlocksReleaseWhenAssessmentTimestampHasImpossibleCalendarDate() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-impossible-assessed-at',
+    assessedAt: '2026-02-30T10:00:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingCodes(packet), ['INVALID_ASSESSMENT_TIMESTAMP']);
+  assert.ok(packet.actions.includes('repair_assessment_timestamp:ms-abstract-impossible-assessed-at'));
+  assert.equal(packet.reviewLanes.aiPeerReview, 'blocked');
+}
+
 function testBlocksImprovementClaimWhenResultsShowWorseDirection() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-worse-direction',
@@ -1147,6 +1178,7 @@ const tests = [
   testHoldsAbstractWhenSourceEvidencePacketsAreMissing,
   testMalformedTopLevelManuscriptIsHeldWithoutCrashing,
   testBlocksReleaseWhenAssessmentTimestampIsInvalid,
+  testBlocksReleaseWhenAssessmentTimestampHasImpossibleCalendarDate,
   testBlocksImprovementClaimWhenResultsShowWorseDirection,
   testBlocksConclusionBenefitClaimWhenResultsShowWorseDirection,
   testBlocksLowerOutcomeBenefitLanguageWhenResultsShowNoClearEffect,

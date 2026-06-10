@@ -373,7 +373,37 @@ function hasText(value) {
 }
 
 function hasValidTimestamp(value) {
-  return hasText(value) && Number.isFinite(Date.parse(value));
+  if (!hasText(value)) return false;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/.exec(value.trim());
+  if (!match) return false;
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText, millisecondText = '0'] = match;
+  const parts = {
+    year: Number(yearText),
+    month: Number(monthText),
+    day: Number(dayText),
+    hour: Number(hourText),
+    minute: Number(minuteText),
+    second: Number(secondText),
+    millisecond: Number(millisecondText.padEnd(3, '0'))
+  };
+  const date = new Date(Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+    parts.millisecond
+  ));
+  return (
+    date.getUTCFullYear() === parts.year
+    && date.getUTCMonth() + 1 === parts.month
+    && date.getUTCDate() === parts.day
+    && date.getUTCHours() === parts.hour
+    && date.getUTCMinutes() === parts.minute
+    && date.getUTCSeconds() === parts.second
+    && date.getUTCMilliseconds() === parts.millisecond
+  );
 }
 
 function impliesImprovement(value) {

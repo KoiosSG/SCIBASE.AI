@@ -24,6 +24,7 @@ const {
   sourceEndpointMismatchManuscript,
   malformedManuscript,
   invalidAssessmentTimestampManuscript,
+  impossibleAssessmentTimestampManuscript,
   cleanManuscript
 } = require('./sample-data');
 
@@ -52,6 +53,7 @@ const packets = [
   ['source-endpoint-mismatch-packet.json', assessStructuredAbstract(sourceEndpointMismatchManuscript)],
   ['malformed-manuscript-packet.json', assessStructuredAbstract(malformedManuscript)],
   ['invalid-assessed-at-packet.json', assessStructuredAbstract(invalidAssessmentTimestampManuscript)],
+  ['impossible-assessed-at-packet.json', assessStructuredAbstract(impossibleAssessmentTimestampManuscript)],
   ['clean-packet.json', assessStructuredAbstract(cleanManuscript)]
 ];
 
