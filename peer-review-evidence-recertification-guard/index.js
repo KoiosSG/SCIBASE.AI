@@ -64,6 +64,10 @@ function reviewerDisplay(item) {
     return safeAnonymousLabel(item.anonymousLabel);
   }
 
+  if (containsUnsafePublicReviewerIdentifier(item.reviewerId)) {
+    return 'reviewer:unverified';
+  }
+
   return hasText(item.reviewerId) ? `reviewer:${item.reviewerId.trim()}` : 'reviewer:unverified';
 }
 
@@ -75,6 +79,10 @@ function safeAnonymousLabel(label) {
 
 function containsDirectIdentifier(value = '') {
   return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|private/i.test(value);
+}
+
+function containsUnsafePublicReviewerIdentifier(value = '') {
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|(?:file:\/\/|[A-Z]:[\\/]Users[\\/][^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+|private-lab|patient-export)/i.test(value);
 }
 
 function evidenceList(value) {
@@ -208,6 +216,10 @@ function evaluateReview(project, review) {
 
   if (!isBlindOrAnonymous(review.mode) && !hasText(review.reviewerId)) {
     reasons.push('reviewer-identity-missing');
+  }
+
+  if (!isBlindOrAnonymous(review.mode) && containsUnsafePublicReviewerIdentifier(review.reviewerId)) {
+    reasons.push('reviewer-identity-unsafe');
   }
 
   if (!hasValidReputationDelta(review.reputationDelta)) {

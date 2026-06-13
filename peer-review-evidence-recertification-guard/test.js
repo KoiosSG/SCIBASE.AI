@@ -1002,6 +1002,43 @@ function testInvalidProjectTimestampBlocksReputationUpdate() {
   assert.equal(result.summary.recommendedAction, 'block-reputation-update');
 }
 
+function testPublicReviewerDirectIdentifierRequiresRecertificationWithoutEchoingId() {
+  const project = buildSampleProject();
+  project.artifacts = [
+    {
+      id: 'analysis-code',
+      type: 'code',
+      currentDigest: 'sha256:code-v3',
+      changedAt: '2026-05-10T10:00:00Z',
+      currentAnchors: {}
+    }
+  ];
+  project.reviews = [
+    {
+      id: 'review-public-email-identity',
+      reviewerId: 'alice.private@example.edu',
+      mode: 'public',
+      artifactId: 'analysis-code',
+      evidenceDigest: 'sha256:code-v3',
+      submittedAt: '2026-05-16T11:00:00Z',
+      reputationDelta: 14
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const decision = byId(result.reviewDecisions, 'review-public-email-identity');
+  const task = byId(result.recertificationTasks, 'recertify-review-public-email-identity');
+  const action = byId(result.reputationActions, 'review-public-email-identity');
+  const packetJson = JSON.stringify(result);
+
+  assert.equal(decision.status, 'recertification-required');
+  assert.deepEqual(decision.reasons, ['reviewer-identity-unsafe']);
+  assert.equal(task.reviewer, 'reviewer:unverified');
+  assert.equal(action.appliesTo, 'reviewer:unverified');
+  assert.equal(packetJson.includes('alice.private@example.edu'), false);
+}
+
 const tests = [
   testStaleReviewsFreezeReputationUntilRecertified,
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
@@ -1033,7 +1070,8 @@ const tests = [
   testMalformedReviewEntriesRequireRecertificationInsteadOfCrashing,
   testMalformedInlineCommentEntriesRequireRecertificationInsteadOfCrashing,
   testMalformedProjectPacketRequiresRecertificationInsteadOfCrashing,
-  testInvalidProjectTimestampBlocksReputationUpdate
+  testInvalidProjectTimestampBlocksReputationUpdate,
+  testPublicReviewerDirectIdentifierRequiresRecertificationWithoutEchoingId
 ];
 
 for (const test of tests) {
