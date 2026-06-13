@@ -455,6 +455,49 @@ function testLanguageTaggedSynonymsArePreservedForEntityPages() {
   assert.equal(diabetes.schemaOrg.about.length, 3);
 }
 
+function testInstrumentAliasesRemainTypedGraphNodesWithoutCalibrationClaims() {
+  const corpus = {
+    corpusId: 'kg-instrument-alias-upload-batch-17',
+    generatedAt: '2026-06-13T18:40:00Z',
+    entities: [
+      {
+        id: 'entity:instrument:lc-ms-ms',
+        canonicalName: 'Liquid chromatography tandem mass spectrometry',
+        ontology: 'SCIBASE-INSTRUMENT',
+        identifier: 'lc-ms-ms',
+        entityType: 'scientific-instrument',
+        localizedNames: {
+          en: ['LC-MS/MS'],
+          de: ['Fluessigchromatographie Tandem Massenspektrometrie'],
+          es: ['cromatografia liquida espectrometria de masas en tandem']
+        }
+      }
+    ],
+    homographs: {},
+    mentions: [
+      {
+        id: 'mention-lcms-de',
+        documentId: 'instrument-paper-1',
+        text: 'Fluessigchromatographie Tandem Massenspektrometrie',
+        language: 'de',
+        confidence: 0.94
+      }
+    ]
+  };
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-lcms-de');
+  const instrument = byId(result.entityPackets, 'entity:instrument:lc-ms-ms');
+
+  assert.equal(event.decision, 'accept-canonical-entity');
+  assert.equal(event.reason, 'trusted-translated-alias');
+  assert.equal(instrument.entityType, 'scientific-instrument');
+  assert.equal(instrument.jsonLd.additionalType, 'scientific-instrument');
+  assert.equal(instrument.schemaOrg.about[0].additionalType, 'scientific-instrument');
+  assert.deepEqual(result.recommendationGuards.safeEntityIds, ['entity:instrument:lc-ms-ms']);
+  assert.equal(JSON.stringify(instrument).includes('calibrationCertificate'), false);
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const result = evaluateAliasGuard(buildSampleCorpus());
 
@@ -487,6 +530,7 @@ const tests = [
   testMalformedMentionEntriesAreHeldForCuratorReview,
   testMalformedTopLevelCorpusIsHeldForCuratorReview,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
+  testInstrumentAliasesRemainTypedGraphNodesWithoutCalibrationClaims,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 

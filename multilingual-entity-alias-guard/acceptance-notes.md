@@ -7,7 +7,7 @@ It is not:
 - a broad entity extractor or navigator
 - an ontology deprecation or synonym migration tool
 - a recommendation visibility or diversity guard
-- a geospatial, clinical trial, biological accession, software runtime, or temporal validity guard
+- a geospatial, clinical trial, biological accession, software runtime, temporal validity, or instrument calibration certificate guard
 
 Validation coverage:
 
@@ -27,4 +27,5 @@ Validation coverage:
 - malformed mention rows such as null entries are held for curator review instead of crashing before graph packets are produced
 - malformed top-level corpus packets are held for curator review instead of crashing before graph evidence is produced
 - localized names remain language-tagged on entity packets
+- multilingual scientific instrument/tool aliases can become typed graph nodes when confidence evidence is strong, without introducing calibration-certificate, revocation-window, or unit-compatibility claims
 - audit output is deterministic and private-data free

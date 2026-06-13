@@ -409,13 +409,26 @@ function buildEntityPackets(entities, decisions) {
   return evidenceList(entities).map((entity) => {
     const localizedNames = localizedNamesFor(entity);
     const aliasEvidenceIssues = localizedNameIssuesFor(entity);
+    const entityType = isTextValue(entity.entityType) ? entity.entityType : null;
     const accepted = decisions.filter(
       (decision) =>
         decision.decision === 'accept-canonical-entity' && decision.candidateEntityId === entity.id
     );
     const languages = Array.from(new Set(accepted.map((decision) => decision.language))).sort();
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'DefinedTerm',
+      name: entity.canonicalName,
+      identifier: `${entity.ontology}:${entity.identifier}`,
+      inDefinedTermSet: entity.ontology,
+      alternateName: Object.values(localizedNames).flat()
+    };
 
-    return {
+    if (entityType) {
+      jsonLd.additionalType = entityType;
+    }
+
+    const packet = {
       id: entity.id,
       canonicalName: entity.canonicalName,
       ontology: entity.ontology,
@@ -430,24 +443,31 @@ function buildEntityPackets(entities, decisions) {
         confidence: decision.confidence
       })),
       localizedNames,
-      jsonLd: {
-        '@context': 'https://schema.org',
-        '@type': 'DefinedTerm',
-        name: entity.canonicalName,
-        identifier: `${entity.ontology}:${entity.identifier}`,
-        inDefinedTermSet: entity.ontology,
-        alternateName: Object.values(localizedNames).flat()
-      },
+      jsonLd,
       schemaOrg: {
         '@type': 'ScholarlyArticle',
-        about: accepted.map((decision) => ({
-          '@type': 'DefinedTerm',
-          name: decision.text,
-          inLanguage: decision.language,
-          identifier: `${entity.ontology}:${entity.identifier}`
-        }))
+        about: accepted.map((decision) => {
+          const aboutTerm = {
+            '@type': 'DefinedTerm',
+            name: decision.text,
+            inLanguage: decision.language,
+            identifier: `${entity.ontology}:${entity.identifier}`
+          };
+
+          if (entityType) {
+            aboutTerm.additionalType = entityType;
+          }
+
+          return aboutTerm;
+        })
       }
     };
+
+    if (entityType) {
+      packet.entityType = entityType;
+    }
+
+    return packet;
   });
 }
 

@@ -13,6 +13,7 @@
 - Holds Latin-language mentions with Cyrillic or Greek lookalike characters, including lowercase Greek confusables, for curator review before creating graph edges.
 - Treats omitted localized-name maps, malformed localized-name entries, mention lists, and homograph policies as sparse graph evidence instead of crashing corpus review.
 - Emits schema.org-style `DefinedTerm` JSON-LD packets for entity pages.
+- Carries optional typed entity metadata, including scientific instrument/tool aliases, into JSON-LD packets without claiming calibration-chain validation.
 
 ## Knowledge Navigation
 
@@ -30,4 +31,4 @@
 
 - Synthetic data only.
 - No credentials, private corpora, live ontology calls, external APIs, or production recommendation systems.
-- This slice is distinct from ontology drift, synonym dedupe, generic entity disambiguation, temporal validity, geospatial provenance, and recommendation visibility/diversity guards.
+- This slice is distinct from ontology drift, synonym dedupe, generic entity disambiguation, temporal validity, geospatial provenance, instrument calibration certificate validity/revocation/unit-compatibility guards, and recommendation visibility/diversity guards.
