@@ -376,6 +376,43 @@ function testMissingVisibleFocusIndicatorBlocksKeyboardRelease() {
   assert.ok(packet.actions.includes('add_visible_focus_indicator:project-risk-filter'));
 }
 
+function testPrivateComponentIdsAreRedactedFromFindingsAndActions() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'C:\\Users\\Alice\\dashboards\\private-lab',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:25:00Z',
+    widgets: [
+      {
+        id: 'alice.private@example.edu',
+        type: 'metric',
+        title: 'Private cohort summary',
+        foreground: '#111827',
+        background: '#ffffff',
+        critical: true,
+        keyboardReachable: true,
+        screenReaderLabel: 'Owner alice.private@example.edu cohort summary',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  const packetJson = JSON.stringify(packet);
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.equal(packet.findings[0].componentId, 'component-redacted-1');
+  assert.ok(packet.actions.includes('block_release:dashboard-redacted'));
+  assert.ok(packet.actions.includes('redact_accessibility_text:component-redacted-1'));
+  assert.equal(packetJson.includes('alice.private@example.edu'), false);
+  assert.equal(packetJson.includes('C:\\Users\\Alice'), false);
+  assert.equal(packetJson.includes('private-lab'), false);
+}
+
 const tests = [
   testCriticalAccessibilityIssuesBlockDashboardRelease,
   testCleanDashboardReleasesWithWcagSignals,
@@ -390,7 +427,8 @@ const tests = [
   testMalformedDashboardPacketBlocksRelease,
   testMalformedMotionEvidenceBlocksRelease,
   testShorthandHexContrastEvidenceRemainsValid,
-  testMissingVisibleFocusIndicatorBlocksKeyboardRelease
+  testMissingVisibleFocusIndicatorBlocksKeyboardRelease,
+  testPrivateComponentIdsAreRedactedFromFindingsAndActions
 ];
 
 for (const test of tests) {

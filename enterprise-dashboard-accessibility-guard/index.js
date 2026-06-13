@@ -7,17 +7,26 @@ function assessDashboardRelease(dashboard) {
     ...assessVisualAndOperableComponents(normalized.dashboard),
     ...assessMotion(normalized.dashboard)
   ];
+  const safeComponentId = createComponentIdentifierSanitizer();
+  const safeFindings = findings.map((finding) => ({
+    ...finding,
+    componentId: safeComponentId(finding.componentId)
+  }));
+  const safeDashboard = {
+    ...normalized.dashboard,
+    dashboardId: safeDashboardId(normalized.dashboard.dashboardId)
+  };
   const blockerCount = findings.filter((finding) => finding.severity === 'blocker').length;
   const warningCount = findings.filter((finding) => finding.severity === 'warning').length;
 
   const packet = {
-    dashboardId: normalized.dashboard.dashboardId,
+    dashboardId: safeDashboard.dashboardId,
     institutionId: normalized.dashboard.institutionId,
     status: chooseStatus(blockerCount, warningCount),
     releaseLanes: chooseReleaseLanes(blockerCount, warningCount),
-    findings,
-    actions: buildActions(normalized.dashboard, findings),
-    wcagSignals: buildWcagSignals(findings),
+    findings: safeFindings,
+    actions: buildActions(safeDashboard, safeFindings),
+    wcagSignals: buildWcagSignals(safeFindings),
     assessedAt: normalized.dashboard.assessedAt
   };
 
@@ -312,6 +321,27 @@ function contrastRatio(foreground, background) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+function createComponentIdentifierSanitizer() {
+  const redactions = new Map();
+  let redactionCount = 0;
+
+  return (componentId) => {
+    if (!containsPrivateIdentifier(componentId)) return componentId;
+    if (!redactions.has(componentId)) {
+      redactions.set(componentId, `component-redacted-${++redactionCount}`);
+    }
+    return redactions.get(componentId);
+  };
+}
+
+function safeDashboardId(dashboardId) {
+  return containsPrivateIdentifier(dashboardId) ? 'dashboard-redacted' : dashboardId;
+}
+
+function containsPrivateIdentifier(value = '') {
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|(?:file:\/\/|[A-Z]:[\\/]Users[\\/][^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+|\bprivate[- ]lab\b|\bpatient-export\b)/i.test(value);
+}
+
 function hexToRgb(hex) {
   if (typeof hex !== 'string') return null;
   const token = hex.trim().replace('#', '');
@@ -338,7 +368,7 @@ function relativeLuminance(rgb) {
 }
 
 function containsPrivateData(value = '') {
-  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|(?:sso|student|user|account)\s+id|private lab|restricted project/i.test(value);
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|(?:sso|student|user|account)\s+id|(?:file:\/\/|[A-Z]:[\\/]Users[\\/][^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+)|\bprivate[- ]lab\b|\bpatient-export\b|restricted project/i.test(value);
 }
 
 function accessibilityText(component) {
