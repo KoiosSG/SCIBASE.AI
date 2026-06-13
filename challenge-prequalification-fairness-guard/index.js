@@ -277,7 +277,17 @@ function applicantListIsMissing(round) {
 }
 
 function outputApplicantIdFor(applicant) {
-  return applicantIdFor(applicant) || 'unidentified-applicant';
+  const applicantId = applicantIdFor(applicant);
+  if (!applicantId) return 'unidentified-applicant';
+  if (containsDirectIdentifier(applicantId)) {
+    const redactionHash = crypto.createHash('sha256').update(applicantId).digest('hex').slice(0, 8);
+    return `applicant-redacted-${redactionHash}`;
+  }
+  return applicantId;
+}
+
+function containsDirectIdentifier(value = '') {
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|(?:file:\/\/|[A-Z]:[\\/]Users[\\/][^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+|private-lab|patient-export)/i.test(value);
 }
 
 function duplicateNonConflictedReviewerIds(reviews) {

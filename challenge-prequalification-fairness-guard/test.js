@@ -1407,6 +1407,38 @@ function testAuditDigestIsDeterministicAndPrivateFree() {
   assert.equal(JSON.stringify(first).includes('government_id'), false);
 }
 
+function testApplicantDirectIdentifiersAreRedactedFromDecisionsAndActions() {
+  const round = buildSampleRound();
+  round.applicants = [
+    {
+      id: 'solver.private@example.edu',
+      sponsorDecision: 'reject',
+      rejectionReasons: [],
+      appealDueAt: '2026-06-30T00:00:00Z'
+    }
+  ];
+  round.reviews = [
+    {
+      applicantId: 'solver.private@example.edu',
+      reviewerId: 'reviewer-1',
+      criterionId: 'technical-plan',
+      score: 66,
+      conflict: false
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = result.decisions[0];
+  const action = result.remediationActions[0];
+  const packetJson = JSON.stringify(result);
+
+  assert.match(decision.applicantId, /^applicant-redacted-[a-f0-9]{8}$/);
+  assert.equal(decision.id, decision.applicantId);
+  assert.equal(action.applicantId, decision.applicantId);
+  assert.equal(action.id, `remediate-${decision.applicantId}`);
+  assert.equal(packetJson.includes('solver.private@example.edu'), false);
+}
+
 const tests = [
   testEligibleApplicantIsAcceptedWithPublishedCriteriaAndQuorum,
   testAnonymousScreeningLeakHoldsApplicantForFairnessReview,
@@ -1443,7 +1475,8 @@ const tests = [
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
   testAwardPublicationMetadataHoldsPrequalificationRound,
-  testAuditDigestIsDeterministicAndPrivateFree
+  testAuditDigestIsDeterministicAndPrivateFree,
+  testApplicantDirectIdentifiersAreRedactedFromDecisionsAndActions
 ];
 
 for (const test of tests) {
