@@ -547,6 +547,35 @@ function testMissingRepositoryAssessmentTimestampBlocksOtherwisePinnedReferences
   assert.equal(packet.referenceSignals.verificationFresh, false);
 }
 
+function testPrivateReferenceTargetsAreRedactedBeforeFindings() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-private-target',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'dataset-private-file-target',
+        kind: 'api',
+        target: 'file:///Users/alice/private-lab/export.csv?token=secret-token-123',
+        checksum: null,
+        doi: null,
+        license: 'CC-BY-4.0',
+        attribution: 'Example Lab',
+        authRequired: true,
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  const packetJson = JSON.stringify(packet);
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['AUTH_REQUIRED_REFERENCE']);
+  assert.equal(packet.findings[0].target, '[redacted-local-path]');
+  assert.equal(packetJson.includes('/Users/alice'), false);
+  assert.equal(packetJson.includes('private-lab'), false);
+  assert.equal(packetJson.includes('secret-token-123'), false);
+}
+
 function testMalformedTopLevelRepositoryPacketBlocksReleaseInsteadOfCrashing() {
   const packet = assessExternalReferences(null);
 
@@ -584,6 +613,7 @@ const tests = [
   testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder,
   testAuthenticatedReferenceTargetsDoNotEchoSecretMaterial,
   testMissingRepositoryAssessmentTimestampBlocksOtherwisePinnedReferences,
+  testPrivateReferenceTargetsAreRedactedBeforeFindings,
   testMalformedTopLevelRepositoryPacketBlocksReleaseInsteadOfCrashing
 ];
 

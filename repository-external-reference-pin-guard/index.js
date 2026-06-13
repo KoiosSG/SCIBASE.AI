@@ -357,7 +357,15 @@ function sanitizeReferenceTarget(target) {
   if (typeof target !== 'string') return target;
   return target
     .replace(/\/\/([^/@\s]+):([^/@\s]+)@/g, '//[redacted-credentials]@')
-    .replace(/([?&](?:access_token|api_key|key|secret|signature|sig|token)=)[^&\s]+/gi, '$1[redacted]');
+    .replace(/([?&](?:access_token|api_key|key|secret|signature|sig|token)=)[^&\s]+/gi, '$1[redacted]')
+    .replace(/file:\/\/[^ \s"')]+/gi, '[redacted-local-path]')
+    .replace(/[A-Z]:[\\/]Users[\\/][^ \s"')]+/gi, '[redacted-local-path]')
+    .replace(/\/Users\/[^ \s"')]+/g, '[redacted-local-path]')
+    .replace(/\/home\/[^ \s"')]+/g, '[redacted-local-path]')
+    .replace(/\bmailto:[^ \s"')]+/gi, '[redacted-private-reference]')
+    .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[redacted-private-reference]')
+    .replace(/\borcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]\b/gi, '[redacted-private-reference]')
+    .replace(/\b(?:private-lab|patient-export)\b/gi, '[redacted-private-reference]');
 }
 
 function compareFindings(left, right) {
