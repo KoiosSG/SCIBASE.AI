@@ -29,15 +29,16 @@ function assessImportBatch(batch) {
     ...blockFindings
   ].sort(compareFindings);
   const status = chooseStatus(findings);
+  const outputBatch = sanitizeBatchMetadata(batch);
   const packet = {
-    importId: batch.importId,
-    workspaceId: batch.workspaceId,
+    importId: outputBatch.importId,
+    workspaceId: outputBatch.workspaceId,
     status,
     insertionLanes: chooseInsertionLanes(status),
-    source: sanitizeSource(batch.source || {}),
+    source: sanitizeSource(outputBatch.source || {}),
     findings,
     sanitizedBlocks,
-    actions: buildActions(batch, findings),
+    actions: buildActions(outputBatch, findings),
     assessedAt: batch.receivedAt
   };
 
@@ -362,6 +363,48 @@ function sanitizeCells(cells) {
   });
 }
 
+function sanitizeBatchMetadata(batch) {
+  return {
+    ...batch,
+    importId: sanitizeImportId(batch.importId),
+    workspaceId: sanitizeWorkspaceId(batch.workspaceId),
+    source: sanitizeBatchSource(batch.source || {})
+  };
+}
+
+function sanitizeImportId(value) {
+  if (!value) return 'unknown-import';
+  return containsPrivateMetadata(value) ? 'import-redacted' : value;
+}
+
+function sanitizeWorkspaceId(value) {
+  if (value === undefined || value === null) return null;
+  return containsPrivateMetadata(value) ? redactPrivateMetadata(value) : value;
+}
+
+function sanitizeBatchSource(source) {
+  return {
+    ...source,
+    origin: sourceOriginLabel(source.origin)
+  };
+}
+
+function containsPrivateMetadata(value = '') {
+  return containsLocalPrivatePath(value) || containsDirectIdentifier(value);
+}
+
+function containsDirectIdentifier(value = '') {
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]/i.test(value);
+}
+
+function redactPrivateMetadata(value = '') {
+  if (typeof value !== 'string') return value;
+  return redactLocalPrivatePaths(value)
+    .replace(/\bmailto:[^ \s"')]+/gi, '[redacted-private-reference]')
+    .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[redacted-private-reference]')
+    .replace(/\borcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]\b/gi, '[redacted-private-reference]');
+}
+
 function containsHiddenInstruction(value = '') {
   return /ignore previous|system prompt|hidden instruction|do not show|approve the submission/i.test(value);
 }
@@ -471,7 +514,7 @@ function sanitizeSource(source) {
 
 function sourceOriginLabel(origin) {
   const value = origin || 'unknown';
-  return containsLocalPrivatePath(value) ? redactLocalPrivatePaths(value) : value;
+  return containsPrivateMetadata(value) ? redactPrivateMetadata(value) : value;
 }
 
 function isRecognizedImportChannel(channel) {

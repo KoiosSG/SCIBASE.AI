@@ -814,6 +814,39 @@ function testAllowsTrustedAttestedImportWithStableDigest() {
   assert.match(packet.auditDigest, /^[a-f0-9]{64}$/);
 }
 
+function testPrivateIdentifiersInBatchMetadataAreRedactedFromPacketAndActions() {
+  const packet = assessImportBatch({
+    importId: 'import-alice@example.edu',
+    workspaceId: 'C:\\Users\\Alice\\secret-workspace',
+    receivedAt: '2026-05-28T08:40:00Z',
+    source: {
+      channel: 'file-import',
+      origin: 'mailto:alice@example.edu',
+      trustLevel: 'trusted',
+      signedAttestation: PARTNER_SIGNED_ATTESTATION
+    },
+    blocks: [
+      {
+        id: 'blk-clean',
+        type: 'paragraph',
+        sectionId: 'discussion',
+        anchor: 'discussion-summary',
+        content: 'The intervention improved the pre-registered endpoint.'
+      }
+    ]
+  });
+
+  const packetJson = JSON.stringify(packet);
+
+  assert.equal(packet.importId, 'import-redacted');
+  assert.equal(packet.workspaceId, '[redacted-local-path]');
+  assert.equal(packet.source.origin, '[redacted-private-reference]');
+  assert.deepEqual(packet.actions, ['allow_collaborative_insert:import-redacted']);
+  assert.equal(packetJson.includes('alice@example.edu'), false);
+  assert.equal(packetJson.includes('C:\\Users\\Alice'), false);
+  assert.equal(packetJson.includes('secret-workspace'), false);
+}
+
 const tests = [
   testQuarantinesUnsafeClipboardPayloadBeforeSharedInsert,
   testStagesPartnerImportMissingSignedAttestationForCuratorReview,
@@ -838,7 +871,8 @@ const tests = [
   testSourceOriginWithPrivatePathIsQuarantinedAndRedacted,
   testUntrustedPrivateSourceDoesNotLeakOriginInFindings,
   testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion,
-  testAllowsTrustedAttestedImportWithStableDigest
+  testAllowsTrustedAttestedImportWithStableDigest,
+  testPrivateIdentifiersInBatchMetadataAreRedactedFromPacketAndActions
 ];
 
 for (const test of tests) {
