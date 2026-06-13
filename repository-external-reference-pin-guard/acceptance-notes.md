@@ -24,6 +24,7 @@ Expected evidence:
 - Malformed external-reference entries produce `MALFORMED_REFERENCE_ENTRY` blockers and `repair_reference_entry:*` actions instead of crashing or disappearing from reviewer packets.
 - Blank or missing reference IDs produce `MISSING_REFERENCE_ID` blockers, stable `unidentified-reference-*` packet IDs, and `assign_reference_id:*` actions instead of releasing ambiguous remediation evidence.
 - Missing repository assessment timestamps produce `INVALID_REPOSITORY_ASSESSED_AT` blockers and `repair_repository_assessed_at:*` actions instead of releasing otherwise pinned references without audit timing evidence.
+- Authenticated reference targets do not echo embedded credentials or token query values in finding packets.
 - Future-dated API snapshots do not count as pinned snapshot evidence for DOI/export release.
 - Otherwise pinned references without verification timestamps are blocked until verification evidence is refreshed.
 - `reports/warning-packet.json` stages pinned references that still need license and attribution metadata.

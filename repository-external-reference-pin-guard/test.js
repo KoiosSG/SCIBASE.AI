@@ -495,6 +495,33 @@ function testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder() {
   });
 }
 
+function testAuthenticatedReferenceTargetsDoNotEchoSecretMaterial() {
+  const packet = assessExternalReferences({
+    repositoryId: 'repo-reference-auth-target',
+    assessedAt: '2026-05-28T12:00:00Z',
+    references: [
+      {
+        id: 'api-private-snapshot',
+        kind: 'api_source',
+        target: 'https://reader:super-secret-token@api.example.invalid/export?access_token=secret-token-123&snapshot=latest',
+        snapshotDate: '',
+        checksum: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        authRequired: true,
+        license: 'CC0-1.0',
+        attribution: 'Example API',
+        lastVerifiedAt: '2026-05-20T08:00:00Z'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'hold_repository_release');
+  assert.deepEqual(findingCodes(packet), ['AUTH_REQUIRED_REFERENCE', 'FLOATING_API_REFERENCE']);
+  assert.equal(packet.findings[0].target.includes('super-secret-token'), false);
+  assert.equal(packet.findings[0].target.includes('secret-token-123'), false);
+  assert.equal(JSON.stringify(packet).includes('super-secret-token'), false);
+  assert.equal(JSON.stringify(packet).includes('secret-token-123'), false);
+}
+
 function testMissingRepositoryAssessmentTimestampBlocksOtherwisePinnedReferences() {
   const packet = assessExternalReferences({
     repositoryId: 'repo-reference-missing-assessed-at',
@@ -555,6 +582,7 @@ const tests = [
   testMalformedReferenceEntriesBlockReleaseInsteadOfCrashing,
   testMalformedReferenceManifestBlocksRelease,
   testMissingReferenceIdentityBlocksReleaseWithStablePlaceholder,
+  testAuthenticatedReferenceTargetsDoNotEchoSecretMaterial,
   testMissingRepositoryAssessmentTimestampBlocksOtherwisePinnedReferences,
   testMalformedTopLevelRepositoryPacketBlocksReleaseInsteadOfCrashing
 ];

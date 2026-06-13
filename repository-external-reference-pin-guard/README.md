@@ -16,6 +16,7 @@ This module checks whether a scientific repository can safely publish a DOI, cit
 - Repository-level assessment timestamps must be present and parseable before otherwise pinned references can release.
 - API sources use parseable, non-future dated snapshots with full-length SHA checksum evidence instead of floating "latest" endpoints.
 - Export bundles do not require authenticated external references.
+- Finding targets redact embedded credentials and token query parameters before reviewer packets are emitted.
 - License and attribution metadata are present before DOI publication.
 - Reference verification evidence is present, fresh enough for release, and not future-dated.
 

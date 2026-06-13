@@ -346,11 +346,18 @@ function finding(reference, code, severity, message) {
   return {
     referenceId: reference.id,
     kind: reference.kind,
-    target: reference.target,
+    target: sanitizeReferenceTarget(reference.target),
     code,
     severity,
     message
   };
+}
+
+function sanitizeReferenceTarget(target) {
+  if (typeof target !== 'string') return target;
+  return target
+    .replace(/\/\/([^/@\s]+):([^/@\s]+)@/g, '//[redacted-credentials]@')
+    .replace(/([?&](?:access_token|api_key|key|secret|signature|sig|token)=)[^&\s]+/gi, '$1[redacted]');
 }
 
 function compareFindings(left, right) {
