@@ -155,6 +155,17 @@ function isTextValue(value) {
   return typeof value === 'string';
 }
 
+function safeEntityType(value) {
+  if (!isTextValue(value)) return null;
+  const trimmed = value.trim();
+  if (!trimmed || containsPrivateReference(trimmed)) return null;
+  return /^[a-z0-9][a-z0-9:_./ -]{0,80}$/i.test(trimmed) ? trimmed : null;
+}
+
+function containsPrivateReference(value = '') {
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|(?:file:\/\/|[A-Z]:[\\/]Users[\\/][^ \s"')]+|\/Users\/[^ \s"')]+|\/home\/[^ \s"')]+|private-lab|patient-export)/i.test(value);
+}
+
 function normalizeLanguageTag(language) {
   return String(language || '').normalize('NFKC').trim().replace(/_/g, '-').toLocaleLowerCase();
 }
@@ -409,7 +420,7 @@ function buildEntityPackets(entities, decisions) {
   return evidenceList(entities).map((entity) => {
     const localizedNames = localizedNamesFor(entity);
     const aliasEvidenceIssues = localizedNameIssuesFor(entity);
-    const entityType = isTextValue(entity.entityType) ? entity.entityType : null;
+    const entityType = safeEntityType(entity.entityType);
     const accepted = decisions.filter(
       (decision) =>
         decision.decision === 'accept-canonical-entity' && decision.candidateEntityId === entity.id

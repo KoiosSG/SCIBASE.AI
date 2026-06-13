@@ -508,6 +508,48 @@ function testAuditDigestIsDeterministicAndPrivateFree() {
   assert.ok(!JSON.stringify(result).includes('private@'));
 }
 
+function testPrivateEntityTypeIsOmittedFromGraphPackets() {
+  const corpus = {
+    corpusId: 'corpus-instrument-private-type',
+    generatedAt: '2026-05-28T10:15:00Z',
+    entities: [
+      {
+        id: 'entity:instrument:lc-ms-ms',
+        canonicalName: 'Liquid chromatography tandem mass spectrometry',
+        ontology: 'SCIBASE-INSTRUMENT',
+        identifier: 'lc-ms-ms',
+        entityType: 'scientific-instrument C:\\Users\\Alice\\private-lab',
+        localizedNames: {
+          en: ['LC-MS/MS'],
+          de: ['Fluessigchromatographie Tandem Massenspektrometrie']
+        }
+      }
+    ],
+    homographs: {},
+    mentions: [
+      {
+        id: 'mention-lcms-de',
+        documentId: 'instrument-paper-1',
+        text: 'Fluessigchromatographie Tandem Massenspektrometrie',
+        language: 'de',
+        confidence: 0.94
+      }
+    ]
+  };
+
+  const result = evaluateAliasGuard(corpus);
+  const event = byId(result.mentionDecisions, 'mention-lcms-de');
+  const instrument = byId(result.entityPackets, 'entity:instrument:lc-ms-ms');
+  const packetJson = JSON.stringify(result);
+
+  assert.equal(event.decision, 'accept-canonical-entity');
+  assert.equal(Object.hasOwn(instrument, 'entityType'), false);
+  assert.equal(Object.hasOwn(instrument.jsonLd, 'additionalType'), false);
+  assert.equal(Object.hasOwn(instrument.schemaOrg.about[0], 'additionalType'), false);
+  assert.equal(packetJson.includes('C:\\Users\\Alice'), false);
+  assert.equal(packetJson.includes('private-lab'), false);
+}
+
 const tests = [
   testTrustedTranslatedAliasesBecomeCanonicalGraphNodes,
   testFalseFriendMentionsAreHeldForCuratorReview,
@@ -531,7 +573,8 @@ const tests = [
   testMalformedTopLevelCorpusIsHeldForCuratorReview,
   testLanguageTaggedSynonymsArePreservedForEntityPages,
   testInstrumentAliasesRemainTypedGraphNodesWithoutCalibrationClaims,
-  testAuditDigestIsDeterministicAndPrivateFree
+  testAuditDigestIsDeterministicAndPrivateFree,
+  testPrivateEntityTypeIsOmittedFromGraphPackets
 ];
 
 for (const test of tests) {
