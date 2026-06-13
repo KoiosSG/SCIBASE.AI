@@ -177,6 +177,22 @@ function numericFieldFindings(value, kind) {
 }
 
 function sanitizeMetadata(metadata = {}) {
+  if (metadata === undefined) {
+    return {
+      safe: {},
+      removedKeys: [],
+      findings: []
+    };
+  }
+
+  if (!isRecord(metadata)) {
+    return {
+      safe: {},
+      removedKeys: ['provider-metadata-malformed'],
+      findings: ['unsafe-provider-metadata']
+    };
+  }
+
   const safe = {};
   const removedKeys = [];
   const findings = [];

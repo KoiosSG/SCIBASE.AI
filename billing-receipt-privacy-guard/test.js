@@ -573,6 +573,33 @@ function testCustomerCopyRemainsUsefulAfterRedaction() {
   assert.equal(receipt.customerCopy.lineItems[1].usageCategory, 'storage');
 }
 
+function testNullProviderMetadataIsHeldWithoutCrashing() {
+  const result = evaluateReceiptPrivacy({
+    batchId: 'batch-null-provider-metadata',
+    generatedAt: '2026-05-28T11:30:00Z',
+    receipts: [
+      {
+        id: 'receipt-null-provider-metadata',
+        invoiceId: 'invoice-null-provider-metadata',
+        customerId: 'customer-public-1',
+        totalCents: 9900,
+        currency: 'USD',
+        providerMetadata: null,
+        lineItems: []
+      }
+    ]
+  });
+
+  const receipt = result.receipts[0];
+  const action = result.remediationActions[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('unsafe-provider-metadata'), true);
+  assert.deepEqual(receipt.providerMetadata, {});
+  assert.deepEqual(receipt.removedMetadataKeys, ['provider-metadata-malformed']);
+  assert.equal(action.action, 'replace-private-billing-fields-before-delivery');
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const first = evaluateReceiptPrivacy(buildSampleBatch());
   const second = evaluateReceiptPrivacy(buildSampleBatch());
@@ -604,6 +631,7 @@ const tests = [
   testMalformedLineItemEntriesAreHeldInsteadOfCrashing,
   testMalformedTopLevelBatchIsHeldInsteadOfCrashing,
   testCustomerCopyRemainsUsefulAfterRedaction,
+  testNullProviderMetadataIsHeldWithoutCrashing,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 
