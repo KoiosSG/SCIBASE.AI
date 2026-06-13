@@ -708,6 +708,35 @@ function testSourceOriginWithPrivatePathIsQuarantinedAndRedacted() {
   assert.equal(JSON.stringify(packet).includes('patient-export'), false);
 }
 
+function testUntrustedPrivateSourceDoesNotLeakOriginInFindings() {
+  const packet = assessImportBatch({
+    importId: 'import-untrusted-private-source',
+    workspaceId: 'workspace-paper-7',
+    receivedAt: '2026-05-28T08:34:00Z',
+    source: {
+      channel: 'clipboard',
+      origin: 'file:///Users/sam/private-lab/patient-export.docx',
+      trustLevel: 'untrusted'
+    },
+    blocks: [
+      {
+        id: 'blk-untrusted-private-source',
+        type: 'paragraph',
+        sectionId: 'methods',
+        anchor: 'methods-untrusted-private-source',
+        content: 'Imported collaborator note.'
+      }
+    ]
+  });
+
+  assert.equal(packet.status, 'quarantine_import');
+  assert.deepEqual(findingCodes(packet), ['LOCAL_PRIVATE_SOURCE', 'UNTRUSTED_SOURCE']);
+  assert.ok(packet.actions.includes('redact_source_origin:import-untrusted-private-source'));
+  assert.equal(JSON.stringify(packet).includes('/Users/sam'), false);
+  assert.equal(JSON.stringify(packet).includes('private-lab'), false);
+  assert.equal(JSON.stringify(packet).includes('patient-export'), false);
+}
+
 function testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion() {
   const packet = assessImportBatch({
     importId: 'import-malformed-review-expiry',
@@ -807,6 +836,7 @@ const tests = [
   testForwardSlashWindowsUserPathsAreFullyRedacted,
   testTableCellsWithPrivatePathsAreQuarantinedAndRedacted,
   testSourceOriginWithPrivatePathIsQuarantinedAndRedacted,
+  testUntrustedPrivateSourceDoesNotLeakOriginInFindings,
   testMalformedReviewMetadataExpiryIsDroppedBeforeInsertion,
   testAllowsTrustedAttestedImportWithStableDigest
 ];

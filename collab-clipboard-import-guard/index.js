@@ -135,6 +135,7 @@ function assessBlockShapes(blocks) {
 
 function assessSource(batch) {
   const source = batch.source || {};
+  const originLabel = sourceOriginLabel(source.origin);
   const findings = [];
 
   if (!isRecognizedImportChannel(source.channel)) {
@@ -151,7 +152,7 @@ function assessSource(batch) {
       code: 'UNTRUSTED_SOURCE',
       severity: 'blocker',
       blockId: null,
-      message: `Import source ${source.origin || 'unknown'} is not trusted for collaborative insertion.`
+      message: `Import source ${originLabel} is not trusted for collaborative insertion.`
     }));
   }
 
@@ -160,7 +161,7 @@ function assessSource(batch) {
       code: 'UNKNOWN_SOURCE_TRUST',
       severity: 'warning',
       blockId: null,
-      message: `Import source ${source.origin || 'unknown'} is missing recognized trust metadata.`
+      message: `Import source ${originLabel} is missing recognized trust metadata.`
     }));
   }
 
@@ -462,10 +463,15 @@ function sanitizeSource(source) {
   const origin = source.origin || 'unknown';
   return {
     channel: source.channel || 'unknown',
-    origin: containsLocalPrivatePath(origin) ? redactLocalPrivatePaths(origin) : origin,
+    origin: sourceOriginLabel(origin),
     trustLevel: source.trustLevel || 'unknown',
     attested: hasValidSignedAttestation(source)
   };
+}
+
+function sourceOriginLabel(origin) {
+  const value = origin || 'unknown';
+  return containsLocalPrivatePath(value) ? redactLocalPrivatePaths(value) : value;
 }
 
 function isRecognizedImportChannel(channel) {

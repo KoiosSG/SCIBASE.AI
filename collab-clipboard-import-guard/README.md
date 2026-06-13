@@ -12,7 +12,7 @@ It evaluates synthetic import batches for:
 - hidden instruction-like text that is not visible to collaborators
 - spreadsheet formula cells that could execute after import
 - notebook output snippets and table cells containing local or private filesystem paths, including lowercase-drive and forward-slash Windows user paths
-- source-origin metadata containing local or private filesystem paths
+- source-origin metadata containing local or private filesystem paths, including source-related finding messages for untrusted imports
 - stale or malformed collaborator review metadata bound to old section versions or unverifiable expiry evidence
 - duplicate anchors that would collide inside the import payload or with existing shared-document anchors, with every colliding block regenerated uniquely before insertion even when source block IDs are missing
 

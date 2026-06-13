@@ -42,6 +42,7 @@ Expected evidence:
 - Lowercase Windows user paths are fully redacted from sanitized reviewer output after quarantine.
 - Forward-slash Windows user paths are fully redacted from sanitized reviewer output after quarantine.
 - Source-origin local/private paths are quarantined and redacted before reviewer packets are emitted.
+- Untrusted private source-origin paths are not echoed in finding messages after quarantine.
 - Malformed review metadata expiry evidence is dropped before imported comments can enter shared state.
 - `reports/import-provenance-report.md` summarizes insertion lanes and findings.
 - `reports/summary.svg` provides a visual review packet.
