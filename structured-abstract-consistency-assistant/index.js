@@ -131,13 +131,14 @@ function assessSourceEvidence(manuscript) {
 function unsafeSourceEvidenceFindings(targetPrefix, evidence) {
   const statusField = unsafeSourceEvidenceStatusField(evidence);
   if (!statusField) return [];
+  const statusLabel = unsafeSourceEvidenceStatusLabel(evidence[statusField]);
 
   return [
     finding({
       code: 'SOURCE_EVIDENCE_UNSAFE',
       severity: 'blocker',
       target: `${targetPrefix}.${statusField}`,
-      message: `Structured abstract release requires current source evidence; ${targetPrefix} evidence is marked ${evidence[statusField]}.`
+      message: `Structured abstract release requires current source evidence; ${targetPrefix} evidence is marked ${statusLabel}.`
     })
   ];
 }
@@ -367,8 +368,21 @@ const UNSAFE_SOURCE_EVIDENCE_STATUSES = new Set([
 
 function unsafeSourceEvidenceStatusField(evidence) {
   return ['evidenceStatus', 'sourceStatus', 'citationStatus', 'retractionStatus'].find((field) =>
-    UNSAFE_SOURCE_EVIDENCE_STATUSES.has(normalizeSourceStatus(evidence[field]))
+    Boolean(unsafeSourceEvidenceStatusLabel(evidence[field]))
   );
+}
+
+function unsafeSourceEvidenceStatusLabel(value) {
+  const normalized = normalizeSourceStatus(value);
+  if (!normalized) return null;
+  if (UNSAFE_SOURCE_EVIDENCE_STATUSES.has(normalized)) return normalized;
+
+  for (const status of UNSAFE_SOURCE_EVIDENCE_STATUSES) {
+    if (status === 'concern') continue;
+    if (normalized.includes(status)) return status;
+  }
+
+  return null;
 }
 
 function normalizeSourceStatus(value) {

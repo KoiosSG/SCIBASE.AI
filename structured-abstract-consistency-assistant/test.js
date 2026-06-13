@@ -1198,6 +1198,42 @@ function testAllowsConsistentStructuredAbstractWithStableDigest() {
   assert.match(packet.auditDigest, /^[a-f0-9]{64}$/);
 }
 
+function testUnsafeSourceEvidenceStatusDoesNotEchoPrivatePaths() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-private-status',
+    assessedAt: '2026-05-28T10:20:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer triage.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false,
+      sourceStatus: 'retracted after C:\\Users\\Alice\\private-lab\\note.txt'
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  const finding = packet.findings.find((item) => item.code === 'SOURCE_EVIDENCE_UNSAFE');
+  const packetJson = JSON.stringify(packet);
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.equal(finding.target, 'results.sourceStatus');
+  assert.equal(packetJson.includes('C:\\Users\\Alice'), false);
+  assert.equal(packetJson.includes('private-lab'), false);
+  assert.match(finding.message, /marked retracted/);
+}
+
 const tests = [
   testBlocksReviewerReadyAbstractWhenClaimsDoNotMatchEvidence,
   testPreservesSameCodeFindingsForDifferentEvidenceTargets,
@@ -1234,7 +1270,8 @@ const tests = [
   testRejectsOrdinalMeasurementsAsSampleSizeEvidence,
   testRequiresLimitationLanguageInStructuredAbstractConclusion,
   testStagesAbstractMissingRequiredSections,
-  testAllowsConsistentStructuredAbstractWithStableDigest
+  testAllowsConsistentStructuredAbstractWithStableDigest,
+  testUnsafeSourceEvidenceStatusDoesNotEchoPrivatePaths
 ];
 
 for (const test of tests) {
