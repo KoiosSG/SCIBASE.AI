@@ -28,6 +28,7 @@ Validation coverage:
 - missing receipt and line-item collections are treated as empty billing evidence instead of crashing receipt review
 - unsafe provider metadata keys are removed before delivery
 - unsafe provider metadata key names are redacted when the key itself carries restricted dataset context
+- settlement-reference, processor-settlement, bank-account, IBAN, SWIFT, ACH, SEPA, and similar payment-routing metadata key names are redacted before delivery
 - allowlisted provider metadata keys are still scanned when values are structured or nested
 - customer copies retain useful totals, currency, usage categories, quantities, and units
 - audit digests are deterministic and private-context free

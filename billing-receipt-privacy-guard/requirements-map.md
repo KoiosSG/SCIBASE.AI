@@ -6,6 +6,7 @@
 - Removes project titles, collaborator handles, and private research descriptors from receipt metadata.
 - Scans nested provider metadata values so allowlisted keys cannot hide private workspace context.
 - Redacts unsafe provider metadata key names when the key itself carries restricted dataset or private research context.
+- Redacts settlement-reference, processor-settlement, bank-account, IBAN, SWIFT, ACH, SEPA, and similar payment-routing metadata before receipt delivery.
 - Treats omitted provider metadata as an empty provider packet instead of crashing receipt review.
 - Redacts receipt, invoice, and customer identifiers when they carry private project, dataset, or collaborator context.
 - Redacts unsafe customer-facing currency labels when they carry restricted dataset context.
@@ -33,4 +34,4 @@
 
 - Synthetic data only.
 - No credentials, payment processor calls, customer systems, private workspaces, institutional finance tools, or external APIs.
-- This slice is distinct from pricing, tax, disputes, payment rails, webhook entitlement, invoice acceptance, procurement, subscription renewal, usage reconciliation, storage overage, and analytics licensing gates.
+- This slice is distinct from pricing, tax, disputes, payment rails, FX settlement math, invoice rounding, webhook entitlement, invoice acceptance, procurement, subscription renewal, usage reconciliation, storage overage, and analytics licensing gates.

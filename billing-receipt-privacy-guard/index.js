@@ -18,6 +18,10 @@ const PRIVATE_PATTERNS = [
   {
     id: 'grant-sensitive-context',
     pattern: /(grant confidential|sponsor confidential|unannounced award)/i
+  },
+  {
+    id: 'payment-routing-sensitive',
+    pattern: /(ach|iban|sepa|swift|bank\s*account|merchant\s*account|merchantaccount|processor\s*settlement|processorsettlement|routing\s*number|settlement\s*reference|settlementreference)/i
   }
 ];
 

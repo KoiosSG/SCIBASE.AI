@@ -123,6 +123,47 @@ function testUnsafeProviderMetadataKeyNamesAreRedacted() {
   assert.equal(JSON.stringify(result).includes('GSE-private'), false);
 }
 
+function testSettlementProviderMetadataKeyNamesAreRedacted() {
+  const batch = buildSampleBatch();
+  batch.receipts = [
+    {
+      id: 'receipt-settlement-metadata-key',
+      invoiceId: 'inv-settlement-metadata-key',
+      customerId: 'customer-safe',
+      currency: 'USD',
+      totalCents: 25000,
+      providerMetadata: {
+        accountRef: 'acct-safe',
+        billingPeriod: '2026-06',
+        invoiceRef: 'inv-settlement-metadata-key',
+        plan: 'lab',
+        settlementReference: 'IBAN DE89370400440532013000'
+      },
+      lineItems: [
+        {
+          id: 'line-safe-compute',
+          description: 'AI compute usage',
+          projectRef: 'public-project',
+          usageCategory: 'ai-compute',
+          quantity: 10,
+          unit: 'compute-hour',
+          amountCents: 25000
+        }
+      ]
+    }
+  ];
+
+  const result = evaluateReceiptPrivacy(batch);
+  const receipt = result.receipts[0];
+
+  assert.equal(receipt.decision, 'hold-for-finance-review');
+  assert.equal(receipt.findings.includes('payment-routing-sensitive'), true);
+  assert.equal(receipt.findings.includes('unsafe-provider-metadata'), true);
+  assert.equal(receipt.removedMetadataKeys.includes('metadata-key-redacted-1'), true);
+  assert.equal(JSON.stringify(result).includes('settlementReference'), false);
+  assert.equal(JSON.stringify(result).includes('DE89370400440532013000'), false);
+}
+
 function testCustomerFacingLineItemFieldsAreRedacted() {
   const batch = buildSampleBatch();
   batch.receipts = [
@@ -550,6 +591,7 @@ const tests = [
   testProviderMetadataAllowlistBlocksOverSpecificFields,
   testNestedAllowedMetadataStillScansPrivateContext,
   testUnsafeProviderMetadataKeyNamesAreRedacted,
+  testSettlementProviderMetadataKeyNamesAreRedacted,
   testCustomerFacingLineItemFieldsAreRedacted,
   testCustomerFacingReceiptIdentifiersAreRedacted,
   testRedactedReceiptIdentifiersRemainDistinct,
