@@ -338,7 +338,7 @@ function relativeLuminance(rgb) {
 }
 
 function containsPrivateData(value = '') {
-  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|private lab|restricted project/i.test(value);
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|(?:sso|student|user|account)\s+id|private lab|restricted project/i.test(value);
 }
 
 function accessibilityText(component) {

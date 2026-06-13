@@ -14,7 +14,7 @@ This module evaluates institutional admin dashboard releases before they are sho
 - Malformed dashboard component evidence that would otherwise crash release assessment
 - Malformed top-level dashboard packets that would otherwise crash before reviewer evidence is generated
 - Malformed reduced-motion evidence that would otherwise crash animated chart assessment
-- Private user or project data embedded in screen-reader labels, table summaries, or export summaries
+- Private user, project, or direct identifier data embedded in screen-reader labels, table summaries, or export summaries
 - Missing table and export summaries
 - Heading-order skips
 - Missing reduced-motion fallbacks for animated dashboard content

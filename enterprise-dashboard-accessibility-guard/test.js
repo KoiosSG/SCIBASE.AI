@@ -117,6 +117,38 @@ function testPrivateDataInTableSummaryBlocksRelease() {
   assert.ok(packet.actions.includes('redact_accessibility_text:private-summary-table'));
 }
 
+function testDirectIdentifierInScreenReaderLabelBlocksRelease() {
+  const packet = assessDashboardRelease({
+    dashboardId: 'enterprise-admin-private-label',
+    institutionId: 'institution-redacted',
+    assessedAt: '2026-05-27T13:12:00Z',
+    widgets: [
+      {
+        id: 'private-label-metric',
+        type: 'metric',
+        title: 'Sensitive usage metric',
+        foreground: '#111827',
+        background: '#ffffff',
+        critical: true,
+        keyboardReachable: true,
+        screenReaderLabel: 'Usage for ORCID:0000-0002-1825-0097',
+        headingLevel: 2
+      }
+    ],
+    alerts: [],
+    exports: [],
+    motion: {
+      animatedCharts: [],
+      reducedMotionFallback: true
+    }
+  });
+
+  assert.equal(packet.status, 'hold_accessibility_release');
+  assert.deepEqual(codes(packet), ['PRIVATE_DATA_IN_ACCESSIBILITY_TEXT']);
+  assert.equal(packet.wcagSignals.understandable, false);
+  assert.ok(packet.actions.includes('redact_accessibility_text:private-label-metric'));
+}
+
 function testInvalidContrastEvidenceBlocksRelease() {
   const packet = assessDashboardRelease({
     dashboardId: 'enterprise-admin-invalid-contrast-evidence',
@@ -350,6 +382,7 @@ const tests = [
   testWarningsAllowInternalOnlyPreview,
   testNonCriticalLowContrastRequiresRemediationBeforeRelease,
   testPrivateDataInTableSummaryBlocksRelease,
+  testDirectIdentifierInScreenReaderLabelBlocksRelease,
   testInvalidContrastEvidenceBlocksRelease,
   testMissingCriticalContrastEvidenceBlocksRelease,
   testMissingNoncriticalContrastEvidenceRequiresRemediation,

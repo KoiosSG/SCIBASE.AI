@@ -11,7 +11,7 @@
 - Blocks malformed dashboard component evidence before it can crash release assessment.
 - Blocks malformed top-level dashboard packets before they can crash release assessment.
 - Blocks malformed reduced-motion evidence before it can crash animated chart assessment.
-- Blocks release when private data appears in table or export accessibility summaries.
+- Blocks release when private data or direct identifiers appear in screen-reader labels, table summaries, or export accessibility summaries.
 - Generates reviewer artifacts:
   - `reports/blocked-packet.json`
   - `reports/missing-contrast-packet.json`
