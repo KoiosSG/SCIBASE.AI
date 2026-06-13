@@ -55,6 +55,34 @@ function testAnonymousReviewerIdentityIsRedacted() {
   assert.ok(!JSON.stringify(timelineEvent).includes('orcid:0000-0002-private'));
 }
 
+function testAnonymousLabelWithDirectIdentifierIsNotEchoed() {
+  const project = buildSampleProject();
+  project.reviews = [
+    {
+      id: 'review-blind-direct-label',
+      reviewerId: 'orcid:0000-0002-private-label',
+      anonymousLabel: 'alice.private@example.edu',
+      mode: 'double-blind',
+      artifactId: 'dataset-cohort-table',
+      evidenceDigest: 'sha256:dataset-v1',
+      submittedAt: '2026-05-18T09:00:00Z',
+      reputationDelta: 18
+    }
+  ];
+  project.inlineComments = [];
+
+  const result = evaluateRecertification(project);
+  const task = byId(result.recertificationTasks, 'recertify-review-blind-direct-label');
+  const timelineEvent = result.timelinePacket.events.find(
+    (event) => event.reviewId === 'review-blind-direct-label'
+  );
+
+  assert.equal(task.reviewer, 'anonymous-reviewer');
+  assert.equal(timelineEvent.reviewer, 'anonymous-reviewer');
+  assert.ok(!JSON.stringify(result).includes('alice.private@example.edu'));
+  assert.ok(!JSON.stringify(result).includes('orcid:0000-0002-private-label'));
+}
+
 function testBlindModeRedactionAcceptsCaseAndSeparatorVariants() {
   const project = buildSampleProject();
   project.reviews = [
@@ -978,6 +1006,7 @@ const tests = [
   testStaleReviewsFreezeReputationUntilRecertified,
   testCurrentOrRecertifiedReviewsKeepReputationCredit,
   testAnonymousReviewerIdentityIsRedacted,
+  testAnonymousLabelWithDirectIdentifierIsNotEchoed,
   testBlindModeRedactionAcceptsCaseAndSeparatorVariants,
   testBlindModeRedactionAcceptsSpaceSeparatedModes,
   testInlineCommentsUseArtifactAnchorsForRecertification,

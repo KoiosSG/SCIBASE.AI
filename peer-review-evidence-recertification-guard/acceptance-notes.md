@@ -11,6 +11,7 @@ Validation targets:
 - stale dataset review freezes an 18 point reputation delta
 - recertified code review keeps its 14 point reputation delta
 - double-blind reviewer identity is not leaked in tasks or timeline events
+- anonymous labels that contain direct identifiers are not echoed in tasks or timeline events
 - space-separated blind and fully anonymous mode labels do not leak raw reviewer IDs
 - public or semi-private reviews without reviewer identity are frozen for recertification instead of applying credit to an undefined profile
 - malformed reputation-delta evidence is frozen for recertification instead of applying non-numeric profile credit

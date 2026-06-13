@@ -61,10 +61,20 @@ function isBlindOrAnonymous(mode) {
 
 function reviewerDisplay(item) {
   if (isBlindOrAnonymous(item.mode)) {
-    return hasText(item.anonymousLabel) ? item.anonymousLabel.trim() : 'anonymous-reviewer';
+    return safeAnonymousLabel(item.anonymousLabel);
   }
 
   return hasText(item.reviewerId) ? `reviewer:${item.reviewerId.trim()}` : 'reviewer:unverified';
+}
+
+function safeAnonymousLabel(label) {
+  if (!hasText(label)) return 'anonymous-reviewer';
+  const trimmed = label.trim();
+  return containsDirectIdentifier(trimmed) ? 'anonymous-reviewer' : trimmed;
+}
+
+function containsDirectIdentifier(value = '') {
+  return /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|orcid:\d{4}-\d{4}-\d{4}-\d{3}[\dx]|private/i.test(value);
 }
 
 function evidenceList(value) {

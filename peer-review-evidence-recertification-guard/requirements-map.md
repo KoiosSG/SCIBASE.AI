@@ -34,6 +34,6 @@
 
 ## Privacy And Trust
 
-- Double-blind and fully anonymous reviewer IDs are replaced by anonymous labels even when incoming mode names use spaces or underscores.
+- Double-blind and fully anonymous reviewer IDs are replaced by anonymous labels even when incoming mode names use spaces or underscores, and labels that contain direct identifiers fall back to a generic anonymous reviewer.
 - Synthetic data only; no private profile emails, credentials, or external API calls.
 - The timeline audit digest is deterministic for reviewer verification.
