@@ -379,6 +379,28 @@ function sponsorDecisionIsInvalid(applicant) {
   return !['accept', 'reject'].includes(applicant.sponsorDecision);
 }
 
+const AWARD_PUBLICATION_METADATA_FIELDS = [
+  'awardPublication',
+  'awardAnnouncement',
+  'awardResult',
+  'finalistPublication',
+  'publicAward',
+  'winnerAnnouncement',
+  'winnerPublication'
+];
+
+function hasPrematureAwardPublicationMetadata(round, applicant) {
+  return [round, applicant].some((record) =>
+    AWARD_PUBLICATION_METADATA_FIELDS.some(
+      (field) =>
+        record &&
+        Object.prototype.hasOwnProperty.call(record, field) &&
+        record[field] !== null &&
+        record[field] !== undefined
+    )
+  );
+}
+
 function reviewUsesHiddenCriteria(review, criteriaIds) {
   return Object.keys(reviewScores(review)).some((criterionId) => !criteriaIds.includes(criterionId));
 }
@@ -455,6 +477,10 @@ function reasonsForApplicant(applicant, reviews, round) {
 
   if (generatedAtIsInvalid(round)) {
     reasons.push('generated-at-invalid');
+  }
+
+  if (hasPrematureAwardPublicationMetadata(round, applicant)) {
+    reasons.push('premature-award-publication-metadata');
   }
 
   if (round.anonymousScreeningRequired && reviews.some((review) => !review.anonymousScreeningObserved)) {
@@ -585,6 +611,10 @@ function remediationAction(applicant, reasons) {
 
   if (reasons.includes('generated-at-invalid')) {
     return 'complete-prequalification-evidence';
+  }
+
+  if (reasons.includes('premature-award-publication-metadata')) {
+    return 'separate-award-publication-evidence';
   }
 
   if (reasons.includes('anonymous-screening-leak')) {
@@ -765,6 +795,7 @@ function evaluatePrequalificationRound(round) {
         decision.reasons.includes('malformed-prequalification-round') ||
         decision.reasons.includes('missing-challenge-identity') ||
         decision.reasons.includes('generated-at-invalid') ||
+        decision.reasons.includes('premature-award-publication-metadata') ||
         decision.reasons.includes('duplicate-reviewer-score-evidence') ||
         decision.reasons.includes('missing-reviewer-identity') ||
         decision.reasons.includes('malformed-review-entry') ||

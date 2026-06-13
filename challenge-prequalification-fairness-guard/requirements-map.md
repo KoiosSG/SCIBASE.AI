@@ -15,6 +15,7 @@
 - Holds malformed review entries before sparse reviewer evidence can crash or change solver-team access.
 - Holds missing applicant lists before sparse prequalification packets can crash or change solver-team access.
 - Holds malformed top-level prequalification packets before sparse challenge payloads can crash or change solver-team access.
+- Holds premature award, winner, finalist, or public-result publication metadata before prequalification packets can change solver-team access.
 - Holds incomplete reviewer score packets and invalid finite 0-100 score values for evidence completion instead of letting malformed review records crash or drive decisions.
 - Preserves audit evidence for each applicant before access to private challenge workspaces changes.
 
@@ -38,10 +39,11 @@
 - Holds missing review-list evidence for fairness review before applicant decisions can take effect.
 - Holds malformed review-entry evidence for fairness review before applicant decisions can take effect.
 - Holds missing criteria-list evidence for fairness review before applicant decisions can take effect.
+- Separates prequalification evidence from post-award publication evidence before access decisions can take effect.
 - Produces deterministic digests for challenge administrators and third-party reviewers.
 
 ## Safety And Scope
 
 - Synthetic data only.
 - No credentials, payment processors, identity providers, sponsor systems, private workspaces, or external APIs.
-- This slice is distinct from intake compliance, workspace privacy, clarification freeze, arbitration scoring, payout eligibility, benchmark leakage, sponsor data-room access, and reviewer workload SLA guards.
+- This slice is distinct from intake compliance, workspace privacy, clarification freeze, arbitration scoring, payout eligibility, award publication readiness, benchmark leakage, sponsor data-room access, and reviewer workload SLA guards.

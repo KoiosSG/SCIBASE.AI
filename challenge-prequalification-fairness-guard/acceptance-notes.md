@@ -8,6 +8,7 @@ It is not:
 - a general challenge intake compliance gate
 - a submission workspace privacy or data-room access guard
 - an arbitration scoring or payout eligibility ledger
+- a post-award result publication readiness guard
 - a clarification freeze, benchmark leakage, evaluator calibration, or reviewer workload guard
 
 Validation coverage:
@@ -43,4 +44,5 @@ Validation coverage:
 - invalid or calendar-impossible generated-at timestamps are held before accepted applicants can bypass auditable round timing evidence
 - duplicate reviewer score evidence is held and deduplicated before quorum or weighted threshold scoring
 - missing or blank reviewer identities are held and excluded from reviewer quorum until evidence is completed
+- premature award, winner, finalist, or public-result publication metadata is held until it is separated from prequalification evidence
 - audit digests are deterministic and private-data free

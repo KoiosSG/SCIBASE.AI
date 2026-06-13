@@ -1369,6 +1369,32 @@ function testMissingReviewerIdentityDoesNotSatisfyQuorum() {
   assert.equal(action.action, 'complete-prequalification-evidence');
 }
 
+function testAwardPublicationMetadataHoldsPrequalificationRound() {
+  const round = buildSampleRound();
+  round.awardPublication = {
+    winnerApplicantId: 'applicant-biofoundry',
+    publishAt: '2026-06-20T08:00:00Z',
+    namedWinnerConsent: true
+  };
+  round.applicants = [
+    {
+      id: 'applicant-biofoundry',
+      sponsorDecision: 'accept',
+      rejectionReasons: [],
+      appealDueAt: null
+    }
+  ];
+
+  const result = evaluatePrequalificationRound(round);
+  const decision = byId(result.decisions, 'applicant-biofoundry');
+  const action = byId(result.remediationActions, 'remediate-applicant-biofoundry');
+
+  assert.equal(decision.decision, 'hold-for-fairness-review');
+  assert.equal(decision.reasons.includes('premature-award-publication-metadata'), true);
+  assert.equal(action.action, 'separate-award-publication-evidence');
+  assert.equal(action.priority, 'high');
+}
+
 function testAuditDigestIsDeterministicAndPrivateFree() {
   const first = evaluatePrequalificationRound(buildSampleRound());
   const second = evaluatePrequalificationRound(buildSampleRound());
@@ -1416,6 +1442,7 @@ const tests = [
   testImpossibleGeneratedAtHoldsPrequalificationRound,
   testDuplicateReviewerScoreEvidenceDoesNotSatisfyQuorum,
   testMissingReviewerIdentityDoesNotSatisfyQuorum,
+  testAwardPublicationMetadataHoldsPrequalificationRound,
   testAuditDigestIsDeterministicAndPrivateFree
 ];
 
