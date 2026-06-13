@@ -16,6 +16,7 @@ Expected evidence:
 - `reports/blocked-packet.json` holds AI peer-review release when abstract claims conflict with methods and results.
 - Same-code findings are preserved when methods and results disagree on different evidence targets.
 - Missing source methods/results evidence packets hold release instead of treating a complete abstract as verified.
+- Source methods/results evidence marked retracted, withdrawn, superseded, stale, expression-of-concern, or unsafe holds release until unsafe evidence is replaced.
 - Missing source methods/results primary-endpoint evidence holds release instead of letting generic primary-endpoint wording become reviewer-facing evidence.
 - Source methods/results primary-endpoint disagreements hold release instead of letting the abstract follow only one source evidence packet.
 - Malformed top-level manuscript packets hold release with stable `unknown-manuscript` evidence instead of crashing before AI peer-review gating.

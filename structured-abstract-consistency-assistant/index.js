@@ -86,6 +86,10 @@ function assessSourceEvidence(manuscript) {
     }));
   }
 
+  if (hasMethodsEvidence) {
+    findings.push(...unsafeSourceEvidenceFindings('methods', manuscript.methods));
+  }
+
   if (!hasResultsEvidence) {
     findings.push(finding({
       code: 'MISSING_RESULTS_EVIDENCE',
@@ -100,6 +104,10 @@ function assessSourceEvidence(manuscript) {
       target: 'results.primaryEndpoint',
       message: 'Results evidence must name the primary endpoint before structured abstract release.'
     }));
+  }
+
+  if (hasResultsEvidence) {
+    findings.push(...unsafeSourceEvidenceFindings('results', manuscript.results));
   }
 
   if (
@@ -118,6 +126,20 @@ function assessSourceEvidence(manuscript) {
   }
 
   return findings;
+}
+
+function unsafeSourceEvidenceFindings(targetPrefix, evidence) {
+  const statusField = unsafeSourceEvidenceStatusField(evidence);
+  if (!statusField) return [];
+
+  return [
+    finding({
+      code: 'SOURCE_EVIDENCE_UNSAFE',
+      severity: 'blocker',
+      target: `${targetPrefix}.${statusField}`,
+      message: `Structured abstract release requires current source evidence; ${targetPrefix} evidence is marked ${evidence[statusField]}.`
+    })
+  ];
 }
 
 function assessRequiredSections(manuscript) {
@@ -281,6 +303,7 @@ function buildActions(manuscript, findings) {
   if (codes.has('MISSING_METHODS_EVIDENCE') || codes.has('MISSING_RESULTS_EVIDENCE')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_METHODS_ENDPOINT')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_RESULTS_ENDPOINT')) actions.add(`attach_source_evidence:${manuscript.manuscriptId}`);
+  if (codes.has('SOURCE_EVIDENCE_UNSAFE')) actions.add(`replace_unsafe_source_evidence:${manuscript.manuscriptId}`);
   if (codes.has('SOURCE_ENDPOINT_MISMATCH')) actions.add(`reconcile_source_endpoints:${manuscript.manuscriptId}`);
   if (codes.has('MISSING_ABSTRACT_SECTION')) actions.add(`add_missing_sections:${manuscript.manuscriptId}`);
   if (codes.has('METHODS_DESIGN_MISMATCH') || codes.has('SAMPLE_SIZE_MISMATCH')) actions.add(`revise_methods_summary:${manuscript.manuscriptId}`);
@@ -298,8 +321,8 @@ function buildSignals(findings) {
   );
   return {
     sectionsComplete: !codes.has('MISSING_ABSTRACT_SECTION'),
-    methodsAligned: !codes.has('MISSING_METHODS_EVIDENCE') && !codes.has('MISSING_METHODS_ENDPOINT') && !codes.has('SOURCE_ENDPOINT_MISMATCH') && !codes.has('METHODS_DESIGN_MISMATCH') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'methods.'),
-    resultsAligned: !codes.has('MISSING_RESULTS_EVIDENCE') && !codes.has('MISSING_RESULTS_ENDPOINT') && !codes.has('SOURCE_ENDPOINT_MISMATCH') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'results.') && !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
+    methodsAligned: !codes.has('MISSING_METHODS_EVIDENCE') && !codes.has('MISSING_METHODS_ENDPOINT') && !codes.has('SOURCE_ENDPOINT_MISMATCH') && !hasFinding('SOURCE_EVIDENCE_UNSAFE', 'methods.') && !codes.has('METHODS_DESIGN_MISMATCH') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'methods.'),
+    resultsAligned: !codes.has('MISSING_RESULTS_EVIDENCE') && !codes.has('MISSING_RESULTS_ENDPOINT') && !codes.has('SOURCE_ENDPOINT_MISMATCH') && !hasFinding('SOURCE_EVIDENCE_UNSAFE', 'results.') && !hasFinding('SAMPLE_SIZE_MISMATCH', 'results.') && !codes.has('ENDPOINT_MISMATCH') && !codes.has('RESULT_DIRECTION_MISMATCH') && !codes.has('RESULT_OVERSTATES_EVIDENCE') && !codes.has('CONCLUSION_RESULT_DIRECTION_MISMATCH'),
     limitationsBalanced: !codes.has('MISSING_LIMITATION_LANGUAGE') && !codes.has('CONCLUSION_OVERSTATES_EVIDENCE')
   };
 }
@@ -330,6 +353,26 @@ function normalize(value = '') {
 
 function isEvidenceObject(value) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+const UNSAFE_SOURCE_EVIDENCE_STATUSES = new Set([
+  'concern',
+  'expression of concern',
+  'retracted',
+  'stale',
+  'superseded',
+  'unsafe',
+  'withdrawn'
+]);
+
+function unsafeSourceEvidenceStatusField(evidence) {
+  return ['evidenceStatus', 'sourceStatus', 'citationStatus', 'retractionStatus'].find((field) =>
+    UNSAFE_SOURCE_EVIDENCE_STATUSES.has(normalizeSourceStatus(evidence[field]))
+  );
+}
+
+function normalizeSourceStatus(value) {
+  return normalize(value).replace(/[-_]+/g, ' ');
 }
 
 function phraseIsNegated(text, phrase) {

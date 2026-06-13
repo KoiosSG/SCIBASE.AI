@@ -6,6 +6,7 @@ It evaluates synthetic manuscript packets for:
 
 - missing structured abstract sections
 - missing source methods/results evidence packets, so a polished abstract cannot be released without authoritative comparison data
+- unsafe source methods/results evidence status, such as retracted, withdrawn, superseded, stale, expression-of-concern, or unsafe source packets
 - missing primary-endpoint identifiers in source methods or results evidence, so generic primary-endpoint claims cannot release without named evidence anchors
 - disagreement between source methods and results primary endpoints, so an abstract cannot release by following only one source packet
 - malformed top-level manuscript packets, so broken input is held with stable `unknown-manuscript` reviewer evidence instead of crashing before AI peer-review gating
@@ -41,6 +42,8 @@ The demo writes JSON, Markdown, SVG, and MP4 evidence to `reports/`.
 
 ## Scope
 
-This is intentionally separate from previous issue #16 work on broad assistant suites, evidence/protocol trace, statistics review, research-gap planning, rebuttal packs, ethics/data, citation context, reporting guidelines, benchmark leakage, figure/table consistency, analysis-variable provenance, domain templates, grant fit, limitations disclosure, uncertainty calibration, supplement readiness, prompt safety, study power, COI/funding, retraction, preregistration, external validity, image integrity, assay-control/calibration, literature freshness, randomization/blinding, and Bayesian prior sensitivity.
+This is intentionally separate from previous issue #16 work on broad assistant suites, evidence/protocol trace, statistics review, research-gap planning, rebuttal packs, ethics/data, citation context, reporting guidelines, benchmark leakage, figure/table consistency, analysis-variable provenance, domain templates, grant fit, limitations disclosure, uncertainty calibration, supplement readiness, prompt safety, study power, COI/funding, citation-retraction/recency review, preregistration, external validity, image integrity, assay-control/calibration, literature freshness, randomization/blinding, and Bayesian prior sensitivity.
+
+The assistant can refuse to release a structured abstract when its attached methods/results evidence is already marked unsafe, but it does not call publisher databases, adjudicate retractions, rank citation recency, or replace a dedicated citation-safety guard.
 
 No external services, credentials, live databases, private manuscripts, or payment data are used.

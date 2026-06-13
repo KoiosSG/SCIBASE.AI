@@ -218,6 +218,38 @@ function testBlocksReleaseWhenSourceEvidenceEndpointsDisagree() {
   assert.equal(packet.abstractSignals.resultsAligned, false);
 }
 
+function testBlocksReleaseWhenResultsSourceEvidenceIsRetracted() {
+  const packet = assessStructuredAbstract({
+    manuscriptId: 'ms-abstract-retracted-results-evidence',
+    assessedAt: '2026-06-13T18:55:00Z',
+    abstract: {
+      background: 'Automated checks may reduce reviewer load.',
+      methods: 'We evaluated 96 manuscripts in a retrospective cohort.',
+      results: 'The primary endpoint, comment triage time, improved in 96 manuscripts.',
+      conclusions: 'The assistant may reduce comment triage time in similar retrospective settings.'
+    },
+    methods: {
+      design: 'retrospective cohort',
+      sampleSize: 96,
+      primaryEndpoint: 'comment triage time',
+      confidenceIntervalCrossesNull: false
+    },
+    results: {
+      primaryEndpoint: 'comment triage time',
+      direction: 'improved',
+      sampleSize: 96,
+      exploratory: false,
+      evidenceStatus: 'retracted'
+    },
+    limitations: ['single-institution retrospective data']
+  });
+
+  assert.equal(packet.status, 'hold_peer_review_packet');
+  assert.deepEqual(findingTargets(packet, 'SOURCE_EVIDENCE_UNSAFE'), ['results.evidenceStatus']);
+  assert.ok(packet.actions.includes('replace_unsafe_source_evidence:ms-abstract-retracted-results-evidence'));
+  assert.equal(packet.abstractSignals.resultsAligned, false);
+}
+
 function testBlocksNegatedPrimaryEndpointStatement() {
   const packet = assessStructuredAbstract({
     manuscriptId: 'ms-abstract-negated-primary-endpoint',
@@ -1173,6 +1205,7 @@ const tests = [
   testBlocksReleaseWhenResultsEvidenceOmitsPrimaryEndpoint,
   testBlocksReleaseWhenMethodsEvidenceOmitsPrimaryEndpoint,
   testBlocksReleaseWhenSourceEvidenceEndpointsDisagree,
+  testBlocksReleaseWhenResultsSourceEvidenceIsRetracted,
   testBlocksNegatedPrimaryEndpointStatement,
   testBlocksNegatedMethodsDesignStatement,
   testHoldsAbstractWhenSourceEvidencePacketsAreMissing,
